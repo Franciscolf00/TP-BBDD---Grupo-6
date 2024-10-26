@@ -9,25 +9,6 @@ GO
 
 --------------------------------------------
 --Obtener Ventas registradas
-DROP TABLE IF EXISTS ddbba.Ventas
-GO
-
-CREATE TABLE ddbba.Ventas(
-	IDFactura CHAR(12),
-	tipoFactura CHAR(1),
-	Ciudad VARCHAR(15),
-	tipoCliente CHAR(6),
-	genero CHAR(6),
-	producto VARCHAR(100),
-	precioUnitario DECIMAL(10,2),
-	cantidad INT,
-	fecha DATE,
-	hora TIME,
-	medioDePago CHAR(11),
-	empleado INT,
-	identificadorDePago VARCHAR(30)
-)
-GO
 
 EXEC ddbba.importarVentasRegistradas 'C:\Users\Francisco\OneDrive - Enta Consulting\Escritorio\BBDD Aplicada\TP BBDD Aplicada\TP_integrador_Archivos\Ventas_registradas.csv'
 
@@ -53,7 +34,6 @@ BEGIN
 	EXEC sp_executesql @sql;
 END
 GO
-
 -----------------------------------------
 
 SELECT * FROM ddbba.ProductoImportado
@@ -70,21 +50,9 @@ EXEC sp_MSSet_oledb_prop N'Microsoft.ACE.OLEDB.12.0', N'AllowInProcess', 1;
 EXEC sp_MSSet_oledb_prop N'Microsoft.ACE.OLEDB.12.0', N'DynamicParameters', 1;
 GO
 
-
 -------------------------------------
 --Obtener archivo de productos importados
 
-DROP TABLE IF EXISTS ddbba.ProductoImportado
-GO
-
-CREATE TABLE ddbba.ProductoImportado (
-    id int PRIMARY KEY, 
-	name varchar(50),
-	proveedor varchar(50),
-	cat varchar(50),
-	cant varchar(50),
-	precio decimal(6,2)
-);
 
 INSERT INTO ddbba.ProductoImportado
 SELECT *
@@ -102,13 +70,7 @@ SELECT * FROM ddbba.ProductoImportado
 
 ----------------------------------------
 -- Obtener archivo de accesorios electrónicos
-DROP TABLE IF EXISTS ddbba.accesoriosElectronicos;
 
-CREATE TABLE ddbba.accesoriosElectronicos(
-	producto varchar(50),
-	precioUnitarioUSD decimal(6,2)
-);
-GO
 
 INSERT INTO ddbba.accesoriosElectronicos
 SELECT *
