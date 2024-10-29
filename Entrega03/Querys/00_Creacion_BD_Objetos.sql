@@ -19,10 +19,9 @@ BEGIN
 	RETURN 'C:\TP_integrador_Archivos'; --Aca copiarías tu ruta base hasta los archivos.
 END
 go
-
 CREATE TABLE dbSucursal.Sucursal(
 	IDSucursal INT IDENTITY(1,1) PRIMARY KEY,
-	direccion VARCHAR(70),
+	direccion VARCHAR(200),
 	numTelefono CHAR(9) CHECK(numTelefono like '[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]'),
 	ciudad VARCHAR(9),
 	sucursal VARCHAR(20)
@@ -35,7 +34,7 @@ CREATE TABLE dbSucursal.Empleado(
 	apellido VARCHAR(20),
 	emailEmpresa VARCHAR(50) CHECK(emailEmpresa like '%@superA.com'),
 	emailPersonal VARCHAR(50) CHECK(emailPersonal like '%@%.com'),
-	direccion VARCHAR(70),
+	direccion VARCHAR(100),
 	cargo CHAR(22) CHECK(cargo in ('Cajero', 'Supervisor', 'Gerente de sucursal')),
 	turno CHAR(16) CHECK(turno in('TM', 'TT' , 'Jornada Completa')),
 	FKSucursal INT NOT NULL REFERENCES dbSucursal.Sucursal(IDSucursal)
