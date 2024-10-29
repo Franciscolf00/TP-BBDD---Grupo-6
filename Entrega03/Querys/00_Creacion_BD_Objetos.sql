@@ -81,37 +81,5 @@ CREATE TABLE dbVenta.Venta(
 											OR identificadorDePago IS NULL),
 	FKempleado INT NOT NULL REFERENCES dbSucursal.Empleado(Legajo),
 	FKMetodoDEPago INT NOT NULL REFERENCES dbVenta.MetodoDePago(IDMetodoDePago),
-	FKproducto INT NOT NULL REFERENCES dbProducto.Producto(IDProducto),
+	FKproducto INT NOT NULL REFERENCES dbProducto.Producto(IDProducto)
 )
-
-
-
-------------------------------------------------------
-
---CREATE TABLE ddbba.ProductoImportado (
---    id INT IDENTITY(1,1) PRIMARY KEY, 
---	nombre VARCHAR(50),
---	proveedor NVARCHAR(50),
---	categoria VARCHAR(50),
---	cantidadPorUnidad VARCHAR(50),
---	precioPorUnidad DECIMAL(6,2)
---);
---GO
-
---CREATE TABLE ddbba.accesoriosElectronicos(
---	ID INT IDENTITY(1,1) PRIMARY KEY, 
---	producto VARCHAR(50),
---	precioUnitarioUSD DECIMAL(6,2)
---);
---GO
-
---CREATE TABLE ddbba.ProductoDeCatalogo (
---    idProducto INT IDENTITY(1,1) PRIMARY KEY,
---    categoria VARCHAR(100),
---	nombre VARCHAR(100),
---    precio DECIMAL(10,2),
---    precioReferencia DECIMAL(10,2),
---    unidadReferencia VARCHAR(10),
---    fecha SMALLDATETIME
---);
---GO
