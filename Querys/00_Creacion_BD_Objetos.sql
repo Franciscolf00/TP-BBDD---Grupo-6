@@ -1,68 +1,73 @@
 CREATE DATABASE Com2900G06 COLLATE Modern_Spanish_CI_AS
 GO
 
+--use master;drop database Com2900G06;
+
 USE Com2900G06
 GO
-
-CREATE SCHEMA Producto
+CREATE SCHEMA dbProducto
+GO
+CREATE SCHEMA dbVenta
+GO
+CREATE SCHEMA dbSucursal
 GO
 
-CREATE SCHEMA Venta
-GO
+create or alter function dbVenta.RutaImportacion()
+returns VARCHAR(4000)
+AS
+BEGIN
+	RETURN 'C:\TP_integrador_Archivos'; --Aca copiarías tu ruta base hasta los archivos.
+END
+go
 
-CREATE SCHEMA Sucursal
-GO
-
-
-
-CREATE TABLE Sucursal.Sucursal(
+CREATE TABLE dbSucursal.Sucursal(
 	IDSucursal INT IDENTITY(1,1) PRIMARY KEY,
 	direccion VARCHAR(70),
 	numTelefono CHAR(9) CHECK(numTelefono like '[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]'),
-	ciudad varchar(9),
-	sucursal varchar(20)
+	ciudad VARCHAR(9),
+	sucursal VARCHAR(20)
 )
-
-CREATE TABLE Sucursal.Empleado(
+go
+CREATE TABLE dbSucursal.Empleado(
 	Legajo INT PRIMARY KEY,
 	dni INT UNIQUE,
 	nombre VARCHAR(40),
 	apellido VARCHAR(20),
 	emailEmpresa VARCHAR(50) CHECK(emailEmpresa like '%@superA.com'),
-	emailPersonal VARCHAR(50) CHECK(emailEmpresa like '%@%.com'),
+	emailPersonal VARCHAR(50) CHECK(emailPersonal like '%@%.com'),
 	direccion VARCHAR(70),
 	cargo CHAR(22) CHECK(cargo in ('Cajero', 'Supervisor', 'Gerente de sucursal')),
 	turno CHAR(16) CHECK(turno in('TM', 'TT' , 'Jornada Completa')),
-	FKSucursal INT NOT NULL REFERENCES Sucursal(IDSucursal)
+	FKSucursal INT NOT NULL REFERENCES dbSucursal.Sucursal(IDSucursal)
 )
-
-CREATE TABLE Producto.LineaDeProducto(
+go
+CREATE TABLE dbProducto.LineaDeProducto(
 	IDLineaDeProducto INT IDENTITY(1,1) PRIMARY KEY,
 	nombre VARCHAR(30),
 )
-
-CREATE TABLE Producto.Categoria(
+go
+CREATE TABLE dbProducto.Categoria(
 	IDCategoria INT IDENTITY(1,1) PRIMARY KEY,
 	nombre VARCHAR(30),
-	FKLineaDeProducto INT NOT NULL REFERENCES LineaDeProducto(IDLineaDeProducto)
+	FKLineaDeProducto INT NOT NULL REFERENCES dbProducto.LineaDeProducto(IDLineaDeProducto)
 )
-
-CREATE TABLE Producto.Producto(
+go
+CREATE TABLE dbProducto.Producto(
 	IDProducto INT IDENTITY(1,1) PRIMARY KEY,
 	nombre VARCHAR(50),
 	precioUnitario DECIMAL(10,2),
 	precioReferencia DECIMAL(10,2),
 	unidadReferencia VARCHAR(10),
 	fechaCreacion SMALLDATETIME,
-	FKCategoria INT NOT NULL REFERENCES Categoria(IDCategoria)
+	FKCategoria INT NOT NULL REFERENCES dbProducto.Categoria(IDCategoria)
 )
-
-CREATE TABLE Venta.MetodoDePago(
+go
+CREATE TABLE dbVenta.MetodoDePago(
 	IDMetodoDePago INT IDENTITY (1,1) PRIMARY KEY,
 	nombre VARCHAR(11)
 )
-
-CREATE TABLE Venta.Venta(
+go
+CREATE TABLE dbVenta.Venta(
 	IDVenta INT IDENTITY(1,1) PRIMARY KEY,
 	Factura CHAR(12) UNIQUE CHECK(Factura like '[0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9][0-9][0-9]'),
 	tipoFactura CHAR(1) CHECK(tipoFactura in ('A', 'B', 'C')),
@@ -74,9 +79,9 @@ CREATE TABLE Venta.Venta(
 	identificadorDePago VARCHAR(30) CHECK((LEN(identificadorDePago) = 22 AND identificadorDePago NOT LIKE '%[^0-9]%')
 											OR (LEN(identificadorDePago) = 19 AND identificadorDePago LIKE '[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]')								
 											OR identificadorDePago IS NULL),
-	FKempleado INT NOT NULL REFERENCES Empleado(Legajo),
-	FKMetodoDEPago INT NOT NULL REFERENCES MetodoDePago(IDMetodoDePago),
-	FKproducto INT NOT NULL REFERENCES Producto(IDProducto),
+	FKempleado INT NOT NULL REFERENCES dbSucursal.Empleado(Legajo),
+	FKMetodoDEPago INT NOT NULL REFERENCES dbVenta.MetodoDePago(IDMetodoDePago),
+	FKproducto INT NOT NULL REFERENCES dbProducto.Producto(IDProducto),
 )
 
 
