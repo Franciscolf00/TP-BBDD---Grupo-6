@@ -1,6 +1,7 @@
 CREATE DATABASE Com2900G06 COLLATE Modern_Spanish_CI_AS
 GO
-
+SET DATEFORMAT mdy; --seteo el formato de fecha en el formato que tienen los archivos
+GO
 --use master;drop database Com2900G06;
 
 USE Com2900G06
@@ -16,13 +17,13 @@ create or alter function dbVenta.RutaImportacion()
 returns VARCHAR(4000)
 AS
 BEGIN
-	RETURN 'C:\TP_integrador_Archivos'; --Aca copiarías tu ruta base hasta los archivos.
+	RETURN 'D:\Thiago\UNLAM\2_PLAN_NUEVO\BASES DE DATOS APLICADAS\Github\TP-BBDD---Grupo-6\TP_integrador_Archivos'; --Aca copiarías tu ruta base hasta los archivos.
 END
 go
 CREATE TABLE dbSucursal.Sucursal(
 	IDSucursal INT IDENTITY(1,1) PRIMARY KEY,
 	direccion VARCHAR(200),
-	numTelefono CHAR(9) CHECK(numTelefono like '[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]'),
+	numTelefono CHAR(9),
 	ciudad VARCHAR(9),
 	sucursal VARCHAR(20)
 )
