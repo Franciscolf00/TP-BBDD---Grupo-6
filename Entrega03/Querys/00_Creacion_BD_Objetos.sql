@@ -22,9 +22,10 @@ go
 CREATE TABLE dbSucursal.Sucursal(
 	IDSucursal INT IDENTITY(1,1) PRIMARY KEY,
 	direccion VARCHAR(200),
-	numTelefono CHAR(9) CHECK(numTelefono like '[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]'),
+	numTelefono CHAR(9),
 	ciudad VARCHAR(9),
-	sucursal VARCHAR(20)
+	sucursal VARCHAR(20),
+	estado BIT
 )
 go
 CREATE TABLE dbSucursal.Empleado(
@@ -37,18 +38,21 @@ CREATE TABLE dbSucursal.Empleado(
 	direccion VARCHAR(100),
 	cargo CHAR(22) CHECK(cargo in ('Cajero', 'Supervisor', 'Gerente de sucursal')),
 	turno CHAR(16) CHECK(turno in('TM', 'TT' , 'Jornada Completa')),
-	FKSucursal INT NOT NULL REFERENCES dbSucursal.Sucursal(IDSucursal)
+	FKSucursal INT NOT NULL REFERENCES dbSucursal.Sucursal(IDSucursal),
+	estado BIT
 )
 go
 CREATE TABLE dbProducto.LineaDeProducto(
 	IDLineaDeProducto INT IDENTITY(1,1) PRIMARY KEY,
 	nombre VARCHAR(30),
+	estado BIT
 )
 go
 CREATE TABLE dbProducto.Categoria(
 	IDCategoria INT IDENTITY(1,1) PRIMARY KEY,
 	nombre VARCHAR(30),
-	FKLineaDeProducto INT NOT NULL REFERENCES dbProducto.LineaDeProducto(IDLineaDeProducto)
+	FKLineaDeProducto INT NOT NULL REFERENCES dbProducto.LineaDeProducto(IDLineaDeProducto),
+	estado BIT
 )
 go
 CREATE TABLE dbProducto.Producto(
@@ -58,12 +62,14 @@ CREATE TABLE dbProducto.Producto(
 	precioReferencia DECIMAL(10,2),
 	unidadReferencia VARCHAR(10),
 	fechaCreacion SMALLDATETIME,
-	FKCategoria INT NOT NULL REFERENCES dbProducto.Categoria(IDCategoria)
+	FKCategoria INT NOT NULL REFERENCES dbProducto.Categoria(IDCategoria),
+	estado BIT
 )
 go
 CREATE TABLE dbVenta.MetodoDePago(
 	IDMetodoDePago INT IDENTITY (1,1) PRIMARY KEY,
-	nombre VARCHAR(11)
+	nombre VARCHAR(11),
+	estado BIT
 )
 go
 CREATE TABLE dbVenta.Venta(
@@ -80,5 +86,6 @@ CREATE TABLE dbVenta.Venta(
 											OR identificadorDePago IS NULL),
 	FKempleado INT NOT NULL REFERENCES dbSucursal.Empleado(Legajo),
 	FKMetodoDEPago INT NOT NULL REFERENCES dbVenta.MetodoDePago(IDMetodoDePago),
-	FKproducto INT NOT NULL REFERENCES dbProducto.Producto(IDProducto)
+	FKproducto INT NOT NULL REFERENCES dbProducto.Producto(IDProducto),
+	FKSucursal INT NOT NULL REFERENCES dbSucursal.Sucursal(IDSucursal)
 )
