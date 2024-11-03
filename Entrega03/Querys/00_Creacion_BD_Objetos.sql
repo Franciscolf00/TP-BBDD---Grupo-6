@@ -80,18 +80,18 @@ CREATE TABLE dbVenta.MetodoDePago(
 go
 CREATE TABLE dbVenta.Venta(
 	IDVenta INT IDENTITY(1,1) PRIMARY KEY,
-	Factura INT	UNIQUE,				--Lo tengo que guardar como int para verificar duplicados a la hora de insertar
+	Factura INT,				--Lo tengo que guardar como int para verificar duplicados a la hora de insertar
 	tipoFactura CHAR(1) CHECK(tipoFactura in ('A', 'B', 'C')),
 	tipoCliente CHAR(6) CHECK(tipoCliente in ('Member', 'Normal')),
 	genero CHAR(6) CHECK(genero in ('Male', 'Female')),
 	cantidad INT,
 	fecha DATE,
 	hora TIME,
-	identificadorDePago VARCHAR(30) CHECK((LEN(identificadorDePago) = 22 AND identificadorDePago NOT LIKE '%[^0-9]%')
+	identificadorDePago VARCHAR(30) CHECK((LEN(identificadorDePago) = 22 AND identificadorDePago LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
 											OR (LEN(identificadorDePago) = 19 AND identificadorDePago LIKE '[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]')								
 											OR identificadorDePago IS NULL),
 	FKempleado INT NOT NULL REFERENCES dbSucursal.Empleado(Legajo),
-	FKMetodoDEPago INT NOT NULL REFERENCES dbVenta.MetodoDePago(IDMetodoDePago),
+	FKMetodoDePago INT NOT NULL REFERENCES dbVenta.MetodoDePago(IDMetodoDePago),
 	FKproducto INT NOT NULL REFERENCES dbProducto.Producto(IDProducto),
 	FKSucursal INT NOT NULL REFERENCES dbSucursal.Sucursal(IDSucursal)
 )

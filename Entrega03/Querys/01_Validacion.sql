@@ -233,7 +233,7 @@ CREATE OR ALTER PROCEDURE dbVenta.InsertarVenta
 	@cantidad INT,
 	@identificadorDePago VARCHAR(30),
 	@FKempleado INT,
-	@FKMetodoDEPago INT,	--|| nombre metodo?
+	@FKMetodoDePago INT,	--|| nombre metodo?
 	@FKproducto INT,
 	@FKSucursal INT		--|| nombre sucursal?
 AS
@@ -295,13 +295,13 @@ BEGIN
     IF NOT EXISTS (SELECT IDProducto FROM dbProducto.Producto WHERE IDProducto = @FKproducto)
         SET @error = @error + 'El ID de producto ingresado no esta registrado. ';
 
-	--FALTA VALIDAR @FKMetodoDEPago y @FKSucursal
+	--FALTA VALIDAR @FKMetodoDePago y @FKSucursal
 	
 	IF (@error = '')
     BEGIN
         INSERT INTO dbVenta.Venta(Factura, tipoCliente, tipoCliente, genero, cantidad, identificadorDePago, FKempleado, FKMetodoDEPago, FKproducto, FKSucursal)
 		VALUES (@Factura, @tipoFactura, @tipoFactura, @genero, @cantidad, CAST(GETDATE() as DATE), CAST(GETDATE() as TIME), @identificadorDePago, 
-		@FKempleado, @FKMetodoDEPago, @FKproducto, @FKSucursal);
+		@FKempleado, @FKMetodoDePago, @FKproducto, @FKSucursal);
     END
     ELSE
     BEGIN
