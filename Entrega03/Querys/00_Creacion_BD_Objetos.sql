@@ -11,6 +11,8 @@ CREATE SCHEMA dbVenta
 GO
 CREATE SCHEMA dbSucursal
 GO
+CREATE SCHEMA dbReporte
+GO
 
 create or alter function dbVenta.RutaImportacion()
 returns VARCHAR(4000)
@@ -78,7 +80,9 @@ CREATE TABLE dbVenta.Venta(
 	identificadorDePago VARCHAR(30) CHECK((LEN(identificadorDePago) = 22 AND identificadorDePago NOT LIKE '%[^0-9]%')
 											OR (LEN(identificadorDePago) = 19 AND identificadorDePago LIKE '[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]')								
 											OR identificadorDePago IS NULL),
-	FKempleado INT NOT NULL REFERENCES dbSucursal.Empleado(Legajo),
-	FKMetodoDEPago INT NOT NULL REFERENCES dbVenta.MetodoDePago(IDMetodoDePago),
-	FKproducto INT NOT NULL REFERENCES dbProducto.Producto(IDProducto)
+	FKEmpleado INT NOT NULL REFERENCES dbSucursal.Empleado(Legajo),
+	FKMetodoDePago INT NOT NULL REFERENCES dbVenta.MetodoDePago(IDMetodoDePago),
+	FKProducto INT NOT NULL REFERENCES dbProducto.Producto(IDProducto),
+	FKSucursal INT NOT NULL REFERENCES dbSucursal.Sucursal(IDSucursal)
 )
+
