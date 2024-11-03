@@ -21,11 +21,12 @@ END
 go
 CREATE TABLE dbSucursal.Sucursal(
 	IDSucursal INT IDENTITY(1,1) PRIMARY KEY,
-	direccion VARCHAR(200),
+	direccion VARCHAR(100),
 	numTelefono CHAR(9),
 	ciudad VARCHAR(9),
 	sucursal VARCHAR(20),
-	estado BIT
+	estado BIT,
+	fechaBaja DATETIME
 )
 go
 CREATE TABLE dbSucursal.Empleado(
@@ -33,48 +34,53 @@ CREATE TABLE dbSucursal.Empleado(
 	dni INT UNIQUE,
 	nombre VARCHAR(40),
 	apellido VARCHAR(20),
-	emailEmpresa VARCHAR(50) CHECK(emailEmpresa like '%@superA.com'),
-	emailPersonal VARCHAR(50) CHECK(emailPersonal like '%@%.com'),
+	emailEmpresa VARCHAR(100) CHECK(emailEmpresa like '%@superA.com'),
+	emailPersonal VARCHAR(100) CHECK(emailPersonal like '%@%.com'),
 	direccion VARCHAR(100),
 	cargo CHAR(22) CHECK(cargo in ('Cajero', 'Supervisor', 'Gerente de sucursal')),
 	turno CHAR(16) CHECK(turno in('TM', 'TT' , 'Jornada Completa')),
 	FKSucursal INT NOT NULL REFERENCES dbSucursal.Sucursal(IDSucursal),
-	estado BIT
+	estado BIT,
+	fechaBaja DATETIME
 )
 go
 CREATE TABLE dbProducto.LineaDeProducto(
 	IDLineaDeProducto INT IDENTITY(1,1) PRIMARY KEY,
 	nombre VARCHAR(30),
-	estado BIT
+	estado BIT,
+	fechaBaja DATETIME
 )
 go
 CREATE TABLE dbProducto.Categoria(
 	IDCategoria INT IDENTITY(1,1) PRIMARY KEY,
-	nombre VARCHAR(30),
+	nombre VARCHAR(50),
 	FKLineaDeProducto INT NOT NULL REFERENCES dbProducto.LineaDeProducto(IDLineaDeProducto),
-	estado BIT
+	estado BIT,
+	fechaBaja DATETIME
 )
 go
 CREATE TABLE dbProducto.Producto(
 	IDProducto INT IDENTITY(1,1) PRIMARY KEY,
-	nombre VARCHAR(50),
+	nombre VARCHAR(100),
 	precioUnitario DECIMAL(10,2),
 	precioReferencia DECIMAL(10,2),
-	unidadReferencia VARCHAR(10),
+	unidadReferencia VARCHAR(20),
 	fechaCreacion SMALLDATETIME,
 	FKCategoria INT NOT NULL REFERENCES dbProducto.Categoria(IDCategoria),
-	estado BIT
+	estado BIT,
+	fechaBaja DATETIME
 )
 go
 CREATE TABLE dbVenta.MetodoDePago(
 	IDMetodoDePago INT IDENTITY (1,1) PRIMARY KEY,
 	nombre VARCHAR(11),
-	estado BIT
+	estado BIT,
+	fechaBaja DATETIME
 )
 go
 CREATE TABLE dbVenta.Venta(
 	IDVenta INT IDENTITY(1,1) PRIMARY KEY,
-	Factura CHAR(12) UNIQUE CHECK(Factura like '[0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9][0-9][0-9]'),
+	Factura INT	UNIQUE,				--Lo tengo que guardar como int para verificar duplicados a la hora de insertar
 	tipoFactura CHAR(1) CHECK(tipoFactura in ('A', 'B', 'C')),
 	tipoCliente CHAR(6) CHECK(tipoCliente in ('Member', 'Normal')),
 	genero CHAR(6) CHECK(genero in ('Male', 'Female')),
@@ -89,3 +95,4 @@ CREATE TABLE dbVenta.Venta(
 	FKproducto INT NOT NULL REFERENCES dbProducto.Producto(IDProducto),
 	FKSucursal INT NOT NULL REFERENCES dbSucursal.Sucursal(IDSucursal)
 )
+

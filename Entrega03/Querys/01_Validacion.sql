@@ -1,5 +1,8 @@
 USE Com2900G06
 --use master;
+------------------------------------------------------------------------------------
+--Inserciones
+------------------------------------------------------------------------------------
 GO
 CREATE OR ALTER PROCEDURE dbVenta.InsertarMetodoDePago
     @nombre VARCHAR(200)
@@ -200,7 +203,7 @@ BEGIN
 		SET @error = @error + 'El precio unitario debe ser mayor a 0. ';
 
 	--Validar precio de referencia
-	IF (@precioReferencia <= 0 OR @precioReferencia IS NULL)
+	IF (@precioReferencia <= 0)
 		SET @error = @error + 'El precio de referencia debe ser mayor que 0. ';
 
 	--Validar unidad de referencia
@@ -223,7 +226,7 @@ END
 ----------------------------------------
 go
 CREATE OR ALTER PROCEDURE dbVenta.InsertarVenta
-	@Factura CHAR(12),
+	@Factura INT,
 	@tipoFactura CHAR(1),
 	@tipoCliente CHAR(6),	
 	@genero CHAR(6),
@@ -237,11 +240,15 @@ AS
 BEGIN
 	DECLARE @error varchar(max) = '';
 
-	--Validar factura
-	IF (COALESCE(@Factura, '') = '')
+	--IF (COALESCE(@Factura, '') = '')
+	--	SET @error = @error + 'Falta el numero de factura. ';
+	--ELSE IF(@Factura not like '[0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9][0-9][0-9]')
+	--	SET @error = @error + 'Numero de factura inválido, debe tener el formato XXX-XX-XXXX siendo X un numero del 0-9. ';
+	--Validar factura.
+	IF (@Factura=0 OR @Factura IS NULL)
 		SET @error = @error + 'Falta el numero de factura. ';
-	ELSE IF(@Factura not like '[0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9][0-9][0-9]')
-		SET @error = @error + 'Numero de factura inválido, debe tener el formato XXX-XX-XXXX siendo X un numero del 0-9. ';
+	ELSE IF(@Factura <= 100000000 OR @Factura >=999999999)
+		SET @error = @error + 'Numero de factura inválido, deben ser 9 digitos exactos del 0-9. ';
 
 	--Validar tipo de factura
 	IF (COALESCE(@Factura, '') = '' OR @Factura not in('A', 'B', 'C'))
@@ -301,3 +308,388 @@ BEGIN
         RAISERROR (@error, 16, 1);
     END
 END
+------------------------------------------------------------------------------------
+--Actualizaciones
+------------------------------------------------------------------------------------
+GO
+CREATE OR ALTER PROCEDURE dbSucursal.ActualizarSucursal
+	@sentencia nvarchar(max)
+AS
+BEGIN
+	BEGIN TRY
+		IF @sentencia LIKE '%--%' OR @sentencia LIKE '%;%' OR @sentencia LIKE '%/*%*/%'
+			RAISERROR('Error: Inyeccion de sql', 16, 1);
+
+		DECLARE @columnasValidas NVARCHAR(MAX) = 'IDSucursal, direccion, numTelefono, ciudad, sucursal, estado';
+			IF NOT EXISTS(
+				SELECT 1 
+				FROM STRING_SPLIT(REPLACE(@sentencia, ' ', ''), ',') AS s 
+				WHERE s.value NOT LIKE '%='
+				AND s.value NOT IN ('IDSucursal', 'direccion', 'numTelefono', 'ciudad','sucursal','estado')
+			)
+			BEGIN
+				RAISERROR('Columnas invalidas.', 16, 1);
+				RETURN;
+			END
+
+		DECLARE @SQL nvarchar(max) = N'UPDATE dbSucursal.Sucursal ' + RTRIM(@sentencia);
+		EXEC sp_executesql @SQL;
+	END TRY
+	BEGIN CATCH
+		PRINT 'Ocurrió un error en la actualización. Por favor revise la sentencia escrita e intente de nuevo.';
+	END CATCH
+END
+------------------------------------------------------------------------------------
+GO
+CREATE OR ALTER PROCEDURE dbSucursal.ActualizarEmpleado
+	@sentencia nvarchar(max)
+AS
+BEGIN
+	BEGIN TRY
+		IF @sentencia LIKE '%--%' OR @sentencia LIKE '%;%' OR @sentencia LIKE '%/*%*/%'
+			RAISERROR('Error: Inyeccion de sql', 16, 1);
+
+		DECLARE @columnasValidas NVARCHAR(MAX) = 'legajo, dni, nombre, apellido, emailEmpresa, emailPersonal, direccion, cargo, turno, FKSucursal, estado';
+			IF NOT EXISTS(
+				SELECT 1 
+				FROM STRING_SPLIT(REPLACE(@sentencia, ' ', ''), ',') AS s 
+				WHERE s.value NOT LIKE '%='
+				AND s.value NOT IN ('legajo', 'dni', 'nombre', 'apellido', 'emailEmpresa', 'emailPersonal',
+				'direccion', 'cargo', 'turno', 'FKSucursal', 'estado')
+			)
+			BEGIN
+				RAISERROR('Campos invalidos.', 16, 1);
+				RETURN;
+			END
+
+		DECLARE @SQL nvarchar(max) = N'UPDATE dbSucursal.Empleado ' + RTRIM(@sentencia);
+		EXEC sp_executesql @SQL;
+	END TRY
+	BEGIN CATCH
+		PRINT 'Ocurrió un error en la actualización. Por favor revise la sentencia escrita e intente de nuevo.';
+	END CATCH
+END
+------------------------------------------------------------------------------------
+GO
+CREATE OR ALTER PROCEDURE dbSucursal.ActualizarLineaDeProducto
+	@sentencia nvarchar(max)
+AS
+BEGIN
+	BEGIN TRY
+		IF @sentencia LIKE '%--%' OR @sentencia LIKE '%;%' OR @sentencia LIKE '%/*%*/%'
+			RAISERROR('Error: Inyeccion de sql', 16, 1);
+
+		DECLARE @columnasValidas NVARCHAR(MAX) = 'IDLineaDeProducto, nombre, estado';
+			IF NOT EXISTS(
+				SELECT 1 
+				FROM STRING_SPLIT(REPLACE(@sentencia, ' ', ''), ',') AS s 
+				WHERE s.value NOT LIKE '%='
+				AND s.value NOT IN ('IDLineaDeProducto', 'nombre', 'estado')
+			)
+			BEGIN
+				RAISERROR('Campos invalidos.', 16, 1);
+				RETURN;
+			END
+
+		DECLARE @SQL nvarchar(max) = N'UPDATE dbProducto.LineaDeProducto ' + RTRIM(@sentencia);
+		EXEC sp_executesql @SQL;
+	END TRY
+	BEGIN CATCH
+		PRINT 'Ocurrió un error en la actualización. Por favor revise la sentencia escrita e intente de nuevo.';
+	END CATCH
+END
+------------------------------------------------------------------------------------
+GO
+CREATE OR ALTER PROCEDURE dbSucursal.ActualizarCategoria
+	@sentencia nvarchar(max)
+AS
+BEGIN
+	BEGIN TRY
+		IF @sentencia LIKE '%--%' OR @sentencia LIKE '%;%' OR @sentencia LIKE '%/*%*/%'
+			RAISERROR('Error: Inyeccion de sql', 16, 1);
+
+		DECLARE @columnasValidas NVARCHAR(MAX) = 'IDCategoria, nombre, FKLineaDeProducto, estado';
+			IF NOT EXISTS(
+				SELECT 1 
+				FROM STRING_SPLIT(REPLACE(@sentencia, ' ', ''), ',') AS s 
+				WHERE s.value NOT LIKE '%='
+				AND s.value NOT IN ('IDCategoria', 'nombre', 'FKLineaDeProducto', 'estado')
+			)
+			BEGIN
+				RAISERROR('Campos invalidos.', 16, 1);
+				RETURN;
+			END
+
+		DECLARE @SQL nvarchar(max) = N'UPDATE dbProducto.Categoria ' + RTRIM(@sentencia);
+		EXEC sp_executesql @SQL;
+	END TRY
+	BEGIN CATCH
+		PRINT 'Ocurrió un error en la actualización. Por favor revise la sentencia escrita e intente de nuevo.';
+	END CATCH
+END
+------------------------------------------------------------------------------------
+GO
+CREATE OR ALTER PROCEDURE dbSucursal.ActualizarProducto
+	@sentencia nvarchar(max)
+AS
+BEGIN
+	BEGIN TRY
+		IF @sentencia LIKE '%--%' OR @sentencia LIKE '%;%' OR @sentencia LIKE '%/*%*/%'
+			RAISERROR('Error: Inyeccion de sql', 16, 1);
+
+		DECLARE @columnasValidas NVARCHAR(MAX) = 'IDProducto, nombre, precioUnitario, precioReferencia, unidadReferencia,
+		fechaCreacion, FKCategoria, estado';
+			IF NOT EXISTS(
+				SELECT 1 
+				FROM STRING_SPLIT(REPLACE(@sentencia, ' ', ''), ',') AS s 
+				WHERE s.value NOT LIKE '%='
+				AND s.value NOT IN ('IDProducto', 'nombre', 'precioUnitario', 'precioReferencia', 'unidadReferencia',
+				'fechaCreacion', 'FKCategoria', 'estado')
+			)
+			BEGIN
+				RAISERROR('Campos invalidos.', 16, 1);
+				RETURN;
+			END
+
+		DECLARE @SQL nvarchar(max) = N'UPDATE dbProducto.Producto ' + RTRIM(@sentencia);
+		EXEC sp_executesql @SQL;
+	END TRY
+	BEGIN CATCH
+		PRINT 'Ocurrió un error en la actualización. Por favor revise la sentencia escrita e intente de nuevo.';
+	END CATCH
+END
+------------------------------------------------------------------------------------
+GO
+CREATE OR ALTER PROCEDURE dbSucursal.ActualizarMetodoDePago
+	@sentencia nvarchar(max)
+AS
+BEGIN
+	BEGIN TRY
+		IF @sentencia LIKE '%--%' OR @sentencia LIKE '%;%' OR @sentencia LIKE '%/*%*/%'
+			RAISERROR('Error: Inyeccion de sql', 16, 1);
+
+		DECLARE @columnasValidas NVARCHAR(MAX) = 'IDMetodoDePago, nombre, estado';
+			IF NOT EXISTS(
+				SELECT 1 
+				FROM STRING_SPLIT(REPLACE(@sentencia, ' ', ''), ',') AS s 
+				WHERE s.value NOT LIKE '%='
+				AND s.value NOT IN ('IDMetodoDePago', 'nombre', 'estado')
+			)
+			BEGIN
+				RAISERROR('Campos invalidos.', 16, 1);
+				RETURN;
+			END
+
+		DECLARE @SQL nvarchar(max) = N'UPDATE dbVenta.MetodoDePago ' + RTRIM(@sentencia);
+		EXEC sp_executesql @SQL;
+	END TRY
+	BEGIN CATCH
+		PRINT 'Ocurrió un error en la actualización. Por favor revise la sentencia escrita e intente de nuevo.';
+	END CATCH
+END
+------------------------------------------------------------------------------------
+GO
+CREATE OR ALTER PROCEDURE dbVenta.CancelarVenta
+	@IDVenta INT
+AS
+BEGIN
+	IF NOT EXISTS(SELECT 1 FROM dbVenta.Venta WHERE IDVenta=@IDVenta)
+        RAISERROR('No se encontró la venta ingresada.', 16, 1);
+
+    IF EXISTS(SELECT 1 FROM dbVenta.Venta WHERE IDVenta=@IDVenta AND cantidad>0)
+    BEGIN
+		INSERT INTO dbVenta.Venta(Factura,tipoFactura,tipoCliente,genero,cantidad,fecha,hora,
+		identificadorDePago,FKempleado,FKMetodoDEPago,FKproducto,FKSucursal)
+		SELECT Factura,tipoFactura,tipoCliente,genero,cantidad*(-1),CAST(GETDATE() as DATE), CAST(GETDATE() as TIME),
+		identificadorDePago,FKempleado,FKMetodoDEPago,FKproducto,FKSucursal
+		FROM dbVenta.Venta WHERE @IDVenta=IDVenta
+
+		print 'La venta fue cancelada exitosamente.';
+    END
+    ELSE
+        RAISERROR('La venta ya fue cancelada.', 16, 1);
+END
+------------------------------------------------------------------------------------
+--Borrados(Lógicos)
+------------------------------------------------------------------------------------
+GO
+CREATE OR ALTER PROCEDURE dbSucursal.ModificarEstadoSucursal
+	@IDSucursal INT
+AS
+BEGIN
+	BEGIN TRY
+		--Me fijo que exista y si lo hace que esté activa
+        IF NOT EXISTS (SELECT 1 FROM dbSucursal.Sucursal WHERE IDSucursal = @IDSucursal)
+            RAISERROR('La sucursal no existe.', 16, 1);
+
+        IF EXISTS (SELECT 1 FROM dbSucursal.Sucursal WHERE IDSucursal = @IDSucursal AND estado = 0)
+		BEGIN
+			UPDATE dbSucursal.Sucursal
+			SET estado = 1,fechaBaja=NULL
+			WHERE IDSucursal = @IDSucursal;
+			PRINT 'La sucursal ha sido activada correctamente.';
+		END
+		ELSE
+		BEGIN
+			UPDATE dbSucursal.Sucursal
+			SET estado = 0,fechaBaja=GETDATE()
+			WHERE IDSucursal = @IDSucursal;
+			PRINT 'La sucursal ha sido desactivada correctamente.';
+		END
+    END TRY
+    BEGIN CATCH
+        PRINT 'Ocurrió un error al intentar modificar el estado de la sucursal.';
+    END CATCH
+END
+------------------------------------------------------------------------------------
+GO
+CREATE OR ALTER PROCEDURE dbSucursal.ModificarEstadoEmpleado
+	@Legajo INT
+AS
+BEGIN
+	BEGIN TRY
+		--Me fijo que exista y si lo hace que esté activa
+        IF NOT EXISTS (SELECT 1 FROM dbSucursal.Empleado WHERE Legajo = @Legajo)
+            RAISERROR('El empleado no existe.', 16, 1);
+
+        IF EXISTS (SELECT 1 FROM dbSucursal.Empleado WHERE Legajo = @Legajo AND estado = 0)
+		BEGIN
+			UPDATE dbSucursal.Empleado
+			SET estado = 1,fechaBaja=NULL
+			WHERE Legajo = @Legajo;
+			PRINT 'El empleado ha sido dado de alta correctamente.';
+		END
+		ELSE
+		BEGIN
+			UPDATE dbSucursal.Empleado
+			SET estado = 0,fechaBaja=GETDATE()
+			WHERE Legajo = @Legajo;
+			PRINT 'El empleado ha sido dado de baja correctamente.';
+		END
+    END TRY
+    BEGIN CATCH
+        PRINT 'Ocurrió un error al intentar modificar el estado del empleado.';
+    END CATCH
+END
+------------------------------------------------------------------------------------
+GO
+CREATE OR ALTER PROCEDURE dbSucursal.ModificarEstadoLineaDeProducto
+	@IDLineaDeProducto INT
+AS
+BEGIN
+	BEGIN TRY
+		--Me fijo que exista y si lo hace que esté activa
+        IF NOT EXISTS (SELECT 1 FROM dbProducto.LineaDeProducto WHERE IDLineaDeProducto = @IDLineaDeProducto)
+            RAISERROR('La linea de producto no existe.', 16, 1);
+
+        IF EXISTS (SELECT 1 FROM dbProducto.LineaDeProducto WHERE IDLineaDeProducto = @IDLineaDeProducto AND estado = 0)
+		BEGIN
+			UPDATE dbProducto.LineaDeProducto
+			SET estado = 1,fechaBaja=NULL
+			WHERE IDLineaDeProducto = @IDLineaDeProducto;
+			PRINT 'La linea de producto ha sido activada correctamente.';
+		END
+		ELSE
+		BEGIN
+			UPDATE dbProducto.LineaDeProducto
+			SET estado = 0,fechaBaja=GETDATE()
+			WHERE IDLineaDeProducto = @IDLineaDeProducto;
+			PRINT 'La linea de producto ha sido desactivada correctamente.';
+		END
+    END TRY
+    BEGIN CATCH
+        PRINT 'Ocurrió un error al intentar modificar el estado de la linea de producto.';
+    END CATCH
+END
+------------------------------------------------------------------------------------
+GO
+CREATE OR ALTER PROCEDURE dbSucursal.ModificarEstadoCategoria
+	@IDCategoria INT
+AS
+BEGIN
+	BEGIN TRY
+		--Me fijo que exista y si lo hace que esté activa
+        IF NOT EXISTS (SELECT 1 FROM dbProducto.Categoria WHERE IDCategoria = @IDCategoria)
+            RAISERROR('La categoria no existe.', 16, 1);
+
+        IF EXISTS (SELECT 1 FROM dbProducto.Categoria WHERE IDCategoria = @IDCategoria AND estado = 0)	
+		BEGIN
+			UPDATE dbProducto.Categoria
+			SET estado = 1,fechaBaja=NULL
+			WHERE IDCategoria = @IDCategoria;
+			PRINT 'La categoria ha sido activada correctamente.';
+		END
+		ELSE
+		BEGIN
+			UPDATE dbProducto.Categoria
+			SET estado = 0,fechaBaja=GETDATE()
+			WHERE IDCategoria = @IDCategoria;
+			PRINT 'La categoria ha sido desactivada correctamente.';
+		END
+    END TRY
+    BEGIN CATCH
+        PRINT 'Ocurrió un error al intentar modificar el estado de la categoria.';
+    END CATCH
+END
+------------------------------------------------------------------------------------
+GO
+CREATE OR ALTER PROCEDURE dbSucursal.ModificarEstadoProducto
+	@IDProducto INT
+AS
+BEGIN
+	BEGIN TRY
+		--Me fijo que exista y si lo hace que esté activa
+        IF NOT EXISTS (SELECT 1 FROM dbProducto.Producto WHERE IDProducto = @IDProducto)
+            RAISERROR('El producto no existe.', 16, 1);
+
+        IF EXISTS (SELECT 1 FROM dbProducto.Producto WHERE IDProducto = @IDProducto AND estado = 0)
+		BEGIN
+			UPDATE dbProducto.Producto
+			SET estado = 1,fechaBaja=NULL
+			WHERE IDProducto = @IDProducto;
+			PRINT 'El producto ha sido activado correctamente.';
+		END
+		ELSE
+		BEGIN
+			UPDATE dbProducto.Producto
+			SET estado = 0,fechaBaja=GETDATE()
+			WHERE IDProducto = @IDProducto;
+			PRINT 'El producto ha sido desactivado correctamente.';
+		END
+    END TRY
+    BEGIN CATCH
+        PRINT 'Ocurrió un error al intentar modificar el estado del producto.';
+    END CATCH
+END
+------------------------------------------------------------------------------------
+GO
+CREATE OR ALTER PROCEDURE dbSucursal.ModificarEstadoMetodoDePago
+	@IDMetodoDePago INT
+AS
+BEGIN
+	BEGIN TRY
+		--Me fijo que exista y si lo hace que esté activa
+        IF NOT EXISTS (SELECT 1 FROM dbVenta.MetodoDePago WHERE IDMetodoDePago = @IDMetodoDePago)
+            RAISERROR('El metodo de pago no existe.', 16, 1);
+
+        IF EXISTS (SELECT 1 FROM dbVenta.MetodoDePago WHERE IDMetodoDePago = @IDMetodoDePago AND estado = 0)
+        BEGIN
+			UPDATE dbVenta.MetodoDePago
+			SET estado = 1,fechaBaja=NULL
+			WHERE IDMetodoDePago = @IDMetodoDePago;
+			PRINT 'El metodo de pago ha sido activado correctamente.';
+		END
+		ELSE
+		BEGIN
+			UPDATE dbVenta.MetodoDePago
+			SET estado = 0,fechaBaja=GETDATE()
+			WHERE IDMetodoDePago = @IDMetodoDePago;
+			PRINT 'El metodo de pago ha sido desactivado correctamente.';
+		END
+
+    END TRY
+    BEGIN CATCH
+        PRINT 'Ocurrió un error al intentar modificar el estado del metodo de pago.';
+    END CATCH
+END
+
