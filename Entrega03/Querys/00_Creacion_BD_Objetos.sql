@@ -18,9 +18,18 @@ create or alter function dbVenta.RutaImportacion()
 returns VARCHAR(4000)
 AS
 BEGIN
-	RETURN 'C:\TP_integrador_Archivos'; --Aca copiar�as tu ruta base hasta los archivos.
+	RETURN 'D:\Github\gitops\TP-BBDD---Grupo-6\TP_integrador_Archivos'; --Aca copiar�as tu ruta base hasta los archivos.
 END
 go
+
+DROP TABLE IF EXISTS dbVenta.Venta;
+DROP TABLE IF EXISTS dbSucursal.Empleado;    
+DROP TABLE IF EXISTS dbSucursal.Sucursal; 
+DROP TABLE IF EXISTS dbProducto.Producto; 
+DROP TABLE IF EXISTS dbProducto.Categoria;   
+DROP TABLE IF EXISTS dbProducto.LineaDeProducto; 
+DROP TABLE IF EXISTS dbVenta.MetodoDePago;   
+
 CREATE TABLE dbSucursal.Sucursal(
 	IDSucursal INT IDENTITY(1,1) PRIMARY KEY,
 	direccion VARCHAR(100),
