@@ -13,7 +13,7 @@ BEGIN
     -- Validar nombre 
     IF (COALESCE(@nombre, '') = '')
         SET @error = @error + 'Falta nombre. ';
-	ELSE IF (LEN(@nombre)>200)
+	ELSE IF (LEN(@nombre)>11)
 		SET @error = @error + 'Nombre demasiado largo. Tamaño maximo de 11 caracteres. ';
     ELSE IF EXISTS (SELECT nombre FROM dbVenta.MetodoDePago WHERE nombre = @nombre)
         SET @error = @error + 'El nombre del metodo de pago ingresado ya existe. ';
@@ -41,11 +41,10 @@ CREATE OR ALTER PROCEDURE dbVenta.InsertarEmpleado
 	@direccion VARCHAR(100),
 	@cargo CHAR(22),
 	@turno CHAR(16),
-	@nombreSucursal varchar(20)
+	@FKSucursal INT
 AS
 BEGIN
     DECLARE @error varchar(max) = '';
-	DECLARE @FKSucursal INT
 	
     --Validar Legajo
     IF (@Legajo IS NULL OR @Legajo = 0)
@@ -54,7 +53,7 @@ BEGIN
         SET @error = @error + 'El Legajo ingresado ya existe. '; 
 
 	--Validar dni
-	IF (@dni IS NULL OR @Legajo = 0)
+	IF (@dni IS NULL OR @dni = 0)
         SET @error = 'DNI vacío o nulo. ';
     IF EXISTS (SELECT @dni FROM dbSucursal.Empleado WHERE dni = @dni)
         SET @error = @error + 'El DNI ingresado ya existe. '; 
@@ -73,12 +72,12 @@ BEGIN
 	
 	--Validar email Empresa
     IF (COALESCE(@emailEmpresa, '') = '' OR @emailEmpresa NOT LIKE '%@superA.com' 
-	OR LEN(@emailEmpresa) >= 50)
+	OR LEN(@emailEmpresa) >= 100)
         SET @error = @error + 'Mail(empresa) inválido. ';
 
 	--Validar email Personal
     IF (COALESCE(@emailPersonal, '') = '' OR @emailPersonal NOT LIKE '%@%.com' 
-	OR LEN(@emailPersonal) >= 50)
+	OR LEN(@emailPersonal) >= 100)
         SET @error = @error + 'Mail(personal) inválido. ';
 
 	--Validar dirección
@@ -95,24 +94,11 @@ BEGIN
 	IF (COALESCE(@turno, '') = '' OR @turno NOT in('TM', 'TT' , 'Jornada Completa'))
 		SET @error = @error + 'Turno inválido(Turnos disponibles: TM,TT,Jornada Completa). ';
 
-
-	-- Validar la sucursal(IMPORTANTE: paso el nombre y no la ID porque son 3 sucursales, veo mas normal esto ya que no es como el nombre de una persona
-	-- que puede haber 100 'Jhon')
-    IF (COALESCE(@nombreSucursal, '') = '')
-	BEGIN
-		SET @error = @error + 'Falta el nombre de la sucursal. ';
-	END
-	ELSE
-	BEGIN
-		SELECT @FKSucursal = IDSucursal
-		FROM dbSucursal.Sucursal
-		WHERE sucursal = @nombreSucursal;
-    
-		IF @FKSucursal IS NULL
-		BEGIN
-			SET @error = @error + 'La sucursal ingresada no existe. ';
-		END
-	END
+	--Validar FK de sucursal 
+	IF (@FKSucursal IS NULL OR @FKSucursal = 0)
+        SET @error = 'ID de sucursal vacio o nulo. ';
+	ELSE IF NOT EXISTS (SELECT IDSucursal FROM dbSucursal.Sucursal WHERE IDSucursal = @FKSucursal)
+		SET @error = @error + 'El ID de sucursal ingresado no existe. ';
 	
     -- Insertar datos si NO hay errores
     IF (@error = '')
@@ -154,23 +140,28 @@ END
 go
 CREATE OR ALTER PROCEDURE dbProducto.InsertarCategoria
 	@nombreCategoria VARCHAR(30),
-	@nombreLineaDeProducto VARCHAR(30)
+	@FKLineaDeProducto INT
 AS
 BEGIN
 	DECLARE @error varchar(max) = '';
 	--Validar categoria
 	IF (COALESCE(@nombreCategoria, '') = '')
 		SET @error = @error + 'Falta categoria. ';
-	ELSE IF (LEN(@nombreCategoria) > 30)
-		SET @error = @error + 'Categoria demasiado larga. Tamaño máximo de 30 caracteres. ';
+	ELSE IF (LEN(@nombreCategoria) > 50)
+		SET @error = @error + 'Categoria demasiado larga. Tamaño máximo de 50 caracteres. ';
 	ELSE IF EXISTS (SELECT nombre FROM dbProducto.LineaDeProducto WHERE nombre = @nombreCategoria)
 		SET @error = @error + 'La categoria ingresada ya existe. ';
 
-	--FALTA VALIDAR FK
+	--Validar FK de linea de producto
+	IF (@FKLineaDeProducto IS NULL OR @FKLineaDeProducto = 0)
+        SET @error = 'ID de linea de producto vacio o nulo. ';
+	ELSE IF NOT EXISTS (SELECT IDLineaDeProducto FROM dbProducto.LineaDeProducto WHERE IDLineaDeProducto = @FKLineaDeProducto)
+		SET @error = @error + 'ID de linea de producto ingresado no existe. ';
+
 	IF (@error = '')
     BEGIN
         INSERT INTO dbProducto.Categoria(nombre,FKLineaDeProducto,estado)
-        VALUES (@nombreCategoria,,1);
+        VALUES (@nombreCategoria,@FKLineaDeProducto,1);
     END
     ELSE
     BEGIN
@@ -212,7 +203,12 @@ BEGIN
 	ELSE IF (LEN(@unidadReferencia) > 10)
 		SET @error = @error + 'Unidad de referencia demasiado larga. Tamaño máximo de 10 caracteres. ';
 
-	--FALTA VALIDAR FK
+	--Validar FK de categoria
+	IF (@FKCategoria IS NULL OR @FKCategoria = 0)
+        SET @error = 'ID de categoria vacio o nulo. ';
+	ELSE IF NOT EXISTS (SELECT IDCategoria FROM dbProducto.Categoria WHERE IDCategoria = @FKCategoria)
+		SET @error = @error + 'ID de categoria ingresado no existe. ';
+
 	IF (@error = '')
     BEGIN
         INSERT INTO dbProducto.Producto (nombre, precioUnitario, precioReferencia, unidadReferencia, fechaCreacion, FKCategoria,estado)
@@ -233,9 +229,9 @@ CREATE OR ALTER PROCEDURE dbVenta.InsertarVenta
 	@cantidad INT,
 	@identificadorDePago VARCHAR(30),
 	@FKempleado INT,
-	@FKMetodoDePago INT,	--|| nombre metodo?
+	@FKMetodoDePago INT,	
 	@FKproducto INT,
-	@FKSucursal INT		--|| nombre sucursal?
+	@FKSucursal INT		
 AS
 BEGIN
 	DECLARE @error varchar(max) = '';
@@ -295,7 +291,17 @@ BEGIN
     IF NOT EXISTS (SELECT IDProducto FROM dbProducto.Producto WHERE IDProducto = @FKproducto)
         SET @error = @error + 'El ID de producto ingresado no esta registrado. ';
 
-	--FALTA VALIDAR @FKMetodoDePago y @FKSucursal
+	--Validar FK de sucursal 
+	IF (@FKSucursal IS NULL OR @FKSucursal = 0)
+        SET @error = 'ID de sucursal vacio o nulo. ';
+	ELSE IF NOT EXISTS (SELECT IDSucursal FROM dbSucursal.Sucursal WHERE IDSucursal = @FKSucursal)
+		SET @error = @error + 'El ID de sucursal ingresado no existe. ';
+
+	--Validar FK de metodo de pago 
+	IF (@FKMetodoDePago IS NULL OR @FKMetodoDePago = 0)
+        SET @error = 'ID de metodo de pago vacio o nulo. ';
+	ELSE IF NOT EXISTS (SELECT IDMetodoDePago FROM dbVenta.MetodoDePago WHERE IDMetodoDePago = @FKMetodoDePago)
+		SET @error = @error + 'El ID de metodo de pago ingresado no existe. ';
 	
 	IF (@error = '')
     BEGIN
@@ -313,179 +319,189 @@ END
 ------------------------------------------------------------------------------------
 GO
 CREATE OR ALTER PROCEDURE dbSucursal.ActualizarSucursal
-	@sentencia nvarchar(max)
+	@sucursalAactualizar INT,
+	@direccion VARCHAR(100),
+	@numTelefono CHAR(9),
+	@ciudad VARCHAR(9),
+	@sucursal VARCHAR(20)
 AS
 BEGIN
 	BEGIN TRY
-		IF @sentencia LIKE '%--%' OR @sentencia LIKE '%;%' OR @sentencia LIKE '%/*%*/%'
-			RAISERROR('Error: Inyeccion de sql', 16, 1);
+        --Existe la sucursal que quiero actualizar?
+        IF NOT EXISTS (SELECT 1 FROM dbSucursal.Sucursal WHERE IDSucursal = @sucursalAactualizar)
+        BEGIN
+            RAISERROR('La sucursal con el ID especificado no existe.', 16, 1);
+            RETURN;
+        END
 
-		DECLARE @columnasValidas NVARCHAR(MAX) = 'IDSucursal, direccion, numTelefono, ciudad, sucursal, estado';
-			IF NOT EXISTS(
-				SELECT 1 
-				FROM STRING_SPLIT(REPLACE(@sentencia, ' ', ''), ',') AS s 
-				WHERE s.value NOT LIKE '%='
-				AND s.value NOT IN ('IDSucursal', 'direccion', 'numTelefono', 'ciudad','sucursal','estado')
-			)
-			BEGIN
-				RAISERROR('Columnas invalidas.', 16, 1);
-				RETURN;
-			END
+        UPDATE dbSucursal.Sucursal
+        SET direccion=@direccion,
+            numTelefono=@numTelefono,
+            ciudad=@ciudad,
+            sucursal=@sucursal
+        WHERE IDSucursal = @sucursalAactualizar;
 
-		DECLARE @SQL nvarchar(max) = N'UPDATE dbSucursal.Sucursal ' + RTRIM(@sentencia);
-		EXEC sp_executesql @SQL;
-	END TRY
-	BEGIN CATCH
-		PRINT 'Ocurrió un error en la actualización. Por favor revise la sentencia escrita e intente de nuevo.';
-	END CATCH
+        PRINT 'Sucursal actualizada exitosamente.';
+    END TRY
+    BEGIN CATCH
+		RAISERROR('Ocurrió un error en la actualización.', 16, 1);
+    END CATCH
 END
 ------------------------------------------------------------------------------------
 GO
 CREATE OR ALTER PROCEDURE dbSucursal.ActualizarEmpleado
-	@sentencia nvarchar(max)
+	@empleadoAactualizar INT,
+	@dni INT,
+	@nombre VARCHAR(40),
+	@apellido VARCHAR(20),
+	@emailEmpresa VARCHAR(100),
+	@emailPersonal VARCHAR(100),
+	@direccion VARCHAR(100),
+	@cargo CHAR(22),
+	@turno CHAR(16),
+	@FKSucursal INT
 AS
 BEGIN
 	BEGIN TRY
-		IF @sentencia LIKE '%--%' OR @sentencia LIKE '%;%' OR @sentencia LIKE '%/*%*/%'
-			RAISERROR('Error: Inyeccion de sql', 16, 1);
+        --Existe el empleado que quiero actualizar?
+        IF NOT EXISTS (SELECT 1 FROM dbSucursal.Empleado WHERE Legajo = @empleadoAactualizar)
+        BEGIN
+            RAISERROR('El empleado con el legajo especificado no existe.', 16, 1);
+            RETURN;
+        END
+        
+        UPDATE dbSucursal.Empleado
+		SET 
+			dni=@dni,
+			nombre=@nombre,
+			apellido= @apellido,
+			emailEmpresa=@emailEmpresa,
+			emailPersonal=@emailPersonal,
+			direccion=@direccion,
+			cargo=@cargo,
+			turno=@turno,
+			FKSucursal=@FKSucursal
+		WHERE Legajo=@empleadoAactualizar;
 
-		DECLARE @columnasValidas NVARCHAR(MAX) = 'legajo, dni, nombre, apellido, emailEmpresa, emailPersonal, direccion, cargo, turno, FKSucursal, estado';
-			IF NOT EXISTS(
-				SELECT 1 
-				FROM STRING_SPLIT(REPLACE(@sentencia, ' ', ''), ',') AS s 
-				WHERE s.value NOT LIKE '%='
-				AND s.value NOT IN ('legajo', 'dni', 'nombre', 'apellido', 'emailEmpresa', 'emailPersonal',
-				'direccion', 'cargo', 'turno', 'FKSucursal', 'estado')
-			)
-			BEGIN
-				RAISERROR('Campos invalidos.', 16, 1);
-				RETURN;
-			END
-
-		DECLARE @SQL nvarchar(max) = N'UPDATE dbSucursal.Empleado ' + RTRIM(@sentencia);
-		EXEC sp_executesql @SQL;
-	END TRY
-	BEGIN CATCH
-		PRINT 'Ocurrió un error en la actualización. Por favor revise la sentencia escrita e intente de nuevo.';
-	END CATCH
+        PRINT 'Empleado actualizado exitosamente.';
+    END TRY
+    BEGIN CATCH
+		RAISERROR('Ocurrió un error en la actualización.', 16, 1);
+    END CATCH
 END
 ------------------------------------------------------------------------------------
 GO
 CREATE OR ALTER PROCEDURE dbSucursal.ActualizarLineaDeProducto
-	@sentencia nvarchar(max)
+	@lineaDeProductoAactualizar INT,
+	@nombre VARCHAR(30)
 AS
 BEGIN
 	BEGIN TRY
-		IF @sentencia LIKE '%--%' OR @sentencia LIKE '%;%' OR @sentencia LIKE '%/*%*/%'
-			RAISERROR('Error: Inyeccion de sql', 16, 1);
+        --Existe la linea de producto que quiero actualizar?
+        IF NOT EXISTS (SELECT 1 FROM dbProducto.LineaDeProducto WHERE IDLineaDeProducto=@lineaDeProductoAactualizar)
+        BEGIN
+            RAISERROR('La linea de producto con el ID especificado no existe.', 16, 1);
+            RETURN;
+        END
+        
+        UPDATE dbProducto.LineaDeProducto
+		SET 
+			nombre=@nombre
+		WHERE IDLineaDeProducto=@lineaDeProductoAactualizar;
 
-		DECLARE @columnasValidas NVARCHAR(MAX) = 'IDLineaDeProducto, nombre, estado';
-			IF NOT EXISTS(
-				SELECT 1 
-				FROM STRING_SPLIT(REPLACE(@sentencia, ' ', ''), ',') AS s 
-				WHERE s.value NOT LIKE '%='
-				AND s.value NOT IN ('IDLineaDeProducto', 'nombre', 'estado')
-			)
-			BEGIN
-				RAISERROR('Campos invalidos.', 16, 1);
-				RETURN;
-			END
-
-		DECLARE @SQL nvarchar(max) = N'UPDATE dbProducto.LineaDeProducto ' + RTRIM(@sentencia);
-		EXEC sp_executesql @SQL;
-	END TRY
-	BEGIN CATCH
-		PRINT 'Ocurrió un error en la actualización. Por favor revise la sentencia escrita e intente de nuevo.';
-	END CATCH
+        PRINT 'Linea de producto actualizada exitosamente.';
+    END TRY
+    BEGIN CATCH
+		RAISERROR('Ocurrió un error en la actualización.', 16, 1);
+    END CATCH
 END
 ------------------------------------------------------------------------------------
 GO
 CREATE OR ALTER PROCEDURE dbSucursal.ActualizarCategoria
-	@sentencia nvarchar(max)
+	@categoriaAactualizar INT,
+	@nombre VARCHAR(50),
+	@FKLineaDeProducto INT
 AS
 BEGIN
 	BEGIN TRY
-		IF @sentencia LIKE '%--%' OR @sentencia LIKE '%;%' OR @sentencia LIKE '%/*%*/%'
-			RAISERROR('Error: Inyeccion de sql', 16, 1);
+        --Existe la categoria que quiero actualizar?
+        IF NOT EXISTS (SELECT 1 FROM dbProducto.Categoria WHERE IDCategoria=@categoriaAactualizar)
+        BEGIN
+            RAISERROR('La categoria con el ID especificado no existe.', 16, 1);
+            RETURN;
+        END
+        
+        UPDATE dbProducto.Categoria
+		SET 
+			nombre=@nombre,
+			FKLineaDeProducto=@FKLineaDeProducto
+		WHERE IDCategoria=@categoriaAactualizar;
 
-		DECLARE @columnasValidas NVARCHAR(MAX) = 'IDCategoria, nombre, FKLineaDeProducto, estado';
-			IF NOT EXISTS(
-				SELECT 1 
-				FROM STRING_SPLIT(REPLACE(@sentencia, ' ', ''), ',') AS s 
-				WHERE s.value NOT LIKE '%='
-				AND s.value NOT IN ('IDCategoria', 'nombre', 'FKLineaDeProducto', 'estado')
-			)
-			BEGIN
-				RAISERROR('Campos invalidos.', 16, 1);
-				RETURN;
-			END
-
-		DECLARE @SQL nvarchar(max) = N'UPDATE dbProducto.Categoria ' + RTRIM(@sentencia);
-		EXEC sp_executesql @SQL;
-	END TRY
-	BEGIN CATCH
-		PRINT 'Ocurrió un error en la actualización. Por favor revise la sentencia escrita e intente de nuevo.';
-	END CATCH
+        PRINT 'Categoria actualizada exitosamente.';
+    END TRY
+    BEGIN CATCH
+		RAISERROR('Ocurrió un error en la actualización.', 16, 1);
+    END CATCH
 END
 ------------------------------------------------------------------------------------
 GO
 CREATE OR ALTER PROCEDURE dbSucursal.ActualizarProducto
-	@sentencia nvarchar(max)
+	@productoAactualizar INT,
+	@nombre VARCHAR(100),
+	@precioUnitario DECIMAL(10,2),
+	@precioReferencia DECIMAL(10,2),
+	@unidadReferencia VARCHAR(20),
+	@FKCategoria INT
 AS
 BEGIN
 	BEGIN TRY
-		IF @sentencia LIKE '%--%' OR @sentencia LIKE '%;%' OR @sentencia LIKE '%/*%*/%'
-			RAISERROR('Error: Inyeccion de sql', 16, 1);
+        --Existe el producto que quiero actualizar?
+        IF NOT EXISTS (SELECT 1 FROM dbProducto.Producto WHERE IDProducto=@productoAactualizar)
+        BEGIN
+            RAISERROR('El producto con el ID especificado no existe.', 16, 1);
+            RETURN;
+        END
+        
+        UPDATE dbProducto.Producto
+		SET 
+			nombre=@nombre,
+			precioUnitario=@precioUnitario,
+			precioReferencia=@precioReferencia,
+			unidadReferencia=@unidadReferencia,
+			FKCategoria=@FKCategoria
+		WHERE IDProducto=@productoAactualizar;
 
-		DECLARE @columnasValidas NVARCHAR(MAX) = 'IDProducto, nombre, precioUnitario, precioReferencia, unidadReferencia,
-		fechaCreacion, FKCategoria, estado';
-			IF NOT EXISTS(
-				SELECT 1 
-				FROM STRING_SPLIT(REPLACE(@sentencia, ' ', ''), ',') AS s 
-				WHERE s.value NOT LIKE '%='
-				AND s.value NOT IN ('IDProducto', 'nombre', 'precioUnitario', 'precioReferencia', 'unidadReferencia',
-				'fechaCreacion', 'FKCategoria', 'estado')
-			)
-			BEGIN
-				RAISERROR('Campos invalidos.', 16, 1);
-				RETURN;
-			END
-
-		DECLARE @SQL nvarchar(max) = N'UPDATE dbProducto.Producto ' + RTRIM(@sentencia);
-		EXEC sp_executesql @SQL;
-	END TRY
-	BEGIN CATCH
-		PRINT 'Ocurrió un error en la actualización. Por favor revise la sentencia escrita e intente de nuevo.';
-	END CATCH
+        PRINT 'Producto actualizado exitosamente.';
+    END TRY
+    BEGIN CATCH
+		RAISERROR('Ocurrió un error en la actualización.', 16, 1);
+    END CATCH
 END
 ------------------------------------------------------------------------------------
 GO
 CREATE OR ALTER PROCEDURE dbSucursal.ActualizarMetodoDePago
-	@sentencia nvarchar(max)
+	@metodoDePagoAactualizar INT,
+	@nombre VARCHAR(11)
 AS
 BEGIN
 	BEGIN TRY
-		IF @sentencia LIKE '%--%' OR @sentencia LIKE '%;%' OR @sentencia LIKE '%/*%*/%'
-			RAISERROR('Error: Inyeccion de sql', 16, 1);
+        --Existe el metodo de pago que quiero actualizar?
+        IF NOT EXISTS (SELECT 1 FROM dbVenta.MetodoDePago WHERE IDMetodoDePago=@metodoDePagoAactualizar)
+        BEGIN
+            RAISERROR('El metodo de pago con el ID especificado no existe.', 16, 1);
+            RETURN;
+        END
+        
+        UPDATE dbVenta.MetodoDePago
+		SET 
+			nombre=@nombre
+		WHERE IDMetodoDePago=@metodoDePagoAactualizar;
 
-		DECLARE @columnasValidas NVARCHAR(MAX) = 'IDMetodoDePago, nombre, estado';
-			IF NOT EXISTS(
-				SELECT 1 
-				FROM STRING_SPLIT(REPLACE(@sentencia, ' ', ''), ',') AS s 
-				WHERE s.value NOT LIKE '%='
-				AND s.value NOT IN ('IDMetodoDePago', 'nombre', 'estado')
-			)
-			BEGIN
-				RAISERROR('Campos invalidos.', 16, 1);
-				RETURN;
-			END
-
-		DECLARE @SQL nvarchar(max) = N'UPDATE dbVenta.MetodoDePago ' + RTRIM(@sentencia);
-		EXEC sp_executesql @SQL;
-	END TRY
-	BEGIN CATCH
-		PRINT 'Ocurrió un error en la actualización. Por favor revise la sentencia escrita e intente de nuevo.';
-	END CATCH
+        PRINT 'Metodo de pago actualizado exitosamente.';
+    END TRY
+    BEGIN CATCH
+		RAISERROR('Ocurrió un error en la actualización.', 16, 1);
+    END CATCH
 END
 ------------------------------------------------------------------------------------
 GO
