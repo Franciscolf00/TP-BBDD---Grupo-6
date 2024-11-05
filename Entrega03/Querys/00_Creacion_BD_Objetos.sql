@@ -1,3 +1,26 @@
+-- Entrega 5/11/2024
+-- Grupo 06
+-- Materia: Base de Datos Aplicadas-2900
+-- Alumnos:
+-- Chaves, Juliana - 44005820
+-- Perez, Thiago Exequiel - 43097103
+-- Arce, Tomas Agustin - 43877113
+-- Franco, Francisco Leonel - 42116434
+
+-- Consigna:
+/*
+Luego de decidirse por un motor de base de datos relacional, llegó el momento de generar la base de datos. 
+Deberá instalar el DMBS y documentar el proceso. No incluya capturas de pantalla. 
+Detalle las configuraciones aplicadas (ubicación de archivos, memoria asignada, seguridad, puertos, etc.) 
+en un documento como el que le entregaría al DBA. Cree la base de datos, entidades y relaciones. 
+Incluya restricciones y claves. Deberá entregar un archivo .sql con el script completo de 
+creación (debe funcionar si se lo ejecuta “tal cual” es entregado). Incluya comentarios para indicar qué hace cada módulo de código. 
+Genere store procedures para manejar la inserción, modificado, borrado (si corresponde, 
+también debe decidir si determinadas entidades solo admitirán borrado lógico) de cada tabla. 
+Los nombres de los store procedures NO deben comenzar con “SP”.  
+Genere esquemas para organizar de forma lógica los componentes del sistema y aplique esto en la creación de objetos. NO use el esquema “dbo”.  
+*/
+
 CREATE DATABASE Com2900G06 COLLATE Modern_Spanish_CI_AS
 -------------------------------------------------------------------------------------
 --CONFIGURACIONES INICIALES
