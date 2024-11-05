@@ -1,8 +1,8 @@
 USE Com2900G06
 --use master;
-------------------------------------------------------------------------------------
+/*///////////////////////////////////////////////////////////////////////////////////////// */
 --Inserciones
-------------------------------------------------------------------------------------
+
 GO
 CREATE OR ALTER PROCEDURE dbVenta.InsertarMetodoDePago
     @nombre VARCHAR(max)
@@ -289,6 +289,8 @@ BEGIN
 		SET @error = @error + 'Falta el numero de factura. ';
 	ELSE IF(@Factura <= 100000000 OR @Factura >=999999999)
 		SET @error = @error + 'Numero de factura inválido, deben ser 9 digitos exactos del 0-9. ';
+	ELSE IF EXISTS(SELECT Factura FROM dbVenta.Venta WHERE Factura=@Factura )
+		SET @error = @error + 'Numero de factura ya existente. ';
 
 	--Validar tipo de factura
 	IF (COALESCE(@tipoFactura, '') = '' OR @tipoFactura not in('A', 'B', 'C'))
@@ -357,36 +359,30 @@ BEGIN
         RAISERROR (@error, 16, 1);
     END
 END
-------------------------------------------------------------------------------------
+/*///////////////////////////////////////////////////////////////////////////////////////// */
+/*///////////////////////////////////////////////////////////////////////////////////////// */
+/*///////////////////////////////////////////////////////////////////////////////////////// */
 --Actualizaciones
-------------------------------------------------------------------------------------
 GO
 CREATE OR ALTER PROCEDURE dbSucursal.ActualizarSucursal
-	@sucursalAactualizar INT,
-	@direccion VARCHAR(100),
-	@numTelefono CHAR(9),
-	@ciudad VARCHAR(9),
-	@sucursal VARCHAR(20)
+	@IDSucursal INT,
+	@direccion VARCHAR(100) = NULL,
+	@numTelefono CHAR(9) = NULL,
+	@ciudad VARCHAR(50) = NULL,
+	@sucursal VARCHAR(50) = NULL
 AS
 BEGIN
-	DECLARE @error VARCHAR(max)=''
-    --Existe la sucursal que quiero actualizar?
-    IF NOT EXISTS (SELECT 1 FROM dbSucursal.Sucursal WHERE IDSucursal = @sucursalAactualizar)
-       SET @error=@error+'La sucursal con el ID especificado no existe. '
-
-	IF @error=''
+	IF EXISTS (SELECT 1 FROM dbSucursal.Sucursal WHERE IDSucursal = @IDSucursal)
 	BEGIN
 		UPDATE dbSucursal.Sucursal
-		SET direccion=@direccion,
-			numTelefono=@numTelefono,
-			ciudad=@ciudad,
-			sucursal=@sucursal
-		WHERE IDSucursal = @sucursalAactualizar;
-		PRINT 'Sucursal actualizada exitosamente.';
+		SET	direccion = COALESCE(@direccion, direccion),
+			numTelefono = COALESCE(@numTelefono, numTelefono),
+			ciudad = COALESCE(@ciudad, ciudad),
+			sucursal = COALESCE(@sucursal, sucursal)
+		WHERE IDSucursal = @IDSucursal
 	END
 	ELSE
-		RAISERROR(@error,16,1);
-
+		PRINT 'ID no encontrado'
 END
 ------------------------------------------------------------------------------------
 GO
@@ -540,7 +536,7 @@ BEGIN
 	ELSE
 		RAISERROR(@error, 16, 1);
 END
-------------------------------------------------------------------------------------
+/*///////////////////////////////////////////////////////////////////////////////////////// */
 GO
 CREATE OR ALTER PROCEDURE dbVenta.CancelarVenta		--Tocara rehacerla con NDC y una nueva tabla, pero anda
 	@IDVenta INT
@@ -562,12 +558,14 @@ BEGIN
     ELSE
         RAISERROR('La venta ya fue cancelada.', 16, 1);
 END
-------------------------------------------------------------------------------------
+/*///////////////////////////////////////////////////////////////////////////////////////// */
+/*///////////////////////////////////////////////////////////////////////////////////////// */
+/*///////////////////////////////////////////////////////////////////////////////////////// */
 --Borrados(Lógicos)
-------------------------------------------------------------------------------------
 GO
 CREATE OR ALTER PROCEDURE dbSucursal.ModificarEstadoSucursal
-	@IDSucursal INT
+	@IDSucursal INT,
+	@estado BIT
 AS
 BEGIN
 	DECLARE	 @error VARCHAR(max)=''
@@ -576,7 +574,7 @@ BEGIN
 		SET	@error=@error+'La sucursal no existe. '
 	IF @error=''
 	BEGIN
-        IF EXISTS (SELECT 1 FROM dbSucursal.Sucursal WHERE IDSucursal = @IDSucursal AND estado = 0)
+        IF EXISTS (SELECT 1 FROM dbSucursal.Sucursal WHERE IDSucursal = @IDSucursal AND @estado = 1)
 		BEGIN
 			UPDATE dbSucursal.Sucursal
 			SET estado = 1,fechaBaja=NULL
@@ -597,7 +595,8 @@ END
 ------------------------------------------------------------------------------------
 GO
 CREATE OR ALTER PROCEDURE dbSucursal.ModificarEstadoEmpleado
-	@Legajo INT
+	@Legajo INT,
+	@estado BIT
 AS
 BEGIN
 	DECLARE	 @error VARCHAR(max)=''
@@ -606,7 +605,7 @@ BEGIN
         SET	@error=@error+'El empleado no existe. '
 	IF @error=''
 	BEGIN
-        IF EXISTS (SELECT 1 FROM dbSucursal.Empleado WHERE Legajo = @Legajo AND estado = 0)
+        IF EXISTS (SELECT 1 FROM dbSucursal.Empleado WHERE Legajo = @Legajo AND @estado = 1)
 		BEGIN
 			UPDATE dbSucursal.Empleado
 			SET estado = 1,fechaBaja=NULL
@@ -627,7 +626,8 @@ END
 ------------------------------------------------------------------------------------
 GO
 CREATE OR ALTER PROCEDURE dbProducto.ModificarEstadoLineaDeProducto
-	@IDLineaDeProducto INT
+	@IDLineaDeProducto INT,
+	@estado BIT
 AS
 BEGIN
 	DECLARE	 @error VARCHAR(max)=''
@@ -636,7 +636,7 @@ BEGIN
 		SET	@error=@error+'La linea de producto no existe. '
 	IF @error=''
 	BEGIN
-        IF EXISTS (SELECT 1 FROM dbProducto.LineaDeProducto WHERE IDLineaDeProducto = @IDLineaDeProducto AND estado = 0)
+        IF EXISTS (SELECT 1 FROM dbProducto.LineaDeProducto WHERE IDLineaDeProducto = @IDLineaDeProducto AND @estado = 1)
 		BEGIN
 			UPDATE dbProducto.LineaDeProducto
 			SET estado = 1,fechaBaja=NULL
@@ -657,7 +657,8 @@ END
 ------------------------------------------------------------------------------------
 GO
 CREATE OR ALTER PROCEDURE dbProducto.ModificarEstadoCategoria
-	@IDCategoria INT
+	@IDCategoria INT,
+	@estado BIT
 AS
 BEGIN
 	DECLARE	 @error VARCHAR(max)=''
@@ -666,7 +667,7 @@ BEGIN
         SET	@error=@error+'La categoria no existe. '
 	IF @error=''
 	BEGIN
-        IF EXISTS (SELECT 1 FROM dbProducto.Categoria WHERE IDCategoria = @IDCategoria AND estado = 0)	
+        IF EXISTS (SELECT 1 FROM dbProducto.Categoria WHERE IDCategoria = @IDCategoria AND @estado = 1)	
 		BEGIN
 			UPDATE dbProducto.Categoria
 			SET estado = 1,fechaBaja=NULL
@@ -687,7 +688,8 @@ END
 ------------------------------------------------------------------------------------
 GO
 CREATE OR ALTER PROCEDURE dbProducto.ModificarEstadoProducto
-	@IDProducto INT
+	@IDProducto INT,
+	@estado BIT
 AS
 BEGIN
 	DECLARE	 @error VARCHAR(max)=''
@@ -696,7 +698,7 @@ BEGIN
         SET	@error=@error+'El producto no existe. '
 	IF @error=''
 	BEGIN
-        IF EXISTS (SELECT 1 FROM dbProducto.Producto WHERE IDProducto = @IDProducto AND estado = 0)
+        IF EXISTS (SELECT 1 FROM dbProducto.Producto WHERE IDProducto = @IDProducto AND @estado = 1)
 		BEGIN
 			UPDATE dbProducto.Producto
 			SET estado = 1,fechaBaja=NULL
@@ -717,7 +719,8 @@ END
 ------------------------------------------------------------------------------------
 GO
 CREATE OR ALTER PROCEDURE dbVenta.ModificarEstadoMetodoDePago
-	@IDMetodoDePago INT
+	@IDMetodoDePago INT,
+	@estado BIT
 AS
 BEGIN
 	DECLARE	 @error VARCHAR(max)=''
@@ -726,7 +729,7 @@ BEGIN
         SET	@error=@error+'El metodo de pago no existe. '
 	IF @error=''
 	BEGIN
-        IF EXISTS (SELECT 1 FROM dbVenta.MetodoDePago WHERE IDMetodoDePago = @IDMetodoDePago AND estado = 0)
+        IF EXISTS (SELECT 1 FROM dbVenta.MetodoDePago WHERE IDMetodoDePago = @IDMetodoDePago AND @estado = 1)
         BEGIN
 			UPDATE dbVenta.MetodoDePago
 			SET estado = 1,fechaBaja=NULL

@@ -185,7 +185,7 @@ EXEC dbVenta.InsertarVenta
     @Factura = 123456789,          -- Factura válida
     @tipoFactura = 'A',            -- Tipo de factura válido
     @tipoCliente = 'Normal',       -- Tipo de cliente válido
-    @genero = 'M',                 -- Género válido
+    @genero = 'M',                 -- Género inválido
     @cantidad = 10,                -- Cantidad válida
     @identificadorDePago = '1234-5678-90aa-5678', -- Identificador de pago mal formateado
     @FKempleado = NULL,            -- Legajo vacío
@@ -234,7 +234,7 @@ EXEC dbVenta.InsertarVenta
 --Prueba ACTUALIZACIONES
 GO
 EXEC dbSucursal.ActualizarSucursal
-    @sucursalAactualizar = 1,  -- ID de la sucursal a actualizar
+    @IDSucursal = 1,  -- ID de la sucursal a actualizar
     @direccion = 'Calle Actualizada 123',  -- Nueva dirección
     @numTelefono = '987654321',  -- Nuevo número de teléfono
     @ciudad = 'Ciudad Actualizada',  -- Nueva ciudad
@@ -278,19 +278,41 @@ GO
 /*///////////////////////////////////////////////////////////////////////////////////////// */
 --Prueba BORRADOS(LÓGICOS)
 EXEC dbSucursal.ModificarEstadoSucursal
-	@IDSucursal=2
+	@IDSucursal=2,
+	@estado=1
 GO
 EXEC dbSucursal.ModificarEstadoEmpleado
-	@Legajo=12345
+	@Legajo=12345,
+	@estado=0
 GO
 EXEC dbProducto.ModificarEstadoLineaDeProducto
-	@IDLineaDeProducto=3
+	@IDLineaDeProducto=3,
+	@estado=1
 GO
 EXEC dbProducto.ModificarEstadoCategoria
-	@IDCategoria=1
+	@IDCategoria=1,
+	@estado=0
 GO
 EXEC dbProducto.ModificarEstadoProducto
-	@IDProducto=2
+	@IDProducto=2,
+	@estado=0
 GO
 EXEC dbVenta.ModificarEstadoMetodoDePago
-	@IDMetodoDePago=1
+	@IDMetodoDePago=1,
+	@estado=1
+GO
+
+SELECT * FROM dbSucursal.Sucursal
+GO
+SELECT * FROM dbSucursal.Empleado
+GO
+SELECT * FROM dbProducto.LineaDeProducto
+GO
+SELECT * FROM dbProducto.Categoria
+GO
+SELECT * FROM dbProducto.Producto
+GO
+SELECT * FROM dbVenta.MetodoDePago
+GO
+SELECT * FROM dbVenta.Venta
+

@@ -3,6 +3,23 @@
   <Items>
     <LogicalFolder Name="Connections" Type="2" Sorted="true">
       <Items>
+<<<<<<< Updated upstream
+=======
+        <ConnectionNode Name="(local):DESKTOP-FSRIB0R\Tomas_Arce">
+          <Created>2024-10-30T20:32:21.7147684-03:00</Created>
+          <Type>SQL</Type>
+          <Server>(local)</Server>
+          <UserName />
+          <Authentication>Windows Authentication</Authentication>
+          <InitialDB />
+          <LoginTimeout>30</LoginTimeout>
+          <TrustServerCertificate>True</TrustServerCertificate>
+          <EncryptionOption>False</EncryptionOption>
+          <ExecutionTimeout>0</ExecutionTimeout>
+          <ConnectionProtocol>NotSpecified</ConnectionProtocol>
+          <ApplicationName>Microsoft SQL Server Management Studio - Query</ApplicationName>
+        </ConnectionNode>
+>>>>>>> Stashed changes
         <ConnectionNode Name="DESKTOP-FSRIB0R\SQLEXPRESS:DESKTOP-FSRIB0R\Tomas_Arce">
           <Created>2024-10-26T20:03:19.1938578-03:00</Created>
           <Type>SQL</Type>
@@ -12,8 +29,12 @@
           <InitialDB />
           <LoginTimeout>30</LoginTimeout>
           <TrustServerCertificate>True</TrustServerCertificate>
+<<<<<<< Updated upstream
           <HostNameInServerCertificate />
           <EncryptionOption>True</EncryptionOption>
+=======
+          <EncryptionOption>False</EncryptionOption>
+>>>>>>> Stashed changes
           <ExecutionTimeout>0</ExecutionTimeout>
           <ConnectionProtocol>NotSpecified</ConnectionProtocol>
           <ApplicationName>Microsoft SQL Server Management Studio - Query</ApplicationName>
@@ -52,6 +73,21 @@
           <AssociatedConnUserName />
           <FullPath>04_Importacion.sql</FullPath>
         </FileNode>
+<<<<<<< Updated upstream
+=======
+        <FileNode Name="05_Reportes.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-FSRIB0R\SQLEXPRESS:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-FSRIB0R\SQLEXPRESS</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>05_Reportes.sql</FullPath>
+        </FileNode>
+        <FileNode Name="06_PruebaDeEstres.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-FSRIB0R\SQLEXPRESS:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-FSRIB0R\SQLEXPRESS</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>06_PruebaDeEstres.sql</FullPath>
+        </FileNode>
+>>>>>>> Stashed changes
       </Items>
     </LogicalFolder>
     <LogicalFolder Name="Miscellaneous" Type="3" Sorted="true">

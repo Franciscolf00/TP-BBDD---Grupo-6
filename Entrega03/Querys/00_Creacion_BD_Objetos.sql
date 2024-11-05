@@ -1,6 +1,26 @@
-CREATE DATABASE Com2900G06 COLLATE Modern_Spanish_CI_AS
+--CREATE DATABASE Com2900G06 COLLATE Modern_Spanish_CI_AS
 GO
+<<<<<<< Updated upstream
 
+=======
+-------------------------------------------------------------------------------------
+--CONFIGURACIONES INICIALES
+--Para poder habilitar "Ole Automation Procedures"
+EXEC sp_configure 'show advanced options', 1;
+GO
+--Para poder acceder a fuentes de datos externas(archivo xslx de Excel) con OPENROWSET
+sp_configure 'Ad Hoc Distributed Queries', 1;
+GO
+--Para poder usar los procedures automaticos de OLE dentro de nuestros propios SP
+EXEC sp_configure 'Ole Automation Procedures', 1;		
+RECONFIGURE;
+--EXEC sp_MSSet_oledb_prop N'Microsoft.ACE.OLEDB.12.0', N'AllowInProcess', 1;
+--EXEC sp_MSSet_oledb_prop N'Microsoft.ACE.OLEDB.12.0', N'DynamicParameters', 1;
+
+SET DATEFORMAT mdy; --Seteo el formato de fecha al formato que tienen los archivos
+-------------------------------------------------------------------------------------
+GO
+>>>>>>> Stashed changes
 --use master;drop database Com2900G06;
 
 USE Com2900G06
@@ -16,9 +36,24 @@ create or alter function dbVenta.RutaImportacion()
 returns VARCHAR(4000)
 AS
 BEGIN
+<<<<<<< Updated upstream
 	RETURN 'C:\TP_integrador_Archivos'; --Aca copiarías tu ruta base hasta los archivos.
 END
 go
+=======
+	RETURN 'C:\TP_integrador_Archivos'; --Aca copiarÃ­as tu ruta base hasta los archivos.
+END
+go
+
+DROP TABLE IF EXISTS dbVenta.Venta;
+DROP TABLE IF EXISTS dbSucursal.Empleado;    
+DROP TABLE IF EXISTS dbSucursal.Sucursal; 
+DROP TABLE IF EXISTS dbProducto.Producto; 
+DROP TABLE IF EXISTS dbProducto.Categoria;   
+DROP TABLE IF EXISTS dbProducto.LineaDeProducto; 
+DROP TABLE IF EXISTS dbVenta.MetodoDePago;  
+
+>>>>>>> Stashed changes
 CREATE TABLE dbSucursal.Sucursal(
 	IDSucursal INT IDENTITY(1,1) PRIMARY KEY,
 	direccion VARCHAR(100),
