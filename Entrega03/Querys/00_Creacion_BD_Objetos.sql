@@ -50,7 +50,7 @@ CREATE TABLE dbSucursal.Empleado(
 	emailPersonal VARCHAR(100) CHECK(emailPersonal like '%@%.com'),
 	direccion VARCHAR(100),
 	cargo CHAR(22) CHECK(cargo in ('Cajero', 'Supervisor', 'Gerente de sucursal')),
-	turno CHAR(16) CHECK(turno in('TM', 'TT' , 'Jornada Completa')),
+	turno VARCHAR(16) CHECK(turno in('TM', 'TT' , 'Jornada Completa')),
 	FKSucursal INT NOT NULL REFERENCES dbSucursal.Sucursal(IDSucursal),
 	estado BIT,
 	fechaBaja DATETIME

@@ -10,19 +10,37 @@ CREATE OR ALTER PROCEDURE dbReporte.mostrarTotalDias
     @anio SMALLINT
 AS
 BEGIN
-	SELECT IDProducto AS "@IDProducto", Nombre AS "@Nombre", isnull(Lunes, 0) Lunes, isnull(Martes, 0) Martes, isnull(Miércoles, 0) Miércoles,
+	SELECT 'Total facturado', isnull(Lunes, 0) Lunes, isnull(Martes, 0) Martes, isnull(Miércoles, 0) Miércoles,
 	isnull(Jueves, 0) Jueves, isnull(Sábado, 0) Sábado, isnull(Domingo, 0) Domingo 
-	FROM (SELECT p.IDProducto, p.precioUnitario * v.cantidad as Cantidad_vendida, p.nombre as Nombre, DATENAME(WEEKDAY, v.fecha) AS dia
+	FROM (SELECT p.precioUnitario * v.cantidad as Cantidad_vendida, DATENAME(WEEKDAY, v.fecha) AS dia
 	FROM dbVenta.Venta v
 	INNER JOIN dbProducto.Producto p ON p.IDProducto = v.FKProducto
 	WHERE DATEPART(MONTH, v.fecha) = @mes AND DATEPART(YEAR, v.fecha) = @anio) AS cantPorDia
 	PIVOT (SUM(Cantidad_vendida)
-		FOR dia in ([Lunes],[Martes],[Miércoles],[Jueves],[Viernes],[Sábado],[Domingo])) Producto
+		FOR dia in ([Lunes],[Martes],[Miércoles],[Jueves],[Viernes],[Sábado],[Tucuman])) Producto
 	FOR XML PATH('Producto'), ROOT ('Total_facturado'), ELEMENTS XSINIL;
 END
 GO   
 
-exec dbReporte.mostrarTotalDias 11,2024
+--Otra version, separando por producto
+--CREATE OR ALTER PROCEDURE dbReporte.mostrarTotalDias
+--    @mes TINYINT,
+--    @anio SMALLINT
+--AS
+--BEGIN
+--	SELECT 'Total facturado', isnull(Lunes, 0) Lunes, isnull(Martes, 0) Martes, isnull(Miércoles, 0) Miércoles,
+--	isnull(Jueves, 0) Jueves, isnull(Sábado, 0) Sábado, isnull(Domingo, 0) Domingo 
+--	FROM (SELECT p.precioUnitario * v.cantidad as Cantidad_vendida,  DATENAME(WEEKDAY, v.fecha) AS dia
+--	FROM dbVenta.Venta v
+--	INNER JOIN dbProducto.Producto p ON p.IDProducto = v.FKProducto
+--	WHERE DATEPART(MONTH, v.fecha) = @mes AND DATEPART(YEAR, v.fecha) = @anio) AS cantPorDia
+--	PIVOT (SUM(Cantidad_vendida)
+--		FOR dia in ([Lunes],[Martes],[Miércoles],[Jueves],[Viernes],[Sábado],[Domingo])) Producto
+--	--FOR XML PATH('Producto'), ROOT ('Total_facturado'), ELEMENTS XSINIL;
+--END
+--GO   
+
+exec dbReporte.mostrarTotalDias 1,2019
 GO
 
 
@@ -36,7 +54,6 @@ BEGIN
     DECLARE @meses VARCHAR(MAX);
     DECLARE @columnas VARCHAR(MAX);
 
-    -- Definir los meses y construir la lista de columnas con ISNULL para el trimestre
     SET @meses = CASE @trimestre
                     WHEN 1 THEN '[Enero], [Febrero], [Marzo]'
                     WHEN 2 THEN '[Abril], [Mayo], [Junio]'
@@ -69,13 +86,11 @@ BEGIN
     ) AS Producto 
 	FOR XML PATH(''Turno''), ROOT (''Trimestre''), ELEMENTS XSINIL;';
 
-
-    -- Ejecutar la consulta dinámica con los parámetros
     EXEC sp_executesql @sql, N'@trimestre TINYINT, @anio SMALLINT', @trimestre, @anio;
 END
 GO
 
-exec dbReporte.mostrarTotalTrimestre 1,2024
+exec dbReporte.mostrarTotalTrimestre 1,2019
 
 go
 -- Por rango de fechas: ingresando un rango de fechas a demanda, debe poder mostrar la cantidad de productos vendidos en ese rango, ordenado de mayor a menor. 
@@ -94,7 +109,8 @@ BEGIN
 END
 go
 
-exec dbReporte.mostrarCantidadPorFecha '2024-01-15', '2024-11-03'
+
+exec dbReporte.mostrarCantidadPorFecha '2019-01-15', '2019-03-15'
 go
 
 -- Por rango de fechas: ingresando un rango de fechas a demanda, debe poder mostrar la cantidad de productos vendidos en ese rango por sucursal, ordenado de mayor a menor. 
@@ -113,7 +129,8 @@ BEGIN
 END
 go
 
-exec dbReporte.mostrarCantidadSucursalPorFecha '2024-01-15', '2024-11-03'
+
+exec dbReporte.mostrarCantidadSucursalPorFecha '2019-01-15', '2019-03-15'
 go
 
 -- Mostrar los 5 productos más vendidos en un mes, por semana
@@ -124,12 +141,12 @@ AS
 BEGIN 
     SELECT *
     FROM (
-        SELECT 
-            v.FKProducto AS '@IDProducto', p.nombre AS Nombre, 
+        SELECT v.FKProducto AS '@IDProducto',
+            p.nombre AS Nombre, 
 			--Se resta la semana del año en la que cae el primer día del mes de la semana del año en la que está actualmente
             (DATEPART(WEEK, v.fecha) - DATEPART(WEEK, DATEADD(MONTH, DATEDIFF(MONTH, 0, v.fecha), 0)) + 1) AS SemanaMes,
             COUNT(v.FKProducto) AS Cantidad_vendida,
-            RANK() OVER (PARTITION BY (DATEPART(WEEK, v.fecha) - DATEPART(WEEK, DATEADD(MONTH, DATEDIFF(MONTH, 0, v.fecha), 0)) + 1)
+            DENSE_RANK() OVER (PARTITION BY (DATEPART(WEEK, v.fecha) - DATEPART(WEEK, DATEADD(MONTH, DATEDIFF(MONTH, 0, v.fecha), 0)) + 1)
                          ORDER BY COUNT(v.FKProducto) DESC) AS Ranking_Semana
         FROM dbVenta.Venta v
         INNER JOIN dbProducto.Producto p ON p.IDProducto = v.FKProducto
@@ -143,7 +160,7 @@ BEGIN
 END
 GO
 
-EXEC dbReporte.mostrarTop5ProductosPorSemana 11, 2024;
+EXEC dbReporte.mostrarTop5ProductosPorSemana 1, 2019;
 GO
 
 --Mostrar los 5 productos menos vendidos en el mes. 
@@ -155,10 +172,9 @@ BEGIN
     SELECT *
     FROM (
         SELECT 
-			v.FKProducto AS '@IDProducto',
-            p.nombre AS Nombre, 
+            v.FKProducto AS '@IDProducto', p.nombre AS Nombre, 
             COUNT(v.FKProducto) AS Cantidad_vendida,
-            RANK() OVER (ORDER BY COUNT(v.FKProducto)) AS Ranking
+            DENSE_RANK() OVER (ORDER BY COUNT(v.FKProducto)) AS Ranking
         FROM dbVenta.Venta v
         INNER JOIN dbProducto.Producto p ON p.IDProducto = v.FKProducto
         WHERE DATEPART(MONTH, v.fecha) = @mes AND DATEPART(YEAR, v.fecha) = @anio
@@ -166,11 +182,11 @@ BEGIN
     ) ranked
     WHERE Ranking <= 5
     ORDER BY Ranking
-	FOR XML PATH('Producto'), ROOT ('TopProductos'), ELEMENTS XSINIL;
+	--FOR XML PATH('Producto'), ROOT ('TopProductos'), ELEMENTS XSINIL;
 END
 GO
 
-EXEC dbReporte.mostrarTopMenos5ProductosPorMes 11, 2024;
+EXEC dbReporte.mostrarTopMenos5ProductosPorMes 1, 2019;
 GO
 
 --Mostrar total acumulado de ventas (o sea tambien mostrar el detalle) para una fecha y sucursal particulares 
@@ -179,14 +195,15 @@ CREATE OR ALTER PROCEDURE dbReporte.mostrarAcumuladoSucursal
 @idSucursal TINYINT
 AS
 BEGIN
-	SELECT v.IDVenta AS '@IDVenta', v.Factura, v.tipoFactura, v.identificadorDePago, v.fecha, v.hora, s.sucursal, v.cantidad, p.nombre, p.precioUnitario, SUM(p.precioUnitario * v.cantidad) OVER (ORDER BY v.fecha) as Acumulado
+	SELECT v.IDVenta AS '@IDVenta', v.Factura, v.tipoFactura, v.identificadorDePago, v.fecha, v.hora, s.sucursal, v.cantidad, p.nombre, p.precioUnitario, 
+	SUM(p.precioUnitario * v.cantidad) OVER (ORDER BY v.fecha) as Acumulado
 	FROM dbVenta.Venta v
 	INNER JOIN dbProducto.Producto p ON p.IDProducto = v.FKProducto
 	INNER JOIN dbSucursal.Sucursal s ON s.IDSucursal = v.FKSucursal
-	WHERE v.fecha <= @fecha AND s.IDSucursal = @idSucursal
+	WHERE v.fecha = @fecha AND s.IDSucursal = @idSucursal
 	FOR XML PATH('Venta'), ROOT ('Ventas'), ELEMENTS XSINIL;
 END
 go
 
-EXEC dbReporte.mostrarAcumuladoSucursal '2024-12-01', 1;
+EXEC dbReporte.mostrarAcumuladoSucursal '2019-03-01', 1;
 GO
