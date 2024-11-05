@@ -35,8 +35,8 @@ CREATE TABLE dbSucursal.Sucursal(
 	IDSucursal INT IDENTITY(1,1) PRIMARY KEY,
 	direccion VARCHAR(100),
 	numTelefono CHAR(9),
-	ciudad VARCHAR(9),
-	sucursal VARCHAR(20),
+	ciudad VARCHAR(50),
+	sucursal VARCHAR(50),
 	estado BIT,
 	fechaBaja DATETIME
 )
