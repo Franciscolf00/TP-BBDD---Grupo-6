@@ -35,15 +35,8 @@ BEGIN
 	ORDER BY Fecha,Hora
 END
 GO
-EXEC dbVenta.MostrarVentas
-GO
 -----------------------------------------------------------
 --API PARA PASAR DE DOLARES A PESOS(CAMBIO OFICIAL)
-EXEC sp_configure 'show advanced options', 1;
-RECONFIGURE;
-GO
-EXEC sp_configure 'Ole Automation Procedures', 1;	
-RECONFIGURE;
 GO
 CREATE OR ALTER PROCEDURE dbProducto.APIDolarAPeso
     @tasaCambio REAL OUTPUT 
@@ -73,5 +66,24 @@ BEGIN
 	EXEC sp_OADestroy @Object
 
 	--SELECT @tasaCambio AS [Tasa de conversión];
-
 END
+GO
+CREATE OR ALTER PROCEDURE dbProducto.CargaInicialLineaYCategoria
+AS
+BEGIN
+	--Inserto Linea de producto "Importado" para luego poder buscarla al insertar productos importados
+	INSERT INTO dbProducto.LineaDeProducto(nombre,estado)
+	VALUES('Importado',1)
+	
+	--Inserto Linea de producto "Tecnología" y ,asociada a la misma, categoría "Electrónicos" para luego poder buscarla al insertar 
+	--productos que sean accesorios electrónicos
+	INSERT INTO dbProducto.LineaDeProducto(nombre,estado)
+	VALUES('Tecnología',1)
+
+	INSERT INTO dbProducto.Categoria(nombre,FKLineaDeProducto,estado)
+	SELECT 'Electrónicos',IDLineaDeProducto,1
+	FROM dbProducto.LineaDeProducto
+	WHERE nombre='Tecnología'
+END
+GO
+EXEC dbProducto.CargaInicialLineaYCategoria
