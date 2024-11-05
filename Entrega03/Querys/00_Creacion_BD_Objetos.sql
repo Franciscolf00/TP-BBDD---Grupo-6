@@ -1,7 +1,20 @@
 CREATE DATABASE Com2900G06 COLLATE Modern_Spanish_CI_AS
+-------------------------------------------------------------------------------------
+--CONFIGURACIONES INICIALES
+--Para poder habilitar "Ole Automation Procedures"
+EXEC sp_configure 'show advanced options', 1;
 GO
-SET DATEFORMAT mdy; --seteo el formato de fecha en el formato que tienen los archivos
+--Para poder acceder a fuentes de datos externas(archivo xslx de Excel) con OPENROWSET
+sp_configure 'Ad Hoc Distributed Queries', 1;
 GO
+--Para poder usar los procedures automaticos de OLE dentro de nuestros propios SP
+EXEC sp_configure 'Ole Automation Procedures', 1;
+RECONFIGURE;
+--EXEC sp_MSSet_oledb_prop N'Microsoft.ACE.OLEDB.12.0', N'AllowInProcess', 1;
+--EXEC sp_MSSet_oledb_prop N'Microsoft.ACE.OLEDB.12.0', N'DynamicParameters', 1;
+
+SET DATEFORMAT mdy; --Seteo el formato de fecha al formato que tienen los archivos
+-------------------------------------------------------------------------------------
 --use master;drop database Com2900G06;
 
 USE Com2900G06
