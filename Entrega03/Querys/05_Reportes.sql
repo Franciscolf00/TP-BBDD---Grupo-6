@@ -17,7 +17,7 @@ BEGIN
 	INNER JOIN dbProducto.Producto p ON p.IDProducto = v.FKProducto
 	WHERE DATEPART(MONTH, v.fecha) = @mes AND DATEPART(YEAR, v.fecha) = @anio) AS cantPorDia
 	PIVOT (SUM(Cantidad_vendida)
-		FOR dia in ([Lunes],[Martes],[Miércoles],[Jueves],[Viernes],[Sábado],[Tucuman])) Producto
+		FOR dia in ([Lunes],[Martes],[Miércoles],[Jueves],[Viernes],[Sábado],[Domingo])) Producto
 	FOR XML PATH('Producto'), ROOT ('Total_facturado'), ELEMENTS XSINIL;
 END
 GO   
@@ -182,7 +182,7 @@ BEGIN
     ) ranked
     WHERE Ranking <= 5
     ORDER BY Ranking
-	--FOR XML PATH('Producto'), ROOT ('TopProductos'), ELEMENTS XSINIL;
+	FOR XML PATH('Producto'), ROOT ('TopProductos'), ELEMENTS XSINIL;
 END
 GO
 
