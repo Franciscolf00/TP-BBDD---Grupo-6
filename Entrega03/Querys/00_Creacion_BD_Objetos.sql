@@ -1,6 +1,7 @@
 CREATE DATABASE Com2900G06 COLLATE Modern_Spanish_CI_AS
 GO
-
+SET DATEFORMAT mdy; --seteo el formato de fecha en el formato que tienen los archivos
+GO
 --use master;drop database Com2900G06;
 
 USE Com2900G06
@@ -16,7 +17,7 @@ create or alter function dbVenta.RutaImportacion()
 returns VARCHAR(max)
 AS
 BEGIN
-	RETURN 'C:\Users\Francisco\OneDrive - Enta Consulting\Escritorio\BBDD Aplicada\TP BBDD Aplicada\TP_integrador_Archivos'; --Aca copiarías tu ruta base hasta los archivos.
+	RETURN 'C:\Users\Francisco\OneDrive - Enta Consulting\Escritorio\BBDD Aplicada\TP BBDD Aplicada\TP_integrador_Archivos'; --Aca copiarï¿½as tu ruta base hasta los archivos.
 END
 go
 
