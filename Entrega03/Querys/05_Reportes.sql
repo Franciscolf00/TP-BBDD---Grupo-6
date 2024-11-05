@@ -10,7 +10,8 @@ CREATE OR ALTER PROCEDURE dbReporte.mostrarTotalDias
     @anio SMALLINT
 AS
 BEGIN
-	SELECT 'Total facturado', isnull(Lunes, 0) Lunes, isnull(Martes, 0) Martes, isnull(Miércoles, 0) Miércoles,
+	--'Total facturado'
+	SELECT isnull(Lunes, 0) Lunes, isnull(Martes, 0) Martes, isnull(Miércoles, 0) Miércoles,
 	isnull(Jueves, 0) Jueves, isnull(Sábado, 0) Sábado, isnull(Domingo, 0) Domingo 
 	FROM (SELECT p.precioUnitario * v.cantidad as Cantidad_vendida, DATENAME(WEEKDAY, v.fecha) AS dia
 	FROM dbVenta.Venta v
