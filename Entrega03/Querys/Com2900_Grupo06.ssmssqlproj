@@ -49,11 +49,11 @@
           <AssociatedConnUserName />
           <FullPath>03_Importacion.sql</FullPath>
         </FileNode>
-        <FileNode Name="04_Reportes.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(local):True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>(local)</AssociatedConnSrvName>
+        <FileNode Name="05_Reportes.sql">
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
           <AssociatedConnUserName />
-          <FullPath>04_Reportes.sql</FullPath>
+          <FullPath>05_Reportes.sql</FullPath>
         </FileNode>
       </Items>
     </LogicalFolder>
