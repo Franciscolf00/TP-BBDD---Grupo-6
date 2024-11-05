@@ -37,29 +37,23 @@
           <AssociatedConnUserName />
           <FullPath>00_Creacion_BD_Objetos.sql</FullPath>
         </FileNode>
-<<<<<<< HEAD
-        <FileNode Name="01_Validacion.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(local):True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>(local)</AssociatedConnSrvName>
-=======
         <FileNode Name="01_Inserciones_Actualizaciones_BorradosLogicos.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-FSRIB0R\SQLEXPRESS:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>DESKTOP-FSRIB0R\SQLEXPRESS</AssociatedConnSrvName>
->>>>>>> RamaTomas
           <AssociatedConnUserName />
           <FullPath>01_Inserciones_Actualizaciones_BorradosLogicos.sql</FullPath>
         </FileNode>
-<<<<<<< HEAD
-        <FileNode Name="03_Importacion.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(local):True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>(local)</AssociatedConnSrvName>
-=======
         <FileNode Name="02_LotesDePrueba.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-FSRIB0R\SQLEXPRESS:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>DESKTOP-FSRIB0R\SQLEXPRESS</AssociatedConnSrvName>
->>>>>>> RamaTomas
           <AssociatedConnUserName />
           <FullPath>02_LotesDePrueba.sql</FullPath>
+        </FileNode>
+        <FileNode Name="02_SPTablas.sql">
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
+          <AssociatedConnUserName />
+          <FullPath>02_SPTablas.sql</FullPath>
         </FileNode>
         <FileNode Name="03_Variedad.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-FSRIB0R\SQLEXPRESS:True</AssociatedConnectionMoniker>
@@ -74,8 +68,8 @@
           <FullPath>04_Importacion.sql</FullPath>
         </FileNode>
         <FileNode Name="05_Reportes.sql">
-          <AssociatedConnectionMoniker />
-          <AssociatedConnSrvName />
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(local):True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>(local)</AssociatedConnSrvName>
           <AssociatedConnUserName />
           <FullPath>05_Reportes.sql</FullPath>
         </FileNode>
