@@ -5,6 +5,7 @@ CREATE OR ALTER PROCEDURE dbVenta.MostrarVentas
 AS
 BEGIN
 	SELECT 
+		--inserto '-' primero en el caracter 4, luego en el 7. DDDDDDDDD -> DDD-DDDDDD -> DDD-DD-DDDD
 		STUFF(STUFF(CONVERT(VARCHAR(9), Factura), 4, 0, '-'), 7, 0, '-')  AS ID_Factura,	--Lo muestro con formato DDD-DD-DDDD
 		tipoFactura AS Tipo_de_Factura,
 		s.ciudad AS Ciudad,

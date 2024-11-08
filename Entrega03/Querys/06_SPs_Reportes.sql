@@ -22,7 +22,6 @@ BEGIN
 	FOR XML PATH('Producto'), ROOT ('Total_facturado'), ELEMENTS XSINIL;
 END
 GO   
-
 --Otra version, separando por producto
 --CREATE OR ALTER PROCEDURE dbReporte.mostrarTotalDias
 --    @mes TINYINT,
@@ -41,11 +40,9 @@ GO
 --END
 --GO   
 
-exec dbReporte.mostrarTotalDias 1,2019
-GO
-
 
 -- Trimestral: mostrar el total facturado por turnos de trabajo por mes. 
+
 CREATE OR ALTER PROCEDURE dbReporte.mostrarTotalTrimestre
     @trimestre TINYINT,
     @anio SMALLINT
@@ -90,10 +87,6 @@ BEGIN
     EXEC sp_executesql @sql, N'@trimestre TINYINT, @anio SMALLINT', @trimestre, @anio;
 END
 GO
-
-exec dbReporte.mostrarTotalTrimestre 1,2019
-
-go
 -- Por rango de fechas: ingresando un rango de fechas a demanda, debe poder mostrar la cantidad de productos vendidos en ese rango, ordenado de mayor a menor. 
 CREATE OR ALTER PROCEDURE dbReporte.mostrarCantidadPorFecha
     @inicioFecha DATE,
@@ -108,12 +101,7 @@ BEGIN
 	ORDER BY COUNT(v.FKProducto) desc
 	FOR XML PATH ('Producto'), ROOT ('Productos'), ELEMENTS XSINIL
 END
-go
-
-
-exec dbReporte.mostrarCantidadPorFecha '2019-01-15', '2019-03-15'
-go
-
+GO
 -- Por rango de fechas: ingresando un rango de fechas a demanda, debe poder mostrar la cantidad de productos vendidos en ese rango por sucursal, ordenado de mayor a menor. 
 CREATE OR ALTER PROCEDURE dbReporte.mostrarCantidadSucursalPorFecha
     @inicioFecha DATE,
@@ -128,12 +116,7 @@ BEGIN
 	ORDER BY Cantidad_vendida desc
 	FOR XML PATH('Sucursal'), ROOT ('CantidadSucursal'), ELEMENTS XSINIL;
 END
-go
-
-
-exec dbReporte.mostrarCantidadSucursalPorFecha '2019-01-15', '2019-03-15'
-go
-
+GO
 -- Mostrar los 5 productos más vendidos en un mes, por semana
 CREATE OR ALTER PROCEDURE dbReporte.mostrarTop5ProductosPorSemana
     @mes TINYINT,
@@ -160,10 +143,6 @@ BEGIN
 	FOR XML PATH('Producto'), ROOT ('TopProductos'), ELEMENTS XSINIL;
 END
 GO
-
-EXEC dbReporte.mostrarTop5ProductosPorSemana 1, 2019;
-GO
-
 --Mostrar los 5 productos menos vendidos en el mes. 
 CREATE OR ALTER PROCEDURE dbReporte.mostrarTopMenos5ProductosPorMes
     @mes TINYINT,
@@ -186,10 +165,6 @@ BEGIN
 	FOR XML PATH('Producto'), ROOT ('TopProductos'), ELEMENTS XSINIL;
 END
 GO
-
-EXEC dbReporte.mostrarTopMenos5ProductosPorMes 1, 2019;
-GO
-
 --Mostrar total acumulado de ventas (o sea tambien mostrar el detalle) para una fecha y sucursal particulares 
 CREATE OR ALTER PROCEDURE dbReporte.mostrarAcumuladoSucursal
 @fecha DATE,
@@ -204,7 +179,5 @@ BEGIN
 	WHERE v.fecha = @fecha AND s.IDSucursal = @idSucursal
 	FOR XML PATH('Venta'), ROOT ('Ventas'), ELEMENTS XSINIL;
 END
-go
-
-EXEC dbReporte.mostrarAcumuladoSucursal '2019-03-01', 1;
 GO
+

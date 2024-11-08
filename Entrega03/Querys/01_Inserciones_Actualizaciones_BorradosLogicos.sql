@@ -32,7 +32,7 @@ END
 ------------------------------------------------------------------------------------
 GO
 CREATE OR ALTER PROCEDURE dbSucursal.InsertarSucursal
-	@direccion VARCHAR(max),
+	@direccion VARCHAR(max) = '',
 	@numTelefono CHAR(9),
 	@ciudad VARCHAR(max),
 	@sucursal VARCHAR(max)

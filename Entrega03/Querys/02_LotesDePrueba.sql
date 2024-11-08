@@ -8,7 +8,7 @@ USE Com2900G06
 EXEC dbVenta.InsertarMetodoDePago @nombre = 'Cash'; --Debería insertarse correctamente.
 GO
 -- Caso 2: Nombre válido
-EXEC dbVenta.InsertarMetodoDePago @nombre = 'Credit card'; --Debería insertarse correctamente.
+EXEC dbVenta.InsertarMetodoDePago 'Credit card'; --Debería insertarse correctamente.
 GO
 -- Caso 3: Nombre vacío
 EXEC dbVenta.InsertarMetodoDePago @nombre = ''; --'Falta nombre.'
@@ -315,4 +315,4 @@ GO
 SELECT * FROM dbVenta.MetodoDePago
 GO
 SELECT * FROM dbVenta.Venta
-
+

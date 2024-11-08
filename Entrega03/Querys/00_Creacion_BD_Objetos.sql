@@ -55,7 +55,7 @@ create or alter function dbVenta.RutaImportacion()
 returns VARCHAR(max)
 AS
 BEGIN
-	RETURN 'D:\Github\gitops\TP-BBDD---Grupo-6\TP_integrador_Archivos'; --Aca copiar�as tu ruta base hasta los archivos.
+	RETURN 'C:\Users\Tomas_Arce\Documents\GitHub\TP-BBDD---Grupo-6\TP_integrador_Archivos'; --Aca copiaríaas tu ruta base hasta los archivos.
 END
 go
 
