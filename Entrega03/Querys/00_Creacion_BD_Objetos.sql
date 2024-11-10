@@ -50,7 +50,8 @@ CREATE SCHEMA dbSucursal
 GO
 CREATE SCHEMA dbReporte
 GO
-
+CREATE SCHEMA dbFactura
+GO
 create or alter function dbVenta.RutaImportacion()
 returns VARCHAR(max)
 AS
@@ -66,6 +67,9 @@ DROP TABLE IF EXISTS dbProducto.Producto;
 DROP TABLE IF EXISTS dbProducto.Categoria;   
 DROP TABLE IF EXISTS dbProducto.LineaDeProducto; 
 DROP TABLE IF EXISTS dbVenta.MetodoDePago;   
+DROP TABLE IF EXISTS dbFactura.Factura;
+DROP TABLE IF EXISTS dbFactura.DetalleDeFactura;
+DROP TABLE IF EXISTS dbFactura.NotaDeCredito;
 
 CREATE TABLE dbSucursal.Sucursal(
 	IDSucursal INT IDENTITY(1,1) PRIMARY KEY,
@@ -126,21 +130,43 @@ CREATE TABLE dbVenta.MetodoDePago(
 	fechaBaja DATETIME
 )
 go
+CREATE TABLE dbFactura.Factura(
+	IDFactura INT IDENTITY (1,1) PRIMARY KEY,
+	numeroFactura INT,	--Lo tengo que guardar como int para verificar duplicados a la hora de insertar
+	tipoFactura CHAR(1) CHECK(tipoFactura in ('A', 'B', 'C')),
+	fechaHoraEmision DATETIME,
+	fechaHoraPago DATETIME,		--Para ahorrarnos tener que hacer estado "Pagada"
+	total real
+)
+go
+CREATE TABLE dbFactura.DetalleDeFactura(
+	IDDetalle INT IDENTITY (1,1) PRIMARY KEY,
+	cantidad INT,
+	subtotal real,
+	precioUnitarioAlMomento real,
+	FKProducto INT NOT NULL REFERENCES dbProducto.Producto(IDProducto),
+	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
+)
+go
+CREATE TABLE dbFactura.NotaDeCredito(
+	IDNotaDeCredito INT IDENTITY (1,1) PRIMARY KEY,
+	motivo VARCHAR(150),
+	fechaNota DATE,
+	horaNota TIME,
+	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
+)
+go
 CREATE TABLE dbVenta.Venta(
 	IDVenta INT IDENTITY(1,1) PRIMARY KEY,
-	Factura INT,				--Lo tengo que guardar como int para verificar duplicados a la hora de insertar
-	tipoFactura CHAR(1) CHECK(tipoFactura in ('A', 'B', 'C')),
 	tipoCliente CHAR(6) CHECK(tipoCliente in ('Member', 'Normal')),
 	genero CHAR(6) CHECK(genero in ('Male', 'Female')),
-	cantidad INT,
-	fecha DATE,
-	hora TIME,
+	fechaVenta DATE,
+	horaVenta TIME,
 	identificadorDePago VARCHAR(30) CHECK((LEN(identificadorDePago) = 22 AND identificadorDePago LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
 											OR (LEN(identificadorDePago) = 19 AND identificadorDePago LIKE '[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]')								
 											OR identificadorDePago IS NULL),
 	FKEmpleado INT NOT NULL REFERENCES dbSucursal.Empleado(Legajo),
 	FKMetodoDePago INT NOT NULL REFERENCES dbVenta.MetodoDePago(IDMetodoDePago),
-	FKProducto INT NOT NULL REFERENCES dbProducto.Producto(IDProducto),
-	FKSucursal INT NOT NULL REFERENCES dbSucursal.Sucursal(IDSucursal)
+	FKSucursal INT NOT NULL REFERENCES dbSucursal.Sucursal(IDSucursal),
+	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
 )
-

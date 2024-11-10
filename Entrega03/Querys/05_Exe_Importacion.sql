@@ -1,20 +1,20 @@
 USE Com2900G06
 GO
-exec dbVenta.CargaInformacionComplementariaSucursal 
+exec dbSucursal.CargaInformacionComplementariaSucursal 'C:\Users\Tomas_Arce\Documents\GitHub\TP-BBDD---Grupo-6\TP_integrador_Archivos';
 GO
-exec dbVenta.CargaInformacionComplementariaEmpleados
+exec dbSucursal.CargaInformacionComplementariaEmpleados 'C:\Users\Tomas_Arce\Documents\GitHub\TP-BBDD---Grupo-6\TP_integrador_Archivos';
 GO
-exec dbVenta.CargaInformacionComplementariaClasificacionProductos
+exec dbProducto.CargaInformacionComplementariaClasificacionProductos 'C:\Users\Tomas_Arce\Documents\GitHub\TP-BBDD---Grupo-6\TP_integrador_Archivos';
 GO
-exec dbVenta.CargaInformacionComplementariaMetodosDePago
+exec dbVenta.CargaInformacionComplementariaMetodosDePago 'C:\Users\Tomas_Arce\Documents\GitHub\TP-BBDD---Grupo-6\TP_integrador_Archivos';
 GO
-exec dbProducto.CargaMasivaProductosImportados
+exec dbProducto.CargaMasivaProductosImportados 'C:\Users\Tomas_Arce\Documents\GitHub\TP-BBDD---Grupo-6\TP_integrador_Archivos';
 GO
-exec dbProducto.cargaAccesoriosElectronicos
+exec dbProducto.cargaAccesoriosElectronicos 'C:\Users\Tomas_Arce\Documents\GitHub\TP-BBDD---Grupo-6\TP_integrador_Archivos';
 GO
-exec dbVenta.CargaMasivaCatalogo
+exec dbProducto.CargaMasivaCatalogo 'C:\Users\Tomas_Arce\Documents\GitHub\TP-BBDD---Grupo-6\TP_integrador_Archivos';
 GO
-exec dbVenta.CargaMasivaVentas
+exec dbVenta.CargaMasivaVentas 'C:\Users\Tomas_Arce\Documents\GitHub\TP-BBDD---Grupo-6\TP_integrador_Archivos';
 GO
 
 --EXEC dbVenta.MostrarVentas

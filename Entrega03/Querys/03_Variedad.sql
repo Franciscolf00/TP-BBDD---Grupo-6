@@ -5,35 +5,39 @@ CREATE OR ALTER PROCEDURE dbVenta.MostrarVentas
 AS
 BEGIN
 	SELECT 
-		--inserto '-' primero en el caracter 4, luego en el 7. DDDDDDDDD -> DDD-DDDDDD -> DDD-DD-DDDD
-		STUFF(STUFF(CONVERT(VARCHAR(9), Factura), 4, 0, '-'), 7, 0, '-')  AS ID_Factura,	--Lo muestro con formato DDD-DD-DDDD
-		tipoFactura AS Tipo_de_Factura,
-		s.ciudad AS Ciudad,
-		tipoCliente AS Tipo_de_Cliente,
-		genero AS Genero,
-		l.nombre AS Linea_de_Producto,
-		p.nombre AS Producto,
-		p.precioUnitario AS Precio_Unitario,
-		cantidad AS Cantidad,
-		fecha AS Fecha,
-		hora AS Hora,
-		m.nombre AS Medio_de_Pago,
-		e.Legajo AS Empleado,
-		s.sucursal AS Sucursal
+    -- Formatear el número de factura
+    STUFF(STUFF(CONVERT(VARCHAR(9), f.numeroFactura), 4, 0, '-'), 7, 0, '-') AS ID_Factura,  -- Lo muestro con formato DDD-DD-DDDD
+    f.tipoFactura AS Tipo_de_Factura,
+    s.ciudad AS Ciudad,
+    v.tipoCliente AS Tipo_de_Cliente,
+    v.genero AS Genero,
+    l.nombre AS Linea_de_Producto,
+    p.nombre AS Producto,
+    p.precioUnitario AS Precio_Unitario,
+    df.cantidad AS Cantidad,
+    v.fechaVenta AS Fecha,
+    v.horaVenta AS Hora,
+    m.nombre AS Medio_de_Pago,
+    e.Legajo AS Empleado,
+    s.sucursal AS Sucursal
 	FROM dbVenta.Venta v
+	JOIN dbFactura.Factura f
+		ON f.IDFactura = v.FKFactura
+	JOIN dbFactura.DetalleDeFactura df
+		ON df.FKFactura = f.IDFactura
 	JOIN dbProducto.Producto p
-		ON p.IDProducto=v.FKproducto
-	JOIN dbVenta.MetodoDePago m
-		ON m.IDMetodoDePago=v.FKMetodoDePago
-	JOIN dbSucursal.Empleado e
-		ON e.Legajo=v.FKempleado
-	JOIN dbSucursal.Sucursal s
-		ON s.IDSucursal=e.FKSucursal
+		ON p.IDProducto = df.FKProducto
 	JOIN dbProducto.Categoria c
-		ON c.IDCategoria=p.FKCategoria
+		ON c.IDCategoria = p.FKCategoria
 	JOIN dbProducto.LineaDeProducto l
-		ON l.IDLineaDeProducto=c.FKLineaDeProducto
-	ORDER BY Fecha,Hora
+		ON l.IDLineaDeProducto = c.FKLineaDeProducto
+	JOIN dbVenta.MetodoDePago m
+		ON m.IDMetodoDePago = v.FKMetodoDePago
+	JOIN dbSucursal.Empleado e
+		ON e.Legajo = v.FKempleado
+	JOIN dbSucursal.Sucursal s
+		ON s.IDSucursal = e.FKSucursal
+	ORDER BY v.fechaVenta, v.horaVenta;
 END
 GO
 -----------------------------------------------------------
@@ -88,3 +92,48 @@ BEGIN
 END
 GO
 EXEC dbProducto.CargaInicialLineaYCategoria
+go
+CREATE OR ALTER PROCEDURE dbVenta.MostrarVentas
+AS
+BEGIN
+	SELECT 
+		-- Formateo del número de factura (con guiones en la posición adecuada)
+		STUFF(STUFF(CONVERT(VARCHAR(9), f.numeroFactura), 4, 0, '-'), 7, 0, '-') AS ID_Factura,
+		f.tipoFactura AS Tipo_de_Factura,
+		s.Ciudad AS Ciudad,
+		v.tipoCliente AS Tipo_de_Cliente,
+		v.genero AS Genero,
+		lp.nombre AS Linea_de_Producto,
+		p.nombre AS Producto,
+		p.precioUnitario AS Precio_Unitario,
+		df.cantidad AS Cantidad,
+		f.fechaHoraEmision AS fyh,
+		m.nombre AS Medio_de_Pago,
+		e.Legajo AS Empleado,
+		s.sucursal AS Sucursal
+	FROM dbVenta.Venta v
+	-- Relacionar Venta con Factura
+	JOIN dbFactura.Factura f
+		ON f.FKVenta = v.IDVenta
+	-- Relacionar Factura con detalleDeFactura (productos vendidos)
+	JOIN dbFactura.detalleDeFactura df
+		ON df.FKFactura = f.IDFactura
+	-- Relacionar detalleDeFactura con Producto
+	JOIN dbProducto.Producto p
+		ON p.IDProducto = df.FKProducto
+	-- Relacionar Producto con LineaDeProducto
+	JOIN dbProducto.Categoria c
+		ON c.IDCategoria = p.FKCategoria
+	JOIN dbProducto.LineaDeProducto lp
+		ON lp.IDLineaDeProducto = c.FKLineaDeProducto
+	-- Relacionar Venta con MetodoDePago
+	JOIN dbVenta.MetodoDePago m
+		ON m.IDMetodoDePago = v.FKMetodoDePago
+	-- Relacionar Venta con Empleado (que está relacionado con Sucursal)
+	JOIN dbSucursal.Empleado e
+		ON e.Legajo = v.FKEmpleado
+	JOIN dbSucursal.Sucursal s
+		ON s.IDSucursal = v.FKSucursal
+	ORDER BY f.fechaHoraEmision
+END;
+exec dbVenta.MostrarVentas

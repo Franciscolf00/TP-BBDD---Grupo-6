@@ -264,37 +264,133 @@ BEGIN
     END
 END
 ----------------------------------------
-go
+/*
+	logica de facturación:
+		Ok, luego de cranearlo...
+		1-creo la factura, solo con ID (la pk, no el numero). El resto lo dejo vacio
+		2-inserto detalles
+		3-cierro la factura, levantando el flag de "ultimoDetalle"
+		4-ahora si, estoy habilitado para insertar el resto de datos de la factura(el numero). fecha y hora se generan con getdate. monto lo calculo con los subtotales
+*/
+----------------------------------------
+GO
+CREATE OR ALTER PROCEDURE dbFactura.CrearFactura
+	@IDFacturaGenerada INT OUTPUT
+AS
+BEGIN
+	INSERT dbFactura.Factura(fechaHoraEmision)	--Hago este INSERT nada mas para que se genere el IDFactura, y asi pueda insertar detalles
+	VALUES(NULL)
+
+	SET @IDFacturaGenerada = SCOPE_IDENTITY();	--Capturo el ID generado por el IDENTITY
+END
+----------------------------------------
+GO
+CREATE OR ALTER PROCEDURE dbFactura.InsertarDetalleDeFactura
+	@cantidad INT,
+	@FKProducto INT,
+	@FKFactura INT
+AS
+BEGIN
+	DECLARE @error varchar(max) = '';
+
+	--Validar cantidad									
+	IF (@cantidad <= 0 OR @cantidad IS NULL )
+		SET @error = @error + 'La cantidad debe ser mayor a 0. ';
+
+	--Validar producto							
+	IF (@FKProducto IS NULL OR @FKProducto = 0)
+        SET @error = @error + 'Producto vacío o nulo. ';
+    IF NOT EXISTS (SELECT IDProducto FROM dbProducto.Producto WHERE IDProducto = @FKProducto)
+        SET @error = @error + 'El ID de producto ingresado no esta registrado. ';
+
+	--Validar que haya creado (no emitido) la factura				
+	IF (@FKFactura IS NULL OR @FKFactura = 0)
+        SET @error = @error + 'Factura vacía o nulo. ';
+    IF NOT EXISTS (SELECT IDFactura FROM dbFactura.Factura WHERE IDFactura = @FKFactura)
+        SET @error = @error + 'La factura todavia no existe. ';
+	ELSE IF EXISTS(SELECT 1 FROM dbFactura.Factura WHERE IDFactura = @FKFactura AND fechaHoraEmision IS NOT NULL)
+		SET  @error= @error + 'La factura ya fue emitida, no se pueden insertar más detalles. '
+
+	IF(@error='')
+	BEGIN
+		INSERT dbFactura.DetalleDeFactura(cantidad,subtotal,precioUnitarioAlMomento,FKProducto,FKFactura)
+		SELECT @cantidad,@cantidad*p.precioUnitario,p.precioUnitario,@FKProducto,@FKFactura
+		FROM dbProducto.Producto p
+	END
+	ELSE
+		RAISERROR (@error, 16, 1);
+END
+------------------------------------------
+GO
+CREATE OR ALTER PROCEDURE dbFactura.EmitirFactura
+	@IDFactura INT,
+	@numeroFactura INT,
+	@tipoFactura CHAR(1)
+AS
+BEGIN
+	DECLARE @error varchar(max) = '';
+
+	--Validar factura.												
+	IF (@numeroFactura=0 OR @numeroFactura IS NULL)
+		SET @error = @error + 'Falta el numero de factura. ';
+	ELSE IF(@numeroFactura <= 100000000 OR @numeroFactura >=999999999)
+		SET @error = @error + 'Numero de factura inválido, deben ser 9 digitos exactos del 0-9. ';
+	ELSE IF EXISTS(SELECT numeroFactura FROM dbFactura.Factura WHERE numeroFactura=@numeroFactura )
+		SET @error = @error + 'Numero de factura ya existente. ';
+
+	--Validar tipo de factura												
+	IF (@tipoFactura IS NULL OR @tipoFactura not in('A', 'B', 'C'))
+		SET @error = @error + 'Tipo de factura inválido(Tipos disponibles: A, B, C). ';
+
+	--Validar que la factura exista y no este cerrada
+	IF (@IDFactura IS NULL OR @IDFactura = 0)
+        SET @error = @error + 'ID de factura vacio o nulo. ';
+	ELSE IF NOT EXISTS (SELECT IDFactura FROM dbFactura.Factura WHERE IDFactura = @IDFactura)
+		SET @error = @error + 'El ID de factura ingresado no existe. ';
+	ELSE IF EXISTS(SELECT 1 FROM dbFactura.Factura WHERE IDFactura = @IDFactura AND fechaHoraEmision IS NOT NULL)
+		SET @error = @error + 'La factura ya fué emitida anteriormente. ';
+
+	IF @error=''
+	BEGIN
+		UPDATE dbFactura.Factura 
+		SET 
+		numeroFactura=@numeroFactura,
+		tipoFactura=@tipoFactura,
+		fechaHoraEmision=GETDATE(),
+		total=(
+			SELECT SUM(subtotal)
+			FROM dbFactura.DetalleDeFactura
+			WHERE FKFactura = dbFactura.Factura.IDFactura
+		)
+		WHERE IDFactura=@IDFactura
+	END
+	ELSE
+		RAISERROR (@error, 16, 1);
+END
+------------------------------------------
+GO
 CREATE OR ALTER PROCEDURE dbVenta.InsertarVenta
-	@Factura INT,
-	@tipoFactura CHAR(1),
 	@tipoCliente CHAR(6),	
 	@genero CHAR(6),
-	@cantidad INT,
 	@identificadorDePago VARCHAR(max),
 	@FKempleado INT,
 	@FKMetodoDePago INT,	
-	@FKproducto INT,
 	@FKSucursal INT		
 AS
 BEGIN
 	DECLARE @error varchar(max) = '';
 
-	--IF (COALESCE(@Factura, '') = '')
+	----Validar factura.												mover a factura(emision)
+	--IF (@Factura=0 OR @Factura IS NULL)
 	--	SET @error = @error + 'Falta el numero de factura. ';
-	--ELSE IF(@Factura not like '[0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9][0-9][0-9]')
-	--	SET @error = @error + 'Numero de factura inválido, debe tener el formato XXX-XX-XXXX siendo X un numero del 0-9. ';
-	--Validar factura.
-	IF (@Factura=0 OR @Factura IS NULL)
-		SET @error = @error + 'Falta el numero de factura. ';
-	ELSE IF(@Factura <= 100000000 OR @Factura >=999999999)
-		SET @error = @error + 'Numero de factura inválido, deben ser 9 digitos exactos del 0-9. ';
-	ELSE IF EXISTS(SELECT Factura FROM dbVenta.Venta WHERE Factura=@Factura )
-		SET @error = @error + 'Numero de factura ya existente. ';
+	--ELSE IF(@Factura <= 100000000 OR @Factura >=999999999)
+	--	SET @error = @error + 'Numero de factura inválido, deben ser 9 digitos exactos del 0-9. ';
+	--ELSE IF EXISTS(SELECT Factura FROM dbVenta.Venta WHERE Factura=@Factura )
+	--	SET @error = @error + 'Numero de factura ya existente. ';
 
-	--Validar tipo de factura
-	IF (COALESCE(@tipoFactura, '') = '' OR @tipoFactura not in('A', 'B', 'C'))
-		SET @error = @error + 'Tipo de factura inválido(Tipos disponibles: A, B, C). ';
+	----Validar tipo de factura													mover a factura(emision)
+	--IF (COALESCE(@tipoFactura, '') = '' OR @tipoFactura not in('A', 'B', 'C'))
+	--	SET @error = @error + 'Tipo de factura inválido(Tipos disponibles: A, B, C). ';
 	
 	--Validar tipo de cliente
 	IF (COALESCE(@tipoCliente, '') = '')
@@ -309,9 +405,9 @@ BEGIN
 			SET @error = @error + 'Genero inválido(Female o Male). ';
 	END
 
-	--Validar cantidad
-	IF (@cantidad <= 0 OR @cantidad IS NULL )
-		SET @error = @error + 'La cantidad debe ser mayor a 0. ';
+	----Validar cantidad											mover a detalle
+	--IF (@cantidad <= 0 OR @cantidad IS NULL )
+	--	SET @error = @error + 'La cantidad debe ser mayor a 0. ';
 
 	--Validar identificador de pago
 	IF (@identificadorDePago IS NOT NULL)	-- si es NULL es el caso de pago en efectivo, si no lo es entonces valido
@@ -330,11 +426,11 @@ BEGIN
     IF NOT EXISTS (SELECT Legajo FROM dbSucursal.Empleado WHERE legajo = @FKempleado)
         SET @error = @error + 'El legajo ingresado no esta registrado. ';
 
-	--Validar producto
-	IF (@FKproducto IS NULL OR @FKproducto = 0)
-        SET @error = @error + 'Producto vacío o nulo. ';
-    IF NOT EXISTS (SELECT IDProducto FROM dbProducto.Producto WHERE IDProducto = @FKproducto)
-        SET @error = @error + 'El ID de producto ingresado no esta registrado. ';
+	----Validar producto										mover a detalle
+	--IF (@FKproducto IS NULL OR @FKproducto = 0)
+ --       SET @error = @error + 'Producto vacío o nulo. ';
+ --   IF NOT EXISTS (SELECT IDProducto FROM dbProducto.Producto WHERE IDProducto = @FKproducto)
+ --       SET @error = @error + 'El ID de producto ingresado no esta registrado. ';
 
 	--Validar FK de sucursal 
 	IF (@FKSucursal IS NULL OR @FKSucursal = 0)
@@ -350,9 +446,8 @@ BEGIN
 	
 	IF (@error = '')
     BEGIN
-        INSERT INTO dbVenta.Venta(Factura, tipoFactura, tipoCliente, genero, cantidad, fecha, hora,identificadorDePago, FKempleado, FKMetodoDEPago, FKproducto, FKSucursal)
-		VALUES (@Factura, @tipoFactura, @tipoCliente, @genero, @cantidad, CAST(GETDATE() as DATE), CAST(GETDATE() as TIME), @identificadorDePago, 
-		@FKempleado, @FKMetodoDePago, @FKproducto, @FKSucursal);
+        INSERT INTO dbVenta.Venta(tipoCliente, genero, fechaVenta, horaVenta,identificadorDePago, FKempleado, FKMetodoDePago, FKSucursal)
+		VALUES (@tipoCliente, @genero, CAST(GETDATE() as DATE), CAST(GETDATE() as TIME), @identificadorDePago,@FKempleado, @FKMetodoDePago,@FKSucursal);
     END
     ELSE
     BEGIN
@@ -538,7 +633,7 @@ BEGIN
 END
 /*///////////////////////////////////////////////////////////////////////////////////////// */
 GO
-CREATE OR ALTER PROCEDURE dbVenta.CancelarVenta		--Tocara rehacerla con NDC y una nueva tabla, pero anda
+CREATE OR ALTER PROCEDURE dbVenta.CancelarVenta		--Tocara rehacerla con NDC y una nueva tabla, pero anda. MOVER A SCRIPT ENTREGA 5
 	@IDVenta INT
 AS
 BEGIN
