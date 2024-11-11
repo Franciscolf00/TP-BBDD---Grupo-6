@@ -138,7 +138,7 @@ EXEC dbProducto.InsertarCategoria
     @FKLineaDeProducto = 2;  
 GO
 ----------------------------------------------------------------------------------------------
---PRODUCTO: 1 rows affected
+--PRODUCTO: 2 rows affected
 EXEC dbProducto.InsertarProducto
     @nombre = '',                 -- Nombre vacío
     @precioUnitario = 0,          -- Precio unitario menor o igual a 0
@@ -167,67 +167,108 @@ EXEC dbProducto.InsertarProducto
     @unidadReferencia = 'Litro',
     @FKCategoria = 1;
 GO
+EXEC dbProducto.InsertarProducto
+    @nombre = 'Producto 2',
+    @precioUnitario = 30,
+    @precioReferencia = 40,
+    @unidadReferencia = 'unidad pro',
+    @FKCategoria = 1;
+GO
 ----------------------------------------------------------------------------------------------
---VENTA: 3 rows affected
-EXEC dbVenta.InsertarVenta
-    @Factura = NULL,               -- Falta el número de factura
-    @tipoFactura = 'X',            -- Tipo de factura inválido
-    @tipoCliente = 'VIP',          -- Tipo de cliente inválido
-    @genero = 'Z',                 -- Género inválido
-    @cantidad = -5,                -- Cantidad menor a 0
-    @identificadorDePago = '12345678abcd', -- Identificador de pago incorrecto
-    @FKempleado = 9999,            -- Legajo no registrado
-    @FKMetodoDePago = 9999,        -- ID de método de pago no existente
-    @FKproducto = 9999,            -- ID de producto no registrado
-    @FKSucursal = 9999;            -- ID de sucursal no existente
+--FACTURAS, DETALLES Y VENTA(3 rows affected)
+CREATE OR ALTER PROCEDURE dbFactura.PruebaFacturasYVentas
+AS
+BEGIN
+	DECLARE @IDFactura INT;
+	--Creo la factura
+	print 'creo factura'
+	EXEC dbFactura.CrearFactura @IDFacturaGenerada=@IDFactura OUTPUT;
+
+	--Inserto detalles
+	EXEC dbFactura.InsertarDetalleDeFactura
+		@cantidad=-10,				--Cantidad negativa
+		@FKProducto=1000000,		--Producto no existente
+		@FKFactura=1000;			--Factura no existente
+	print 'inserto 2 detalles'
+	EXEC dbFactura.InsertarDetalleDeFactura
+		@cantidad=5,
+		@FKProducto=1,
+		@FKFactura=@IDFactura;
+	EXEC dbFactura.InsertarDetalleDeFactura
+		@cantidad=2,
+		@FKProducto=2,
+		@FKFactura=@IDFactura;
+
+	--Emito la factura
+	EXEC dbFactura.EmitirFactura
+		@IDFactura=7645,			--Factura no existente
+		@numeroFactura=0,			--Invalido
+		@tipoFactura='Z';			--Tipo Factura inválido
+	
+	print 'emito la factura'
+	EXEC dbFactura.EmitirFactura
+		@IDFactura=@IDFactura,			
+		@numeroFactura=546665237,	
+		@tipoFactura='A';
+
+	--Le asignó la factura a la venta
+	EXEC dbVenta.InsertarVenta
+		@tipoCliente = 'VIP',					-- Tipo de cliente inválido
+		@genero = 'Z',							-- Género inválido
+		@identificadorDePago = '12345678abcd',  -- Identificador de pago incorrecto
+		@FKempleado = 9999,						-- Legajo no registrado
+		@FKMetodoDePago = 9999,					-- ID de método de pago no existente
+		@FKSucursal = 9999,						-- ID de sucursal no existente
+		@FKFactura = 9999;						-- ID de factura no existente
+
+	EXEC dbVenta.InsertarVenta
+		@tipoCliente = 'Normal',       -- Tipo de cliente válido
+		@genero = 'M',                 -- Género inválido
+		@identificadorDePago = '1234-5678-90aa-5678', -- Identificador de pago mal formateado
+		@FKempleado = NULL,            -- Legajo vacío
+		@FKMetodoDePago = 0,           -- ID de método de pago nulo
+		@FKSucursal = 0,               -- ID de sucursal nulo
+		@FKFactura = 9999;			   -- ID de factura nulo
+	print 'le asigno venta a factura'
+	EXEC dbVenta.InsertarVenta
+		@tipoCliente = 'Normal',
+		@genero = 'Male',
+		@identificadorDePago = '1234-5678-9012-3456', 
+		@FKempleado = 54321,              
+		@FKMetodoDePago = 1,                       
+		@FKSucursal = 1,
+		@FKFactura = @IDFactura;
+
+	EXEC dbVenta.InsertarVenta
+		@tipoCliente = 'Member',
+		@genero = 'Female',
+		@identificadorDePago = NULL,   
+		@FKempleado = 54321,               
+		@FKMetodoDePago = 2,                         
+		@FKSucursal = 2,
+		@FKFactura = @IDFactura;			--La factura ya tiene una venta asociada
+	-----
+	--Pruebo que no deje emitir si no agregue ningun detalle
+	print 'creo la factura'
+	EXEC dbFactura.CrearFactura @IDFacturaGenerada=@IDFactura OUTPUT;
+	print 'trato de emitir, falla'
+	EXEC dbFactura.EmitirFactura		--Falta al menos un detalle
+		@IDFactura=@IDFactura,			
+		@numeroFactura=867662468,	
+		@tipoFactura='B';
+	print 'trato de asociar, falla'
+	EXEC dbVenta.InsertarVenta			--Falta que se emita la factura
+		@tipoCliente = 'Member',
+		@genero = 'Female',
+		@identificadorDePago = NULL,   
+		@FKempleado = 54321,               
+		@FKMetodoDePago = 2,                         
+		@FKSucursal = 2,
+		@FKFactura = @IDFactura;
+END
 GO
-EXEC dbVenta.InsertarVenta
-    @Factura = 123456789,          -- Factura válida
-    @tipoFactura = 'A',            -- Tipo de factura válido
-    @tipoCliente = 'Normal',       -- Tipo de cliente válido
-    @genero = 'M',                 -- Género inválido
-    @cantidad = 10,                -- Cantidad válida
-    @identificadorDePago = '1234-5678-90aa-5678', -- Identificador de pago mal formateado
-    @FKempleado = NULL,            -- Legajo vacío
-    @FKMetodoDePago = 0,           -- ID de método de pago nulo
-    @FKproducto = 0,               -- ID de producto nulo
-    @FKSucursal = 0;               -- ID de sucursal nulo
-GO
-EXEC dbVenta.InsertarVenta
-    @Factura = 234567891,
-    @tipoFactura = 'A',
-    @tipoCliente = 'Normal',
-    @genero = 'Male',
-    @cantidad = 20,
-    @identificadorDePago = '1234-5678-9012-3456', -- Pago con tarjeta formateado correctamente
-    @FKempleado = 54321,               -- Legajo existente
-    @FKMetodoDePago = 1,           -- Método de pago válido
-    @FKproducto = 1,               -- Producto válido
-    @FKSucursal = 1;               -- Sucursal válida
-GO
-EXEC dbVenta.InsertarVenta
-    @Factura = 123456789,
-    @tipoFactura = 'B',
-    @tipoCliente = 'Member',
-    @genero = 'Female',
-    @cantidad = 15,
-    @identificadorDePago = NULL,   -- Pago en efectivo
-    @FKempleado = 54321,               -- Legajo existente
-    @FKMetodoDePago = 2,           -- Método de pago válido
-    @FKproducto = 2,               -- Producto válido
-    @FKSucursal = 2;               -- Sucursal válida
-GO
-EXEC dbVenta.InsertarVenta
-    @Factura = 345678912,
-    @tipoFactura = 'C',
-    @tipoCliente = 'Member',
-    @genero = NULL,                -- Género no especificado
-    @cantidad = 5,
-    @identificadorDePago = NULL,   -- Pago en efectivo
-    @FKempleado = 12345,               -- Legajo existente
-    @FKMetodoDePago = 2,           -- Método de pago válido
-    @FKproducto = 1,               -- Producto válido
-    @FKSucursal = 2;               -- Sucursal válida
+EXEC dbFactura.PruebaFacturasYVentas;
+----------------------------------------------------------------------------------------------
 /*///////////////////////////////////////////////////////////////////////////////////////// */
 /*///////////////////////////////////////////////////////////////////////////////////////// */
 /*///////////////////////////////////////////////////////////////////////////////////////// */
@@ -250,16 +291,16 @@ EXEC dbSucursal.ActualizarEmpleado
 	@direccion='direccion actualizada 5421',
 	@cargo='Supervisor',
 	@turno='TM',
-	@FKSucursal=100
+	@FKSucursal=100;
 GO
 EXEC dbProducto.ActualizarLineaDeProducto
 	@lineaDeProductoAactualizar=2,
-	@nombre='linea de producto actualizada'
+	@nombre='linea de producto actualizada';
 GO
 EXEC dbProducto.ActualizarCategoria
 	@categoriaAactualizar=1,
 	@nombre='categoria actualizada',
-	@FKLineaDeProducto=2
+	@FKLineaDeProducto=2;
 GO
 EXEC dbProducto.ActualizarProducto
 	@productoAactualizar=5,
@@ -267,11 +308,11 @@ EXEC dbProducto.ActualizarProducto
 	@precioUnitario=48.6,
 	@precioReferencia=50.0,
 	@unidadReferencia='1 unidad actu',
-	@FKCategoria=2
+	@FKCategoria=2;
 GO
 EXEC dbVenta.ActualizarMetodoDePago
 	 @metodoDePagoAactualizar=1,
-	 @nombre='Chachos'
+	 @nombre='Chachos';
 GO
 /*///////////////////////////////////////////////////////////////////////////////////////// */
 /*///////////////////////////////////////////////////////////////////////////////////////// */
@@ -279,28 +320,29 @@ GO
 --Prueba BORRADOS(LÓGICOS)
 EXEC dbSucursal.ModificarEstadoSucursal
 	@IDSucursal=2,
-	@estado=1
+	@estado=1;
 GO
 EXEC dbSucursal.ModificarEstadoEmpleado
 	@Legajo=12345,
-	@estado=0
+	@estado=0;
 GO
 EXEC dbProducto.ModificarEstadoLineaDeProducto
 	@IDLineaDeProducto=3,
-	@estado=1
+	@estado=1;
 GO
 EXEC dbProducto.ModificarEstadoCategoria
 	@IDCategoria=1,
-	@estado=0
+	@estado=0;
 GO
 EXEC dbProducto.ModificarEstadoProducto
 	@IDProducto=2,
-	@estado=0
+	@estado=0;
 GO
 EXEC dbVenta.ModificarEstadoMetodoDePago
 	@IDMetodoDePago=1,
-	@estado=1
+	@estado=1;
 GO
+
 
 SELECT * FROM dbSucursal.Sucursal
 GO

@@ -135,7 +135,7 @@ CREATE TABLE dbFactura.Factura(
 	numeroFactura INT,	--Lo tengo que guardar como int para verificar duplicados a la hora de insertar
 	tipoFactura CHAR(1) CHECK(tipoFactura in ('A', 'B', 'C')),
 	fechaHoraEmision DATETIME,
-	fechaHoraPago DATETIME,		--Para ahorrarnos tener que hacer estado "Pagada"
+	estadoFactura CHAR(1) CHECK(estadoFactura in ('E','P')),	--Emitida,Pagada
 	total real
 )
 go
@@ -151,8 +151,7 @@ go
 CREATE TABLE dbFactura.NotaDeCredito(
 	IDNotaDeCredito INT IDENTITY (1,1) PRIMARY KEY,
 	motivo VARCHAR(150),
-	fechaNota DATE,
-	horaNota TIME,
+	fechaHoraNota DATETIME,
 	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
 )
 go
@@ -160,8 +159,7 @@ CREATE TABLE dbVenta.Venta(
 	IDVenta INT IDENTITY(1,1) PRIMARY KEY,
 	tipoCliente CHAR(6) CHECK(tipoCliente in ('Member', 'Normal')),
 	genero CHAR(6) CHECK(genero in ('Male', 'Female')),
-	fechaVenta DATE,
-	horaVenta TIME,
+	fechaHoraVenta DATE,
 	identificadorDePago VARCHAR(30) CHECK((LEN(identificadorDePago) = 22 AND identificadorDePago LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
 											OR (LEN(identificadorDePago) = 19 AND identificadorDePago LIKE '[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]')								
 											OR identificadorDePago IS NULL),

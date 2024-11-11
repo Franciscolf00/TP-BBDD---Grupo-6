@@ -13,10 +13,11 @@ BEGIN
 	--'Total facturado'
 	SELECT isnull(Lunes, 0) Lunes, isnull(Martes, 0) Martes, isnull(Miércoles, 0) Miércoles,
 	isnull(Jueves, 0) Jueves, isnull(Sábado, 0) Sábado, isnull(Domingo, 0) Domingo 
-	FROM (SELECT p.precioUnitario * v.cantidad as Cantidad_vendida, DATENAME(WEEKDAY, v.fecha) AS dia
+	FROM (SELECT f.total as Cantidad_vendida, DATENAME(WEEKDAY, v.fechaHoraVenta) AS dia
 	FROM dbVenta.Venta v
-	INNER JOIN dbProducto.Producto p ON p.IDProducto = v.FKProducto
-	WHERE DATEPART(MONTH, v.fecha) = @mes AND DATEPART(YEAR, v.fecha) = @anio) AS cantPorDia
+	INNER JOIN dbFactura.Factura f
+		ON f.IDFactura=v.FKFactura
+	WHERE DATEPART(MONTH, v.fechaHoraVenta) = @mes AND DATEPART(YEAR, v.fechaHoraVenta) = @anio) AS cantPorDia
 	PIVOT (SUM(Cantidad_vendida)
 		FOR dia in ([Lunes],[Martes],[Miércoles],[Jueves],[Viernes],[Sábado],[Domingo])) Producto
 	FOR XML PATH('Producto'), ROOT ('Total_facturado'), ELEMENTS XSINIL;
@@ -70,13 +71,13 @@ BEGIN
     SELECT Turno AS ''@Nombre'','+@columnas+'
     FROM (
         SELECT 
-            p.precioUnitario * v.cantidad AS Cantidad_vendida, 
+            f.total AS Cantidad_vendida, 
             e.turno AS Turno, 
-            DATENAME(MONTH, v.fecha) AS mes
+            DATENAME(MONTH, v.fechaHoraVenta) AS mes
         FROM dbVenta.Venta v
-        INNER JOIN dbProducto.Producto p ON p.IDProducto = v.FKProducto
+        INNER JOIN dbFactura.Factura f ON f.IDFactura=v.FKFactura
         INNER JOIN dbSucursal.Empleado e ON e.Legajo = v.FKEmpleado
-        WHERE DATEPART(QUARTER, v.fecha) = @trimestre AND DATEPART(YEAR, v.fecha) = @anio
+        WHERE DATEPART(QUARTER, v.fechaHoraVenta) = @trimestre AND DATEPART(YEAR, v.fechaHoraVenta) = @anio
     ) AS cantCuatrimestre
     PIVOT (
         SUM(Cantidad_vendida)
@@ -93,12 +94,14 @@ CREATE OR ALTER PROCEDURE dbReporte.mostrarCantidadPorFecha
     @finFecha DATE
 AS
 BEGIN
-	SELECT v.FKProducto AS '@IDProducto', p.nombre as Nombre, COUNT(v.FKProducto) as Cantidad_vendida
+	SELECT p.IDProducto AS '@IDProducto', p.nombre as Nombre, SUM(df.cantidad) as Cantidad_vendida
 	FROM dbVenta.Venta v
-	INNER JOIN dbProducto.Producto p ON p.IDProducto = v.FKProducto
-	WHERE v.fecha >= @inicioFecha AND v.fecha <= @finFecha
-	GROUP BY v.FKProducto, p.nombre
-	ORDER BY COUNT(v.FKProducto) desc
+	INNER JOIN dbFactura.Factura f ON f.IDFactura = v.FKFactura
+	INNER JOIN dbFactura.DetalleDeFactura df ON df.FKFactura = f.IDFactura
+	INNER JOIN dbProducto.Producto p ON p.IDProducto=df.FKProducto
+	WHERE v.fechaHoraVenta >= @inicioFecha AND v.fechaHoraVenta <= @finFecha
+	GROUP BY p.IDProducto, p.nombre
+	ORDER BY SUM(df.cantidad) desc
 	FOR XML PATH ('Producto'), ROOT ('Productos'), ELEMENTS XSINIL
 END
 GO
@@ -108,11 +111,13 @@ CREATE OR ALTER PROCEDURE dbReporte.mostrarCantidadSucursalPorFecha
     @finFecha DATE
 AS
 BEGIN
-	SELECT distinct v.FKSucursal as '@IDSucursal', s.sucursal as Nombre, COUNT(v.FKProducto) OVER (PARTITION BY v.FKSucursal) as Cantidad_vendida
+	SELECT distinct v.FKSucursal as '@IDSucursal', s.sucursal as Nombre, SUM(df.cantidad) OVER (PARTITION BY v.FKSucursal) as Cantidad_vendida
 	FROM dbVenta.Venta v
-	INNER JOIN dbProducto.Producto p ON p.IDProducto = v.FKProducto
+	INNER JOIN dbFactura.Factura f ON f.IDFactura = v.FKFactura
+	INNER JOIN dbFactura.DetalleDeFactura df ON df.FKFactura = f.IDFactura
+	INNER JOIN dbProducto.Producto p ON p.IDProducto=df.FKProducto
 	INNER JOIN dbSucursal.Sucursal s ON s.IDSucursal = v.FKSucursal
-	WHERE v.fecha >= @inicioFecha AND v.fecha <= @finFecha
+	WHERE v.fechaHoraVenta >= @inicioFecha AND v.fechaHoraVenta <= @finFecha
 	ORDER BY Cantidad_vendida desc
 	FOR XML PATH('Sucursal'), ROOT ('CantidadSucursal'), ELEMENTS XSINIL;
 END

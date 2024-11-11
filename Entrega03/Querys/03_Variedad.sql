@@ -5,21 +5,20 @@ CREATE OR ALTER PROCEDURE dbVenta.MostrarVentas
 AS
 BEGIN
 	SELECT 
-    -- Formatear el número de factura
-    STUFF(STUFF(CONVERT(VARCHAR(9), f.numeroFactura), 4, 0, '-'), 7, 0, '-') AS ID_Factura,  -- Lo muestro con formato DDD-DD-DDDD
-    f.tipoFactura AS Tipo_de_Factura,
-    s.ciudad AS Ciudad,
-    v.tipoCliente AS Tipo_de_Cliente,
-    v.genero AS Genero,
-    l.nombre AS Linea_de_Producto,
-    p.nombre AS Producto,
-    p.precioUnitario AS Precio_Unitario,
-    df.cantidad AS Cantidad,
-    v.fechaVenta AS Fecha,
-    v.horaVenta AS Hora,
-    m.nombre AS Medio_de_Pago,
-    e.Legajo AS Empleado,
-    s.sucursal AS Sucursal
+		STUFF(STUFF(CONVERT(VARCHAR(9), f.numeroFactura), 4, 0, '-'), 7, 0, '-') AS ID_Factura,  -- Lo muestro con formato DDD-DD-DDDD
+		f.tipoFactura AS Tipo_de_Factura,
+		s.ciudad AS Ciudad,
+		v.tipoCliente AS Tipo_de_Cliente,
+		v.genero AS Genero,
+		l.nombre AS Linea_de_Producto,
+		p.nombre AS Producto,
+		p.precioUnitario AS Precio_Unitario,
+		df.cantidad AS Cantidad,
+		CAST(v.fechaHoraVenta AS DATE) AS Fecha,
+		CAST(v.fechaHoraVenta AS TIME) AS Hora,
+		m.nombre AS Medio_de_Pago,
+		e.Legajo AS Empleado,
+		s.sucursal AS Sucursal
 	FROM dbVenta.Venta v
 	JOIN dbFactura.Factura f
 		ON f.IDFactura = v.FKFactura
@@ -37,7 +36,7 @@ BEGIN
 		ON e.Legajo = v.FKempleado
 	JOIN dbSucursal.Sucursal s
 		ON s.IDSucursal = e.FKSucursal
-	ORDER BY v.fechaVenta, v.horaVenta;
+	ORDER BY v.fechaHoraVenta;
 END
 GO
 -----------------------------------------------------------
