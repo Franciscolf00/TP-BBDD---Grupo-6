@@ -28,47 +28,59 @@
           <AssociatedConnUserName />
           <FullPath>00_Creacion_BD_Objetos.sql</FullPath>
         </FileNode>
-        <FileNode Name="01_Inserciones_Actualizaciones_BorradosLogicos.sql">
+        <FileNode Name="01_SPs_Inserciones.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-FSRIB0R\SQLEXPRESS:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>DESKTOP-FSRIB0R\SQLEXPRESS</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>01_Inserciones_Actualizaciones_BorradosLogicos.sql</FullPath>
+          <FullPath>01_SPs_Inserciones.sql</FullPath>
         </FileNode>
-        <FileNode Name="02_LotesDePrueba.sql">
+        <FileNode Name="02_SPs_Actualizaciones.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-FSRIB0R\SQLEXPRESS:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>DESKTOP-FSRIB0R\SQLEXPRESS</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>02_LotesDePrueba.sql</FullPath>
+          <FullPath>02_SPs_Actualizaciones.sql</FullPath>
         </FileNode>
-        <FileNode Name="03_Variedad.sql">
+        <FileNode Name="03_SPs_Borrados_Logicos.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-FSRIB0R\SQLEXPRESS:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>DESKTOP-FSRIB0R\SQLEXPRESS</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>03_Variedad.sql</FullPath>
+          <FullPath>03_SPs_Borrados_Logicos.sql</FullPath>
         </FileNode>
-        <FileNode Name="04_SPs_Importacion.sql">
+        <FileNode Name="04_LotesDePrueba.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-FSRIB0R\SQLEXPRESS:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>DESKTOP-FSRIB0R\SQLEXPRESS</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>04_SPs_Importacion.sql</FullPath>
+          <FullPath>04_LotesDePrueba.sql</FullPath>
         </FileNode>
-        <FileNode Name="05_Exe_Importacion.sql">
+        <FileNode Name="05_Variedad.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-FSRIB0R\SQLEXPRESS:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>DESKTOP-FSRIB0R\SQLEXPRESS</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>05_Exe_Importacion.sql</FullPath>
+          <FullPath>05_Variedad.sql</FullPath>
         </FileNode>
-        <FileNode Name="06_SPs_Reportes.sql">
+        <FileNode Name="06_SPs_Importacion.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-FSRIB0R\SQLEXPRESS:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>DESKTOP-FSRIB0R\SQLEXPRESS</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>06_SPs_Reportes.sql</FullPath>
+          <FullPath>06_SPs_Importacion.sql</FullPath>
         </FileNode>
-        <FileNode Name="07_Exe_Reportes.sql">
+        <FileNode Name="07_Exe_Importacion.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-FSRIB0R\SQLEXPRESS:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>DESKTOP-FSRIB0R\SQLEXPRESS</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>07_Exe_Reportes.sql</FullPath>
+          <FullPath>07_Exe_Importacion.sql</FullPath>
+        </FileNode>
+        <FileNode Name="08_SPs_Reportes.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-FSRIB0R\SQLEXPRESS:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-FSRIB0R\SQLEXPRESS</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>08_SPs_Reportes.sql</FullPath>
+        </FileNode>
+        <FileNode Name="09_Exe_Reportes.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-FSRIB0R\SQLEXPRESS:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-FSRIB0R\SQLEXPRESS</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>09_Exe_Reportes.sql</FullPath>
         </FileNode>
       </Items>
     </LogicalFolder>

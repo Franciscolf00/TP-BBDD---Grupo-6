@@ -1,9 +1,7 @@
 USE Com2900G06
 GO
-
 SET LANGUAGE Spanish;
 GO
-
 --Mensual: ingresando un mes y año determinado mostrar el total facturado por días de la semana, incluyendo sábado y domingo. 
 CREATE OR ALTER PROCEDURE dbReporte.mostrarTotalDias
     @mes TINYINT,

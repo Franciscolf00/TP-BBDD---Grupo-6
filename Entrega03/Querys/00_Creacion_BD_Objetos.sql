@@ -60,16 +60,16 @@ BEGIN
 END
 go
 
-DROP TABLE IF EXISTS dbVenta.Venta;
-DROP TABLE IF EXISTS dbSucursal.Empleado;    
-DROP TABLE IF EXISTS dbSucursal.Sucursal; 
+DROP TABLE IF EXISTS dbFactura.DetalleDeFactura;
 DROP TABLE IF EXISTS dbProducto.Producto; 
 DROP TABLE IF EXISTS dbProducto.Categoria;   
 DROP TABLE IF EXISTS dbProducto.LineaDeProducto; 
-DROP TABLE IF EXISTS dbVenta.MetodoDePago;   
-DROP TABLE IF EXISTS dbFactura.Factura;
-DROP TABLE IF EXISTS dbFactura.DetalleDeFactura;
 DROP TABLE IF EXISTS dbFactura.NotaDeCredito;
+DROP TABLE IF EXISTS dbVenta.Venta;
+DROP TABLE IF EXISTS dbVenta.MetodoDePago;   
+DROP TABLE IF EXISTS dbSucursal.Empleado;    
+DROP TABLE IF EXISTS dbSucursal.Sucursal; 
+DROP TABLE IF EXISTS dbFactura.Factura;
 
 CREATE TABLE dbSucursal.Sucursal(
 	IDSucursal INT IDENTITY(1,1) PRIMARY KEY,
@@ -136,20 +136,22 @@ CREATE TABLE dbFactura.Factura(
 	tipoFactura CHAR(1) CHECK(tipoFactura in ('A', 'B', 'C')),
 	fechaHoraEmision DATETIME,
 	estadoFactura CHAR(1) CHECK(estadoFactura in ('E','P')),	--Emitida,Pagada
-	total real
+	total DECIMAL(10,2)
 )
 go
 CREATE TABLE dbFactura.DetalleDeFactura(
 	IDDetalle INT IDENTITY (1,1) PRIMARY KEY,
 	cantidad INT,
-	subtotal real,
-	precioUnitarioAlMomento real,
+	subtotal DECIMAL(10,2),
+	precioUnitarioAlMomento DECIMAL(10,2),
 	FKProducto INT NOT NULL REFERENCES dbProducto.Producto(IDProducto),
 	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
 )
 go
 CREATE TABLE dbFactura.NotaDeCredito(
 	IDNotaDeCredito INT IDENTITY (1,1) PRIMARY KEY,
+	--numeroComprobante INT,	--8 digitos, con 0s adelante
+	--puntoDeVenta	INT,		--5 digitos
 	motivo VARCHAR(150),
 	fechaHoraNota DATETIME,
 	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
@@ -159,7 +161,7 @@ CREATE TABLE dbVenta.Venta(
 	IDVenta INT IDENTITY(1,1) PRIMARY KEY,
 	tipoCliente CHAR(6) CHECK(tipoCliente in ('Member', 'Normal')),
 	genero CHAR(6) CHECK(genero in ('Male', 'Female')),
-	fechaHoraVenta DATE,
+	fechaHoraVenta DATETIME,
 	identificadorDePago VARCHAR(30) CHECK((LEN(identificadorDePago) = 22 AND identificadorDePago LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
 											OR (LEN(identificadorDePago) = 19 AND identificadorDePago LIKE '[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]')								
 											OR identificadorDePago IS NULL),
