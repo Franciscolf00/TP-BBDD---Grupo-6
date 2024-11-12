@@ -1,5 +1,8 @@
 USE Com2900G06
 GO
+SET LANGUAGE Spanish;
+
+GO
 exec dbReporte.mostrarTotalDias 1,2019
 GO
 exec dbReporte.mostrarTotalTrimestre 1,2019

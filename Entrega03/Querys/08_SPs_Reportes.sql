@@ -1,7 +1,9 @@
 USE Com2900G06
 GO
+
 SET LANGUAGE Spanish;
 GO
+
 --Mensual: ingresando un mes y año determinado mostrar el total facturado por días de la semana, incluyendo sábado y domingo. 
 CREATE OR ALTER PROCEDURE dbReporte.mostrarTotalDias
     @mes TINYINT,
@@ -11,16 +13,17 @@ BEGIN
 	--'Total facturado'
 	SELECT isnull(Lunes, 0) Lunes, isnull(Martes, 0) Martes, isnull(Miércoles, 0) Miércoles,
 	isnull(Jueves, 0) Jueves, isnull(Sábado, 0) Sábado, isnull(Domingo, 0) Domingo 
-	FROM (SELECT f.total as Cantidad_vendida, DATENAME(WEEKDAY, v.fechaHoraVenta) AS dia
-	FROM dbVenta.Venta v
-	INNER JOIN dbFactura.Factura f
-		ON f.IDFactura=v.FKFactura
-	WHERE DATEPART(MONTH, v.fechaHoraVenta) = @mes AND DATEPART(YEAR, v.fechaHoraVenta) = @anio) AS cantPorDia
-	PIVOT (SUM(Cantidad_vendida)
+	FROM (SELECT f.total as Total, DATENAME(WEEKDAY, f.fechaHoraEmision) AS dia
+	FROM dbFactura.Factura f
+	WHERE DATEPART(MONTH, f.fechaHoraEmision) = @mes AND DATEPART(YEAR, f.fechaHoraEmision) = @anio) AS cantPorDia
+	PIVOT (SUM(Total)
 		FOR dia in ([Lunes],[Martes],[Miércoles],[Jueves],[Viernes],[Sábado],[Domingo])) Producto
 	FOR XML PATH('Producto'), ROOT ('Total_facturado'), ELEMENTS XSINIL;
 END
 GO   
+
+exec dbReporte.mostrarTotalDias 1,2019
+GO
 --Otra version, separando por producto
 --CREATE OR ALTER PROCEDURE dbReporte.mostrarTotalDias
 --    @mes TINYINT,
@@ -66,7 +69,7 @@ BEGIN
                          END;
 
     SET @sql = '
-    SELECT Turno AS ''@Nombre'','+@columnas+'
+    SELECT RTRIM(Turno) AS ''@Nombre'','+@columnas+'
     FROM (
         SELECT 
             f.total AS Cantidad_vendida, 
@@ -86,6 +89,7 @@ BEGIN
     EXEC sp_executesql @sql, N'@trimestre TINYINT, @anio SMALLINT', @trimestre, @anio;
 END
 GO
+
 -- Por rango de fechas: ingresando un rango de fechas a demanda, debe poder mostrar la cantidad de productos vendidos en ese rango, ordenado de mayor a menor. 
 CREATE OR ALTER PROCEDURE dbReporte.mostrarCantidadPorFecha
     @inicioFecha DATE,
@@ -103,6 +107,9 @@ BEGIN
 	FOR XML PATH ('Producto'), ROOT ('Productos'), ELEMENTS XSINIL
 END
 GO
+
+
+
 -- Por rango de fechas: ingresando un rango de fechas a demanda, debe poder mostrar la cantidad de productos vendidos en ese rango por sucursal, ordenado de mayor a menor. 
 CREATE OR ALTER PROCEDURE dbReporte.mostrarCantidadSucursalPorFecha
     @inicioFecha DATE,
@@ -128,18 +135,20 @@ AS
 BEGIN 
     SELECT *
     FROM (
-        SELECT v.FKProducto AS '@IDProducto',
+        SELECT df.FKProducto AS '@IDProducto',
             p.nombre AS Nombre, 
 			--Se resta la semana del año en la que cae el primer día del mes de la semana del año en la que está actualmente
-            (DATEPART(WEEK, v.fecha) - DATEPART(WEEK, DATEADD(MONTH, DATEDIFF(MONTH, 0, v.fecha), 0)) + 1) AS SemanaMes,
-            COUNT(v.FKProducto) AS Cantidad_vendida,
+            (DATEPART(WEEK, v.fechaHoraVenta) - DATEPART(WEEK, DATEADD(MONTH, DATEDIFF(MONTH, 0, v.fechaHoraVenta), 0)) + 1) AS SemanaMes,
+            COUNT(df.FKProducto) AS Cantidad_vendida,
             DENSE_RANK() OVER (PARTITION BY (DATEPART(WEEK, v.fecha) - DATEPART(WEEK, DATEADD(MONTH, DATEDIFF(MONTH, 0, v.fecha), 0)) + 1)
                          ORDER BY COUNT(v.FKProducto) DESC) AS Ranking_Semana
         FROM dbVenta.Venta v
-        INNER JOIN dbProducto.Producto p ON p.IDProducto = v.FKProducto
-        WHERE DATEPART(MONTH, v.fecha) = @mes AND DATEPART(YEAR, v.fecha) = @anio
-        GROUP BY v.FKProducto, p.nombre, 
-                 (DATEPART(WEEK, v.fecha) - DATEPART(WEEK, DATEADD(MONTH, DATEDIFF(MONTH, 0, v.fecha), 0)) + 1)
+		INNER JOIN dbFactura.Factura f ON f.IDFactura = v.FKFactura
+		INNER JOIN dbFactura.DetalleDeFactura df ON df.FKFactura = f.IDFactura
+		INNER JOIN dbProducto.Producto p ON p.IDProducto=df.FKProducto
+        WHERE DATEPART(MONTH, v.fechaHoraVenta) = @mes AND DATEPART(YEAR, v.fechaHoraVenta) = @anio
+        GROUP BY df.FKProducto, p.nombre, 
+                 (DATEPART(WEEK, v.fechaHoraVenta) - DATEPART(WEEK, DATEADD(MONTH, DATEDIFF(MONTH, 0, v.fechaHoraVenta), 0)) + 1)
     ) ranked
     WHERE Ranking_Semana <= 5
     ORDER BY SemanaMes, Ranking_Semana
