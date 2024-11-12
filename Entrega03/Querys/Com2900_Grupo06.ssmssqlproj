@@ -67,23 +67,23 @@
           <AssociatedConnUserName />
           <FullPath>07_Exe_Reportes.sql</FullPath>
         </FileNode>
-        <FileNode Name="08_SP_NotasDeCredito.sql">
+        <FileNode Name="10_SP_NotasDeCredito.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-A3LKK57\SQLEXPRESS01:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>DESKTOP-A3LKK57\SQLEXPRESS01</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>08_SP_NotasDeCredito.sql</FullPath>
+          <FullPath>10_SP_NotasDeCredito.sql</FullPath>
         </FileNode>
-        <FileNode Name="09_LotesDePrueba_NC.sql">
+        <FileNode Name="11_LotesDePrueba_NC.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-A3LKK57\SQLEXPRESS01:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>DESKTOP-A3LKK57\SQLEXPRESS01</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>09_LotesDePrueba_NC.sql</FullPath>
+          <FullPath>11_LotesDePrueba_NC.sql</FullPath>
         </FileNode>
-        <FileNode Name="10_RolesYUsuarios.sql">
+        <FileNode Name="12_RolesYUsuarios.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-A3LKK57\SQLEXPRESS01:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>DESKTOP-A3LKK57\SQLEXPRESS01</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>10_RolesYUsuarios.sql</FullPath>
+          <FullPath>12_RolesYUsuarios.sql</FullPath>
         </FileNode>
       </Items>
     </LogicalFolder>
