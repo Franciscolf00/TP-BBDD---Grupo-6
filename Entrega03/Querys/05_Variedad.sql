@@ -67,7 +67,8 @@ BEGIN
 		p.nombre AS Producto,
 		p.precioUnitario AS Precio_Unitario,
 		df.cantidad AS Cantidad,
-		f.fechaHoraEmision AS fyh,
+		CAST(f.fechaHoraEmision AS DATE) AS Fecha,
+		CAST(f.fechaHoraEmision AS TIME) AS Hora,
 		m.nombre AS Medio_de_Pago,
 		e.Legajo AS Empleado,
 		s.sucursal AS Sucursal
@@ -96,4 +97,6 @@ BEGIN
 		ON s.IDSucursal = v.FKSucursal
 	ORDER BY f.fechaHoraEmision
 END;
-exec dbVenta.MostrarVentas
+GO
+--exec dbVenta.MostrarVentas;
+GO
