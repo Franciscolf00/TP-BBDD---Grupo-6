@@ -67,8 +67,7 @@ BEGIN
 		p.nombre AS Producto,
 		p.precioUnitario AS Precio_Unitario,
 		df.cantidad AS Cantidad,
-		CAST(f.fechaHoraEmision AS DATE) AS Fecha,
-		CAST(f.fechaHoraEmision AS TIME) AS Hora,
+		f.fechaHoraEmision AS fyh,
 		m.nombre AS Medio_de_Pago,
 		e.Legajo AS Empleado,
 		s.sucursal AS Sucursal
@@ -76,7 +75,7 @@ BEGIN
 	-- Relacionar Venta con Factura
 	JOIN dbFactura.Factura f
 		ON f.IDFactura = v.FKFactura
-	-- Relacionar Factura con detalleDeFactura
+	-- Relacionar Factura con detalleDeFactura (productos vendidos)
 	JOIN dbFactura.detalleDeFactura df
 		ON df.FKFactura = f.IDFactura
 	-- Relacionar detalleDeFactura con Producto
@@ -90,13 +89,11 @@ BEGIN
 	-- Relacionar Venta con MetodoDePago
 	JOIN dbVenta.MetodoDePago m
 		ON m.IDMetodoDePago = v.FKMetodoDePago
-	-- Relacionar Venta con Empleado
+	-- Relacionar Venta con Empleado (que está relacionado con Sucursal)
 	JOIN dbSucursal.Empleado e
 		ON e.Legajo = v.FKEmpleado
-	-- Relacionar Venta con Sucursal
 	JOIN dbSucursal.Sucursal s
 		ON s.IDSucursal = v.FKSucursal
 	ORDER BY f.fechaHoraEmision
 END;
-GO
---exec dbVenta.MostrarVentas
+exec dbVenta.MostrarVentas

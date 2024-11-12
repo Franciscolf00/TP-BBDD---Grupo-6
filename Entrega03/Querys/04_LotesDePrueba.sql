@@ -181,6 +181,7 @@ AS
 BEGIN
 	DECLARE @IDFactura INT;
 	--Creo la factura
+	print 'creo factura'
 	EXEC dbFactura.CrearFactura @IDFacturaGenerada=@IDFactura OUTPUT;
 
 	--Inserto detalles
@@ -188,6 +189,7 @@ BEGIN
 		@cantidad=-10,				--Cantidad negativa
 		@FKProducto=1000000,		--Producto no existente
 		@FKFactura=1000;			--Factura no existente
+	print 'inserto 2 detalles'
 	EXEC dbFactura.InsertarDetalleDeFactura
 		@cantidad=5,
 		@FKProducto=1,
@@ -202,9 +204,11 @@ BEGIN
 		@IDFactura=7645,			--Factura no existente
 		@numeroFactura=0,			--Invalido
 		@tipoFactura='Z';			--Tipo Factura inválido
+	
+	print 'emito la factura'
 	EXEC dbFactura.EmitirFactura
 		@IDFactura=@IDFactura,			
-		@numeroFactura=546665237,		--SI QUIERO EMITIR OTRA CAMBIO ESTE NUMERO
+		@numeroFactura=546665239,	
 		@tipoFactura='A';
 
 	--Le asignó la factura a la venta
@@ -216,6 +220,7 @@ BEGIN
 		@FKMetodoDePago = 9999,					-- ID de método de pago no existente
 		@FKSucursal = 9999,						-- ID de sucursal no existente
 		@FKFactura = 9999;						-- ID de factura no existente
+
 	EXEC dbVenta.InsertarVenta
 		@tipoCliente = 'Normal',       -- Tipo de cliente válido
 		@genero = 'M',                 -- Género inválido
@@ -224,6 +229,7 @@ BEGIN
 		@FKMetodoDePago = 0,           -- ID de método de pago nulo
 		@FKSucursal = 0,               -- ID de sucursal nulo
 		@FKFactura = 9999;			   -- ID de factura nulo
+	print 'le asigno venta a factura'
 	EXEC dbVenta.InsertarVenta
 		@tipoCliente = 'Normal',
 		@genero = 'Male',
@@ -232,6 +238,7 @@ BEGIN
 		@FKMetodoDePago = 1,                       
 		@FKSucursal = 1,
 		@FKFactura = @IDFactura;
+
 	EXEC dbVenta.InsertarVenta
 		@tipoCliente = 'Member',
 		@genero = 'Female',
@@ -240,14 +247,16 @@ BEGIN
 		@FKMetodoDePago = 2,                         
 		@FKSucursal = 2,
 		@FKFactura = @IDFactura;			--La factura ya tiene una venta asociada
-	------------------------------
+	-----
 	--Pruebo que no deje emitir si no agregue ningun detalle
+	print 'creo la factura'
 	EXEC dbFactura.CrearFactura @IDFacturaGenerada=@IDFactura OUTPUT;
-
+	print 'trato de emitir, falla'
 	EXEC dbFactura.EmitirFactura		--Falta al menos un detalle
 		@IDFactura=@IDFactura,			
 		@numeroFactura=867662468,	
 		@tipoFactura='B';
+	print 'trato de asociar, falla'
 	EXEC dbVenta.InsertarVenta			--Falta que se emita la factura
 		@tipoCliente = 'Member',
 		@genero = 'Female',
@@ -321,7 +330,7 @@ EXEC dbSucursal.ModificarEstadoEmpleado
 	@estado=0;
 GO
 EXEC dbProducto.ModificarEstadoLineaDeProducto
-	@IDLineaDeProducto=1,
+	@IDLineaDeProducto=3,
 	@estado=1;
 GO
 EXEC dbProducto.ModificarEstadoCategoria
@@ -338,21 +347,19 @@ EXEC dbVenta.ModificarEstadoMetodoDePago
 GO
 
 
---SELECT * FROM dbSucursal.Sucursal
---GO
---SELECT * FROM dbSucursal.Empleado
---GO
---SELECT * FROM dbProducto.LineaDeProducto
---GO
---SELECT * FROM dbProducto.Categoria
---GO
---SELECT * FROM dbProducto.Producto
---GO
---SELECT * FROM dbVenta.MetodoDePago
---GO
---SELECT * FROM dbVenta.Venta
---GO
---SELECT * FROM dbFactura.DetalleDeFactura
---GO
---SELECT * FROM dbFactura.Factura
---GO
+SELECT * FROM dbSucursal.Sucursal
+GO
+SELECT * FROM dbSucursal.Empleado
+GO
+SELECT * FROM dbProducto.LineaDeProducto
+GO
+SELECT * FROM dbProducto.Categoria
+GO
+SELECT * FROM dbProducto.Producto
+GO
+SELECT * FROM dbVenta.MetodoDePago
+GO
+SELECT * FROM dbVenta.Venta
+GO
+SELECT * FROM dbFactura.Factura
+GO
