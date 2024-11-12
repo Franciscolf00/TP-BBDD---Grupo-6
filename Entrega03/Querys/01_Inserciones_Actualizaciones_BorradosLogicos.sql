@@ -436,7 +436,7 @@ BEGIN
 		SET @error = @error + 'El ID de factura ingresado no existe. ';
 
 	-- Validar que la factura ya haya sido emitida
-	IF NOT EXISTS (SELECT 1 FROM dbFactura.Factura WHERE IDFactura = @FKFactura AND estadoFactura <> 'E')
+	IF EXISTS (SELECT 1 FROM dbFactura.Factura WHERE IDFactura = @FKFactura AND estadoFactura IS NULL)
 	BEGIN
 		SET @error = @error + 'La factura aún no ha sido emitida, no se puede asociar una venta. ';
 	END
@@ -445,15 +445,15 @@ BEGIN
 	IF @error = ''
 	BEGIN
 		-- Validar que la factura no tenga una venta asociada
-		IF NOT EXISTS (SELECT 1 FROM dbVenta.Venta WHERE FKFactura = @FKFactura)
+		IF EXISTS (SELECT 1 FROM dbVenta.Venta WHERE FKFactura = @FKFactura)
 			SET @error = @error + 'La factura ya tiene una venta asociada. ';
 	END
 
 	IF (@error = '')
     BEGIN
         INSERT INTO dbVenta.Venta(tipoCliente, genero, fechaHoraVenta,identificadorDePago, FKempleado, FKMetodoDePago, FKSucursal, FKFactura)
-		VALUES (@tipoCliente, @genero, GETDATE(), @identificadorDePago,@FKempleado, @FKMetodoDePago,@FKSucursal,@FKFactura);
-    END
+		VALUES (@tipoCliente, @genero, GETDATE(), @identificadorDePago,@FKempleado, @FKMetodoDePago,@FKSucursal,@FKFactura)
+	END
     ELSE
     BEGIN
         RAISERROR (@error, 16, 1);
@@ -636,32 +636,29 @@ BEGIN
 	ELSE
 		RAISERROR(@error, 16, 1);
 END
-/*///////////////////////////////////////////////////////////////////////////////////////// */
 GO
---CREATE OR ALTER PROCEDURE dbVenta.CancelarVenta		--Tocara rehacerla con NDC y una nueva tabla, pero anda. MOVER A SCRIPT ENTREGA 5
---	@IDVenta INT
---AS
---BEGIN
---	IF NOT EXISTS(SELECT 1 FROM dbVenta.Venta WHERE IDVenta=@IDVenta)
---        RAISERROR('No se encontró la venta ingresada.', 16, 1);
+CREATE OR ALTER PROCEDURE dbFactura.RecibirPagoFactura
+	@IDFactura INT
+AS
+BEGIN
+	DECLARE @error VARCHAR(max)=''
 
---    IF EXISTS(SELECT 1 FROM dbVenta.Venta WHERE IDVenta=@IDVenta AND cantidad>0)
---    BEGIN
---		INSERT INTO dbVenta.Venta(Factura,tipoFactura,tipoCliente,genero,cantidad,fecha,hora,
---		identificadorDePago,FKempleado,FKMetodoDEPago,FKproducto,FKSucursal)
---		SELECT Factura,tipoFactura,tipoCliente,genero,cantidad*(-1),CAST(GETDATE() as DATE), CAST(GETDATE() as TIME),
---		identificadorDePago,FKempleado,FKMetodoDEPago,FKproducto,FKSucursal
---		FROM dbVenta.Venta WHERE @IDVenta=IDVenta
+	IF NOT EXISTS (SELECT 1 FROM dbFactura.Factura WHERE IDFactura=@IDFactura)
+		SET @error=@error+'La factura con el ID ingresado no existe.'
+	ELSE IF EXISTS(SELECT 1 FROM dbFactura.Factura WHERE IDFactura=@IDFactura AND fechaHoraEmision IS NULL)
+		SET @error=@error+'La factura con el ID ingresado todavia no ha sido emitida.'
+	ELSE IF EXISTS(SELECT 1 FROM dbFactura.Factura WHERE IDFactura=@IDFactura AND estadoFactura='P')
+		SET @error=@error+'La factura con el ID ingresado ya fue pagada.'
 
---		print 'La venta fue cancelada exitosamente.';
---    END
---    ELSE
---        RAISERROR('La venta ya fue cancelada.', 16, 1);
---END
-/*///////////////////////////////////////////////////////////////////////////////////////// */
-/*///////////////////////////////////////////////////////////////////////////////////////// */
-/*///////////////////////////////////////////////////////////////////////////////////////// */
---Borrados(Lógicos)
+	IF @error=''
+	BEGIN
+		UPDATE dbFactura.Factura
+		SET estadoFactura='P'
+		WHERE IDFactura=@IDFactura
+	END
+	ELSE
+		RAISERROR(@error, 16, 1);
+END
 GO
 CREATE OR ALTER PROCEDURE dbSucursal.ModificarEstadoSucursal
 	@IDSucursal INT,

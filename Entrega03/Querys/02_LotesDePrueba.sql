@@ -208,7 +208,7 @@ BEGIN
 	print 'emito la factura'
 	EXEC dbFactura.EmitirFactura
 		@IDFactura=@IDFactura,			
-		@numeroFactura=546665237,	
+		@numeroFactura=546665239,	
 		@tipoFactura='A';
 
 	--Le asignó la factura a la venta
@@ -314,6 +314,9 @@ EXEC dbVenta.ActualizarMetodoDePago
 	 @metodoDePagoAactualizar=1,
 	 @nombre='Chachos';
 GO
+EXEC dbFactura.RecibirPagoFactura
+	@IDFactura = 1;
+GO
 /*///////////////////////////////////////////////////////////////////////////////////////// */
 /*///////////////////////////////////////////////////////////////////////////////////////// */
 /*///////////////////////////////////////////////////////////////////////////////////////// */
@@ -357,4 +360,6 @@ GO
 SELECT * FROM dbVenta.MetodoDePago
 GO
 SELECT * FROM dbVenta.Venta
-
+GO
+SELECT * FROM dbFactura.Factura
+GO

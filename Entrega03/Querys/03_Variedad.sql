@@ -1,44 +1,5 @@
 USE Com2900G06
 --use master
-GO
-CREATE OR ALTER PROCEDURE dbVenta.MostrarVentas
-AS
-BEGIN
-	SELECT 
-		STUFF(STUFF(CONVERT(VARCHAR(9), f.numeroFactura), 4, 0, '-'), 7, 0, '-') AS ID_Factura,  -- Lo muestro con formato DDD-DD-DDDD
-		f.tipoFactura AS Tipo_de_Factura,
-		s.ciudad AS Ciudad,
-		v.tipoCliente AS Tipo_de_Cliente,
-		v.genero AS Genero,
-		l.nombre AS Linea_de_Producto,
-		p.nombre AS Producto,
-		p.precioUnitario AS Precio_Unitario,
-		df.cantidad AS Cantidad,
-		CAST(v.fechaHoraVenta AS DATE) AS Fecha,
-		CAST(v.fechaHoraVenta AS TIME) AS Hora,
-		m.nombre AS Medio_de_Pago,
-		e.Legajo AS Empleado,
-		s.sucursal AS Sucursal
-	FROM dbVenta.Venta v
-	JOIN dbFactura.Factura f
-		ON f.IDFactura = v.FKFactura
-	JOIN dbFactura.DetalleDeFactura df
-		ON df.FKFactura = f.IDFactura
-	JOIN dbProducto.Producto p
-		ON p.IDProducto = df.FKProducto
-	JOIN dbProducto.Categoria c
-		ON c.IDCategoria = p.FKCategoria
-	JOIN dbProducto.LineaDeProducto l
-		ON l.IDLineaDeProducto = c.FKLineaDeProducto
-	JOIN dbVenta.MetodoDePago m
-		ON m.IDMetodoDePago = v.FKMetodoDePago
-	JOIN dbSucursal.Empleado e
-		ON e.Legajo = v.FKempleado
-	JOIN dbSucursal.Sucursal s
-		ON s.IDSucursal = e.FKSucursal
-	ORDER BY v.fechaHoraVenta;
-END
-GO
 -----------------------------------------------------------
 --API PARA PASAR DE DOLARES A PESOS(CAMBIO OFICIAL)
 GO
@@ -113,7 +74,7 @@ BEGIN
 	FROM dbVenta.Venta v
 	-- Relacionar Venta con Factura
 	JOIN dbFactura.Factura f
-		ON f.FKVenta = v.IDVenta
+		ON f.IDFactura = v.FKFactura
 	-- Relacionar Factura con detalleDeFactura (productos vendidos)
 	JOIN dbFactura.detalleDeFactura df
 		ON df.FKFactura = f.IDFactura
