@@ -22,27 +22,6 @@ BEGIN
 END
 GO   
 
-exec dbReporte.mostrarTotalDias 1,2019
-GO
---Otra version, separando por producto
---CREATE OR ALTER PROCEDURE dbReporte.mostrarTotalDias
---    @mes TINYINT,
---    @anio SMALLINT
---AS
---BEGIN
---	SELECT 'Total facturado', isnull(Lunes, 0) Lunes, isnull(Martes, 0) Martes, isnull(Miércoles, 0) Miércoles,
---	isnull(Jueves, 0) Jueves, isnull(Sábado, 0) Sábado, isnull(Domingo, 0) Domingo 
---	FROM (SELECT p.precioUnitario * v.cantidad as Cantidad_vendida,  DATENAME(WEEKDAY, v.fecha) AS dia
---	FROM dbVenta.Venta v
---	INNER JOIN dbProducto.Producto p ON p.IDProducto = v.FKProducto
---	WHERE DATEPART(MONTH, v.fecha) = @mes AND DATEPART(YEAR, v.fecha) = @anio) AS cantPorDia
---	PIVOT (SUM(Cantidad_vendida)
---		FOR dia in ([Lunes],[Martes],[Miércoles],[Jueves],[Viernes],[Sábado],[Domingo])) Producto
---	--FOR XML PATH('Producto'), ROOT ('Total_facturado'), ELEMENTS XSINIL;
---END
---GO   
-
-
 -- Trimestral: mostrar el total facturado por turnos de trabajo por mes. 
 
 CREATE OR ALTER PROCEDURE dbReporte.mostrarTotalTrimestre
@@ -108,8 +87,6 @@ BEGIN
 END
 GO
 
-
-
 -- Por rango de fechas: ingresando un rango de fechas a demanda, debe poder mostrar la cantidad de productos vendidos en ese rango por sucursal, ordenado de mayor a menor. 
 CREATE OR ALTER PROCEDURE dbReporte.mostrarCantidadSucursalPorFecha
     @inicioFecha DATE,
@@ -127,6 +104,7 @@ BEGIN
 	FOR XML PATH('Sucursal'), ROOT ('CantidadSucursal'), ELEMENTS XSINIL;
 END
 GO
+
 -- Mostrar los 5 productos más vendidos en un mes, por semana
 CREATE OR ALTER PROCEDURE dbReporte.mostrarTop5ProductosPorSemana
     @mes TINYINT,
@@ -139,13 +117,13 @@ BEGIN
             p.nombre AS Nombre, 
 			--Se resta la semana del año en la que cae el primer día del mes de la semana del año en la que está actualmente
             (DATEPART(WEEK, v.fechaHoraVenta) - DATEPART(WEEK, DATEADD(MONTH, DATEDIFF(MONTH, 0, v.fechaHoraVenta), 0)) + 1) AS SemanaMes,
-            COUNT(df.FKProducto) AS Cantidad_vendida,
-            DENSE_RANK() OVER (PARTITION BY (DATEPART(WEEK, v.fecha) - DATEPART(WEEK, DATEADD(MONTH, DATEDIFF(MONTH, 0, v.fecha), 0)) + 1)
-                         ORDER BY COUNT(v.FKProducto) DESC) AS Ranking_Semana
+            SUM(df.cantidad) AS Cantidad_vendida,
+            DENSE_RANK() OVER (PARTITION BY (DATEPART(WEEK, v.fechaHoraVenta) - DATEPART(WEEK, DATEADD(MONTH, DATEDIFF(MONTH, 0, v.fechaHoraVenta), 0)) + 1)
+                         ORDER BY SUM(df.cantidad) DESC) AS Ranking_Semana
         FROM dbVenta.Venta v
 		INNER JOIN dbFactura.Factura f ON f.IDFactura = v.FKFactura
 		INNER JOIN dbFactura.DetalleDeFactura df ON df.FKFactura = f.IDFactura
-		INNER JOIN dbProducto.Producto p ON p.IDProducto=df.FKProducto
+		INNER JOIN dbProducto.Producto p ON p.IDProducto= df.FKProducto
         WHERE DATEPART(MONTH, v.fechaHoraVenta) = @mes AND DATEPART(YEAR, v.fechaHoraVenta) = @anio
         GROUP BY df.FKProducto, p.nombre, 
                  (DATEPART(WEEK, v.fechaHoraVenta) - DATEPART(WEEK, DATEADD(MONTH, DATEDIFF(MONTH, 0, v.fechaHoraVenta), 0)) + 1)
@@ -154,6 +132,8 @@ BEGIN
     ORDER BY SemanaMes, Ranking_Semana
 	FOR XML PATH('Producto'), ROOT ('TopProductos'), ELEMENTS XSINIL;
 END
+GO
+
 GO
 --Mostrar los 5 productos menos vendidos en el mes. 
 CREATE OR ALTER PROCEDURE dbReporte.mostrarTopMenos5ProductosPorMes
@@ -164,32 +144,80 @@ BEGIN
     SELECT *
     FROM (
         SELECT 
-            v.FKProducto AS '@IDProducto', p.nombre AS Nombre, 
-            COUNT(v.FKProducto) AS Cantidad_vendida,
-            DENSE_RANK() OVER (ORDER BY COUNT(v.FKProducto)) AS Ranking
+            df.FKProducto AS '@IDProducto', p.nombre AS Nombre, 
+            SUM(df.cantidad) AS Cantidad_vendida,
+            DENSE_RANK() OVER (ORDER BY SUM(df.cantidad)) AS Ranking
         FROM dbVenta.Venta v
-        INNER JOIN dbProducto.Producto p ON p.IDProducto = v.FKProducto
-        WHERE DATEPART(MONTH, v.fecha) = @mes AND DATEPART(YEAR, v.fecha) = @anio
-        GROUP BY v.FKProducto, p.nombre
+		INNER JOIN dbFactura.Factura f ON f.IDFactura = v.FKFactura
+		INNER JOIN dbFactura.DetalleDeFactura df ON df.FKFactura = f.IDFactura
+		INNER JOIN dbProducto.Producto p ON p.IDProducto = df.FKProducto
+
+        WHERE DATEPART(MONTH, v.fechaHoraVenta) = @mes AND DATEPART(YEAR, v.fechaHoraVenta) = @anio
+        GROUP BY df.FKProducto, p.nombre
     ) ranked
     WHERE Ranking <= 5
     ORDER BY Ranking
 	FOR XML PATH('Producto'), ROOT ('TopProductos'), ELEMENTS XSINIL;
 END
 GO
+
+
 --Mostrar total acumulado de ventas (o sea tambien mostrar el detalle) para una fecha y sucursal particulares 
 CREATE OR ALTER PROCEDURE dbReporte.mostrarAcumuladoSucursal
 @fecha DATE,
 @idSucursal TINYINT
 AS
 BEGIN
-	SELECT v.IDVenta AS '@IDVenta', v.Factura, v.tipoFactura, v.identificadorDePago, v.fecha, v.hora, s.sucursal, v.cantidad, p.nombre, p.precioUnitario, 
-	SUM(p.precioUnitario * v.cantidad) OVER (ORDER BY v.fecha) as Acumulado
+		SELECT 
+		-- Formateo del número de factura (con guiones en la posición adecuada)
+		STUFF(STUFF(CONVERT(VARCHAR(9), f.numeroFactura), 4, 0, '-'), 7, 0, '-') AS ID_Factura,
+		f.tipoFactura AS Tipo_de_Factura,
+		s.Ciudad AS Ciudad,
+		v.tipoCliente AS Tipo_de_Cliente,
+		v.genero AS Genero,
+		lp.nombre AS Linea_de_Producto,
+		p.nombre AS Producto,
+		p.precioUnitario AS Precio_Unitario,
+		df.cantidad AS Cantidad,
+		CAST(f.fechaHoraEmision AS DATE) AS Fecha,
+		CAST(f.fechaHoraEmision AS TIME) AS Hora,
+		m.nombre AS Medio_de_Pago,
+		e.Legajo AS Empleado,
+		s.sucursal AS Sucursal,
+		SUM(f.total) OVER (ORDER BY v.fechaHoraVenta) as Acumulado
 	FROM dbVenta.Venta v
-	INNER JOIN dbProducto.Producto p ON p.IDProducto = v.FKProducto
-	INNER JOIN dbSucursal.Sucursal s ON s.IDSucursal = v.FKSucursal
-	WHERE v.fecha = @fecha AND s.IDSucursal = @idSucursal
+	-- Relacionar Venta con Factura
+	JOIN dbFactura.Factura f
+		ON f.IDFactura = v.FKFactura
+	-- Relacionar Factura con detalleDeFactura (productos vendidos)
+	JOIN dbFactura.detalleDeFactura df
+		ON df.FKFactura = f.IDFactura
+	-- Relacionar detalleDeFactura con Producto
+	JOIN dbProducto.Producto p
+		ON p.IDProducto = df.FKProducto
+	-- Relacionar Producto con LineaDeProducto
+	JOIN dbProducto.Categoria c
+		ON c.IDCategoria = p.FKCategoria
+	JOIN dbProducto.LineaDeProducto lp
+		ON lp.IDLineaDeProducto = c.FKLineaDeProducto
+	-- Relacionar Venta con MetodoDePago
+	JOIN dbVenta.MetodoDePago m
+		ON m.IDMetodoDePago = v.FKMetodoDePago
+	-- Relacionar Venta con Empleado (que está relacionado con Sucursal)
+	JOIN dbSucursal.Empleado e
+		ON e.Legajo = v.FKEmpleado
+	JOIN dbSucursal.Sucursal s
+		ON s.IDSucursal = v.FKSucursal
+
+	WHERE CAST(v.fechaHoraVenta AS DATE) = @fecha
+     AND s.IDSucursal = @idSucursal
+
 	FOR XML PATH('Venta'), ROOT ('Ventas'), ELEMENTS XSINIL;
+
 END
 GO
+
+
+
+
 
