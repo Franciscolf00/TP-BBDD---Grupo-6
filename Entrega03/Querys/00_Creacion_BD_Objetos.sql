@@ -52,12 +52,12 @@ CREATE SCHEMA dbReporte
 GO
 CREATE SCHEMA dbFactura
 GO
-create or alter function dbVenta.RutaImportacion()
-returns VARCHAR(max)
-AS
-BEGIN
-	RETURN 'C:\Users\Tomas_Arce\Documents\GitHub\TP-BBDD---Grupo-6\TP_integrador_Archivos'; --Aca copiaríaas tu ruta base hasta los archivos.
-END
+--create or alter function dbVenta.RutaImportacion()
+--returns VARCHAR(max)
+--AS
+--BEGIN
+--	RETURN 'C:\Users\Tomas_Arce\Documents\GitHub\TP-BBDD---Grupo-6\TP_integrador_Archivos'; --Aca copiaríaas tu ruta base hasta los archivos.
+--END
 go
 
 DROP TABLE IF EXISTS dbFactura.DetalleDeFactura;
@@ -136,7 +136,8 @@ CREATE TABLE dbFactura.Factura(
 	tipoFactura CHAR(1) CHECK(tipoFactura in ('A', 'B', 'C')),
 	fechaHoraEmision DATETIME,
 	estadoFactura CHAR(1) CHECK(estadoFactura in ('E','P')),	--Emitida,Pagada
-	total DECIMAL(10,2)
+	total DECIMAL(10,2),
+	totalConIva DECIMAL(10,2)
 )
 go
 CREATE TABLE dbFactura.DetalleDeFactura(

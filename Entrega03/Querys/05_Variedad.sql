@@ -52,7 +52,7 @@ BEGIN
 END
 GO
 EXEC dbProducto.CargaInicialLineaYCategoria
-go
+GO
 CREATE OR ALTER PROCEDURE dbVenta.MostrarVentas
 AS
 BEGIN
@@ -67,6 +67,8 @@ BEGIN
 		p.nombre AS Producto,
 		p.precioUnitario AS Precio_Unitario,
 		df.cantidad AS Cantidad,
+		f.total AS Total,
+		(f.total * 1.21) AS Con_IVA,
 		CAST(f.fechaHoraEmision AS DATE) AS Fecha,
 		CAST(f.fechaHoraEmision AS TIME) AS Hora,
 		m.nombre AS Medio_de_Pago,
