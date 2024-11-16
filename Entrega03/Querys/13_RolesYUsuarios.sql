@@ -4,7 +4,7 @@ GO
 
 -- Creamos el login y user de cajero
 CREATE LOGIN Cajero
-WITH PASSWORD = 'abc123'.
+WITH PASSWORD = 'abc123',
 DEFAULT_DATABASE=Com2900G06, -- Default Database en la que se está trabajando.
 CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF; -- Asignamos credenciales sin vencimiento y sin restricciones de password.
 GO

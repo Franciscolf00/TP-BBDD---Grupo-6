@@ -26,6 +26,9 @@ BEGIN
     ADD direccionCifrada VARBINARY(256);
 END;
 
+ALTER TABLE dbSucursal.Empleado
+ALTER COLUMN direccion VARBINARY(MAX);
+
 -- Obtenemos la clave de cifrado. Lo cargaríamos desde otra capa.
 DECLARE @FraseClaveCargadaPorUsuario NVARCHAR(256);  
 SET @FraseClaveCargadaPorUsuario = 'Grupo06'; 
