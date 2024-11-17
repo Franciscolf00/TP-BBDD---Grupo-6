@@ -132,34 +132,7 @@ CREATE TABLE dbVenta.MetodoDePago(
 	estado BIT,
 	fechaBaja DATETIME
 )
-go
-CREATE TABLE dbFactura.Factura(
-	IDFactura INT IDENTITY (1,1) PRIMARY KEY,
-	numeroFactura INT,	--Lo tengo que guardar como int para verificar duplicados a la hora de insertar
-	tipoFactura CHAR(1) CHECK(tipoFactura in ('A', 'B', 'C')),
-	fechaHoraEmision DATETIME,
-	estadoFactura CHAR(1) CHECK(estadoFactura in ('E','P')),	--Emitida,Pagada
-	total DECIMAL(10,2),
-	totalConIva DECIMAL(10,2),
-	puntoDeVenta INT		--5 digitos
-)
-go
-CREATE TABLE dbFactura.DetalleDeFactura(
-	IDDetalle INT IDENTITY (1,1) PRIMARY KEY,
-	cantidad INT,
-	subtotal DECIMAL(10,2),
-	precioUnitarioAlMomento DECIMAL(10,2),
-	FKProducto INT NOT NULL REFERENCES dbProducto.Producto(IDProducto),
-	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
-)
-go
-CREATE TABLE dbFactura.NotaDeCredito(
-	IDNotaDeCredito INT IDENTITY (1,1) PRIMARY KEY,
-	numeroComprobante INT,		--8 digitos, con 0s adelante
-	motivo VARCHAR(150),
-	fechaHoraNota DATETIME,
-	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
-)
+
 go
 CREATE TABLE dbVenta.Venta(
 	IDVenta INT IDENTITY(1,1) PRIMARY KEY,
@@ -171,9 +144,54 @@ CREATE TABLE dbVenta.Venta(
 											OR identificadorDePago IS NULL),
 	FKEmpleado INT NOT NULL REFERENCES dbSucursal.Empleado(Legajo),
 	FKMetodoDePago INT NOT NULL REFERENCES dbVenta.MetodoDePago(IDMetodoDePago),
-	FKSucursal INT NOT NULL REFERENCES dbSucursal.Sucursal(IDSucursal),
+	FKSucursal INT NOT NULL REFERENCES dbSucursal.Sucursal(IDSucursal)
+)
+
+go
+
+CREATE TABLE dbFactura.Factura(
+	IDFactura INT IDENTITY (1,1) PRIMARY KEY,
+	numeroFactura INT,	--Lo tengo que guardar como int para verificar duplicados a la hora de insertar
+	tipoFactura CHAR(1) CHECK(tipoFactura in ('A', 'B', 'C')),
+	fechaHoraEmision DATETIME,
+	estadoFactura CHAR(1) CHECK(estadoFactura in ('E','P')),	--Emitida,Pagada
+	total DECIMAL(10,2),
+	totalConIva DECIMAL(10,2),
+	puntoDeVenta INT,		--5 digitos
+	FKVenta INT NOT NULL REFERENCES dbVenta.Venta(IDVenta)
+)
+go
+CREATE TABLE dbVenta.DetalleDeVenta(
+	IDDetalle INT IDENTITY (1,1) PRIMARY KEY,
+	cantidad INT,
+	subtotal DECIMAL(10,2),
+	precioUnitarioAlMomento DECIMAL(10,2),
+	FKProducto INT NOT NULL REFERENCES dbProducto.Producto(IDProducto),
+	FKVenta INT NOT NULL REFERENCES dbVenta.Venta(IDVenta)
+)
+go
+
+/*
+CREATE TABLE dbFactura.DetalleDeFactura(
+	IDDetalle INT IDENTITY (1,1) PRIMARY KEY,
+	cantidad INT,
+	subtotal DECIMAL(10,2),
+	precioUnitarioAlMomento DECIMAL(10,2),
+	FKProducto INT NOT NULL REFERENCES dbProducto.Producto(IDProducto),
 	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
 )
+go
+*/
+
+go
+CREATE TABLE dbFactura.NotaDeCredito(
+	IDNotaDeCredito INT IDENTITY (1,1) PRIMARY KEY,
+	numeroComprobante INT,		--8 digitos, con 0s adelante
+	motivo VARCHAR(150),
+	fechaHoraNota DATETIME,
+	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
+)
+
 go
 CREATE FUNCTION dbSistema.ValidarCUIT (@CUIT CHAR(13))
 RETURNS BIT

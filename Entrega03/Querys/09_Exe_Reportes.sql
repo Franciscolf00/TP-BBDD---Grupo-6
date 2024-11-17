@@ -15,5 +15,6 @@ EXEC dbReporte.mostrarTop5ProductosPorSemana 1, 2019;
 GO
 EXEC dbReporte.mostrarTopMenos5ProductosPorMes 1, 2019;
 GO
+
 EXEC dbReporte.mostrarAcumuladoSucursal '2019-03-01', 1;
 GO
