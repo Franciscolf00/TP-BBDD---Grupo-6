@@ -3,7 +3,8 @@ GO
 -- SP Generación de nota de crédito
 CREATE OR ALTER PROCEDURE dbFactura.GenerarNotaDeCredito
 	@IDFactura INT,
-	@motivo VARCHAR(150)
+	@motivo VARCHAR(150),
+	@numeroComprobante INT,
 AS
 BEGIN
 	DECLARE @error VARCHAR(MAX) = '';
@@ -13,14 +14,21 @@ BEGIN
 
 	IF NOT EXISTS(SELECT 1 FROM dbFactura.Factura WHERE IDFactura=@IDFactura)
 		SET @error = @error + 'No existe factura con el ID ingresado.';
+										
+	IF (@numeroComprobante=0 OR @numeroComprobante IS NULL)
+		SET @error = @error + 'Falta el numero de comprobante. ';
+	ELSE IF(@numeroComprobante < 1 OR @numeroComprobante > 99999999)
+		SET @error = @error + 'Numero de comprobante inválido, debe encontrarse entre 1-99999999. ';
+	ELSE IF EXISTS(SELECT numeroComprobante FROM dbFactura.NotaDeCredito WHERE numeroComprobante=@numeroComprobante)
+		SET @error = @error + 'Numero de comprobante ya existente. ';
 
 	IF EXISTS(SELECT 1 FROM dbFactura.Factura WHERE IDFactura=@IDFactura AND (estadoFactura = 'E' OR estadoFactura IS NULL))
 		SET @error = @error + 'Para realizar una nota de crédito, debe existir una factura en estado pagada.';
 
 	IF (@error = '')
     BEGIN
-		INSERT INTO dbFactura.NotaDeCredito(motivo, fechaHoraNota, FKFactura)
-		SELECT @motivo, GETDATE(), @IDFactura
+		INSERT INTO dbFactura.NotaDeCredito(motivo, fechaHoraNota, numeroComprobante, FKFactura)
+		SELECT @motivo, GETDATE(), @numeroComprobante, @IDFactura
 	END
 	ELSE
 	BEGIN

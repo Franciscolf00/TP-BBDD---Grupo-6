@@ -325,10 +325,13 @@ GO
 CREATE OR ALTER PROCEDURE dbFactura.EmitirFactura
 	@IDFactura INT,
 	@numeroFactura INT,
-	@tipoFactura CHAR(1)
+	@tipoFactura CHAR(1),
+	@puntoDeVenta INT
 AS
 BEGIN
 	DECLARE @error varchar(max) = '';
+	DECLARE @IVA DECIMAL(5,2);
+	SELECT @IVA=PorcentajeIVA FROM dbSistema.Parametrizacion;
 
 	--Validar factura.												
 	IF (@numeroFactura=0 OR @numeroFactura IS NULL)
@@ -337,6 +340,12 @@ BEGIN
 		SET @error = @error + 'Numero de factura inválido, deben ser 9 digitos exactos del 0-9. ';
 	ELSE IF EXISTS(SELECT numeroFactura FROM dbFactura.Factura WHERE numeroFactura=@numeroFactura )
 		SET @error = @error + 'Numero de factura ya existente. ';
+
+	--Validar punto de venta.												
+	IF (@puntoDeVenta=0 OR @puntoDeVenta IS NULL)
+		SET @error = @error + 'Falta el punto de venta. ';
+	ELSE IF(@puntoDeVenta < 1 OR @puntoDeVenta > 99999)
+		SET @error = @error + 'Punto de venta inválido, debe encontrarse entre 1-99999. ';
 
 	--Validar tipo de factura												
 	IF (@tipoFactura IS NULL OR @tipoFactura not in('A', 'B', 'C'))
@@ -362,11 +371,13 @@ BEGIN
 		estadoFactura='E',				--pongo estado en Emitida
 		tipoFactura=@tipoFactura,
 		fechaHoraEmision=GETDATE(),
+		puntoDeVenta=@puntoDeVenta,
 		total=(
 			SELECT SUM(subtotal)
 			FROM dbFactura.DetalleDeFactura
 			WHERE FKFactura = dbFactura.Factura.IDFactura
-		)
+		),
+		totalConIva=total+total*@IVA			--total IVA
 		WHERE IDFactura=@IDFactura
 	END
 	ELSE
