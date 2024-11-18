@@ -179,38 +179,8 @@ GO
 CREATE OR ALTER PROCEDURE dbFactura.PruebaFacturasYVentas
 AS
 BEGIN
-	DECLARE @IDFactura INT;
-	--Creo la factura
-	EXEC dbFactura.CrearFactura @IDFacturaGenerada=@IDFactura OUTPUT;
-
-	--Inserto detalles
-	EXEC dbFactura.InsertarDetalleDeFactura
-		@cantidad=-10,				--Cantidad negativa
-		@FKProducto=1000000,		--Producto no existente
-		@FKFactura=1000;			--Factura no existente
-	EXEC dbFactura.InsertarDetalleDeFactura
-		@cantidad=5,
-		@FKProducto=1,
-		@FKFactura=@IDFactura;
-	EXEC dbFactura.InsertarDetalleDeFactura
-		@cantidad=2,
-		@FKProducto=2,
-		@FKFactura=@IDFactura;
-
-	--Emito la factura
-	EXEC dbFactura.EmitirFactura
-		@IDFactura=7645,			--Factura no existente
-		@numeroFactura=0,			--Invalido
-		@tipoFactura='Z',			--Tipo Factura inválido
-		@puntoDeVenta=-4;			--Invalido
-
-	EXEC dbFactura.EmitirFactura
-		@IDFactura=@IDFactura,			
-		@numeroFactura=546665237,		--SI QUIERO EMITIR OTRA CAMBIO ESTE NUMERO
-		@tipoFactura='A',
-		@puntoDeVenta=1;
-
-	--Le asignó la factura a la venta
+	DECLARE @IDVenta INT;
+	--Inserto la venta y creo su factura(prefactura)
 	EXEC dbVenta.InsertarVenta
 		@tipoCliente = 'VIP',					-- Tipo de cliente inválido
 		@genero = 'Z',							-- Género inválido
@@ -218,7 +188,7 @@ BEGIN
 		@FKempleado = 9999,						-- Legajo no registrado
 		@FKMetodoDePago = 9999,					-- ID de método de pago no existente
 		@FKSucursal = 9999,						-- ID de sucursal no existente
-		@FKFactura = 9999;						-- ID de factura no existente
+		@IDVentaGenerada=@IDVenta OUTPUT;
 	EXEC dbVenta.InsertarVenta
 		@tipoCliente = 'Normal',       -- Tipo de cliente válido
 		@genero = 'M',                 -- Género inválido
@@ -226,42 +196,61 @@ BEGIN
 		@FKempleado = NULL,            -- Legajo vacío
 		@FKMetodoDePago = 0,           -- ID de método de pago nulo
 		@FKSucursal = 0,               -- ID de sucursal nulo
-		@FKFactura = 9999;			   -- ID de factura nulo
-	EXEC dbVenta.InsertarVenta
+		@IDVentaGenerada=@IDVenta OUTPUT;	
+	EXEC dbVenta.InsertarVenta				--Se inserta exitosamente
 		@tipoCliente = 'Normal',
 		@genero = 'Male',
 		@identificadorDePago = '1234-5678-9012-3456', 
 		@FKempleado = 54321,              
 		@FKMetodoDePago = 1,                       
 		@FKSucursal = 1,
-		@FKFactura = @IDFactura;
-	EXEC dbVenta.InsertarVenta
-		@tipoCliente = 'Member',
-		@genero = 'Female',
-		@identificadorDePago = NULL,   
-		@FKempleado = 54321,               
-		@FKMetodoDePago = 2,                         
-		@FKSucursal = 2,
-		@FKFactura = @IDFactura;			--La factura ya tiene una venta asociada
+		@IDVentaGenerada=@IDVenta OUTPUT;	
+	--Inserto detalles
+	EXEC dbVenta.InsertarDetalleDeVenta
+		@cantidad=-10,				--Cantidad negativa
+		@FKProducto=1000000,		--Producto no existente
+		@FKVenta=1000;			--Factura no existente
+	EXEC dbVenta.InsertarDetalleDeVenta	--Se inserta exitosamente
+		@cantidad=5,
+		@FKProducto=1,
+		@FKVenta=@IDVenta;
+	EXEC dbVenta.InsertarDetalleDeVenta	--Se inserta exitosamente
+		@cantidad=2,
+		@FKProducto=2,
+		@FKVenta=@IDVenta;
+
+	--Emito la factura
+	EXEC dbFactura.EmitirFactura
+		@IDVenta=7645,			--Factura no existente
+		@numeroFactura=0,			--Invalido
+		@tipoFactura='Z',			--Tipo Factura inválido
+		@puntoDeVenta=-4;			--Invalido
+	EXEC dbFactura.EmitirFactura	--Se emite exitosamente
+		@IDVenta=@IDVenta,			
+		@numeroFactura=546665239,			--Cambiar si queres que lo emita
+		@tipoFactura='A',
+		@puntoDeVenta=1;
 	------------------------------
 	--Pruebo que no deje emitir si no agregue ningun detalle
-	EXEC dbFactura.CrearFactura @IDFacturaGenerada=@IDFactura OUTPUT;
+	EXEC dbVenta.InsertarVenta				--Se inserta exitosamente
+		@tipoCliente = 'Normal',
+		@genero = 'Male',
+		@identificadorDePago = '1234-5678-9012-3456', 
+		@FKempleado = 54321,              
+		@FKMetodoDePago = 1,                       
+		@FKSucursal = 1,
+		@IDVentaGenerada=@IDVenta OUTPUT;	
 
-	EXEC dbFactura.EmitirFactura		--Falta al menos un detalle
-		@IDFactura=@IDFactura,			
-		@numeroFactura=867662468,	
-		@tipoFactura='B',
-		@puntoDeVenta=2;
-	EXEC dbVenta.InsertarVenta			--Falta que se emita la factura
-		@tipoCliente = 'Member',
-		@genero = 'Female',
-		@identificadorDePago = NULL,   
-		@FKempleado = 54321,               
-		@FKMetodoDePago = 2,                         
-		@FKSucursal = 2,
-		@FKFactura = @IDFactura;
+	EXEC dbFactura.EmitirFactura	--no puedo emitir porque necesito al menos un detalle
+		@IDVenta=@IDVenta,			
+		@numeroFactura=546665237,	--numero de factura ya existente
+		@tipoFactura='A',
+		@puntoDeVenta=1;
 END
 GO
+select * from dbVenta.Venta
+select * from dbVenta.DetalleDeVenta
+select * from dbFactura.Factura
 EXEC dbFactura.PruebaFacturasYVentas;
 ----------------------------------------------------------------------------------------------
 /*///////////////////////////////////////////////////////////////////////////////////////// */

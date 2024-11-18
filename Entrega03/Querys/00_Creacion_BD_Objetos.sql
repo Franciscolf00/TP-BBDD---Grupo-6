@@ -135,8 +135,6 @@ CREATE TABLE dbVenta.MetodoDePago(
 )
 
 go
-
-
 CREATE TABLE dbFactura.Factura(
 	IDFactura INT IDENTITY (1,1) PRIMARY KEY,
 	numeroFactura INT,	--Lo tengo que guardar como int para verificar duplicados a la hora de insertar
@@ -148,7 +146,6 @@ CREATE TABLE dbFactura.Factura(
 	puntoDeVenta INT		--5 digitos
 )
 go
-
 CREATE TABLE dbVenta.Venta(
 	IDVenta INT IDENTITY(1,1) PRIMARY KEY,
 	tipoCliente CHAR(6) CHECK(tipoCliente in ('Member', 'Normal')),
@@ -162,7 +159,6 @@ CREATE TABLE dbVenta.Venta(
 	FKSucursal INT NOT NULL REFERENCES dbSucursal.Sucursal(IDSucursal),
 	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
 )
-
 go
 
 CREATE TABLE dbVenta.DetalleDeVenta(
@@ -174,20 +170,6 @@ CREATE TABLE dbVenta.DetalleDeVenta(
 	FKVenta INT NOT NULL REFERENCES dbVenta.Venta(IDVenta)
 )
 go
-
-/*
-CREATE TABLE dbFactura.DetalleDeFactura(
-	IDDetalle INT IDENTITY (1,1) PRIMARY KEY,
-	cantidad INT,
-	subtotal DECIMAL(10,2),
-	precioUnitarioAlMomento DECIMAL(10,2),
-	FKProducto INT NOT NULL REFERENCES dbProducto.Producto(IDProducto),
-	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
-)
-go
-*/
-
-go
 CREATE TABLE dbFactura.NotaDeCredito(
 	IDNotaDeCredito INT IDENTITY (1,1) PRIMARY KEY,
 	numeroComprobante INT,		--8 digitos, con 0s adelante
@@ -197,7 +179,7 @@ CREATE TABLE dbFactura.NotaDeCredito(
 )
 
 go
-CREATE FUNCTION dbSistema.ValidarCUIT (@CUIT CHAR(13))
+CREATE OR ALTER FUNCTION dbSistema.ValidarCUIT (@CUIT CHAR(13))
 RETURNS BIT
 AS
 BEGIN
@@ -241,3 +223,33 @@ CREATE TABLE dbSistema.Parametrizacion(
 	montoMinimoDatos INT			--Monto minimo para pedir los datos del cliente
 )
 go
+
+CREATE OR ALTER PROCEDURE dbSistema.ConfiguracionInicial
+	@CUITAurora CHAR(13),
+	@PorcentajeIVA DECIMAL(5,2),
+	@montoMinimoDatos DECIMAL(10,2)
+AS
+BEGIN
+	DECLARE @error VARCHAR(max)='';
+	IF( dbSistema.ValidarCUIT(@CUITAurora) = 0)
+		SET @error=@error + 'CUIT de la empresa invalido. ';
+
+	IF (@PorcentajeIVA < 0 OR @PorcentajeIVA IS NULL )
+		SET @error = @error + 'El IVA debe ser mayor o igual a 0. ';	--se vale soñar
+
+	IF (@montoMinimoDatos <= 0 OR @montoMinimoDatos IS NULL )
+		SET @error = @error + 'El monto minimo para exigir datos para factura tipo B y C debe ser mayor a 0. ';
+
+	IF (@error = '')
+    BEGIN
+        INSERT INTO dbSistema.Parametrizacion (CUITAurora,PorcentajeIVA,montoMinimoDatos)
+		VALUES (@CUITAurora,@PorcentajeIVA,@montoMinimoDatos);
+    END
+    ELSE
+        RAISERROR (@error, 16, 1);
+END
+GO
+EXEC dbSistema.ConfiguracionInicial 
+	@CUITAurora='30-68584975-1',
+	@PorcentajeIVA=0.21,
+	@montoMinimoDatos=40000;
