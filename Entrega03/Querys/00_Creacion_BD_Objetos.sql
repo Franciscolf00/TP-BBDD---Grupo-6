@@ -62,16 +62,17 @@ GO
 --END
 go
 
-DROP TABLE IF EXISTS dbFactura.DetalleDeFactura;
+
+DROP TABLE IF EXISTS dbFactura.DetalleDeVenta;
+DROP TABLE IF EXISTS dbVenta.Venta;
+DROP TABLE IF EXISTS dbFactura.Factura;
 DROP TABLE IF EXISTS dbProducto.Producto; 
 DROP TABLE IF EXISTS dbProducto.Categoria;   
 DROP TABLE IF EXISTS dbProducto.LineaDeProducto; 
 DROP TABLE IF EXISTS dbFactura.NotaDeCredito;
-DROP TABLE IF EXISTS dbVenta.Venta;
 DROP TABLE IF EXISTS dbVenta.MetodoDePago;   
 DROP TABLE IF EXISTS dbSucursal.Empleado;    
 DROP TABLE IF EXISTS dbSucursal.Sucursal; 
-DROP TABLE IF EXISTS dbFactura.Factura;
 DROP TABLE IF EXISTS dbSistema.Parametrizacion;
 
 CREATE TABLE dbSucursal.Sucursal(
@@ -134,6 +135,20 @@ CREATE TABLE dbVenta.MetodoDePago(
 )
 
 go
+
+
+CREATE TABLE dbFactura.Factura(
+	IDFactura INT IDENTITY (1,1) PRIMARY KEY,
+	numeroFactura INT,	--Lo tengo que guardar como int para verificar duplicados a la hora de insertar
+	tipoFactura CHAR(1) CHECK(tipoFactura in ('A', 'B', 'C')),
+	fechaHoraEmision DATETIME,
+	estadoFactura CHAR(1) CHECK(estadoFactura in ('E','P')),	--Emitida,Pagada
+	total DECIMAL(10,2),
+	totalConIva DECIMAL(10,2),
+	puntoDeVenta INT		--5 digitos
+)
+go
+
 CREATE TABLE dbVenta.Venta(
 	IDVenta INT IDENTITY(1,1) PRIMARY KEY,
 	tipoCliente CHAR(6) CHECK(tipoCliente in ('Member', 'Normal')),
@@ -144,23 +159,12 @@ CREATE TABLE dbVenta.Venta(
 											OR identificadorDePago IS NULL),
 	FKEmpleado INT NOT NULL REFERENCES dbSucursal.Empleado(Legajo),
 	FKMetodoDePago INT NOT NULL REFERENCES dbVenta.MetodoDePago(IDMetodoDePago),
-	FKSucursal INT NOT NULL REFERENCES dbSucursal.Sucursal(IDSucursal)
+	FKSucursal INT NOT NULL REFERENCES dbSucursal.Sucursal(IDSucursal),
+	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
 )
 
 go
 
-CREATE TABLE dbFactura.Factura(
-	IDFactura INT IDENTITY (1,1) PRIMARY KEY,
-	numeroFactura INT,	--Lo tengo que guardar como int para verificar duplicados a la hora de insertar
-	tipoFactura CHAR(1) CHECK(tipoFactura in ('A', 'B', 'C')),
-	fechaHoraEmision DATETIME,
-	estadoFactura CHAR(1) CHECK(estadoFactura in ('E','P')),	--Emitida,Pagada
-	total DECIMAL(10,2),
-	totalConIva DECIMAL(10,2),
-	puntoDeVenta INT,		--5 digitos
-	FKVenta INT NOT NULL REFERENCES dbVenta.Venta(IDVenta)
-)
-go
 CREATE TABLE dbVenta.DetalleDeVenta(
 	IDDetalle INT IDENTITY (1,1) PRIMARY KEY,
 	cantidad INT,

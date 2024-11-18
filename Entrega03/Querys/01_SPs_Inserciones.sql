@@ -273,7 +273,7 @@ END
 */
 ----------------------------------------
 GO
-CREATE OR ALTER PROCEDURE dbFactura.CrearFactura
+CREATE OR ALTER PROCEDURE dbFactura.CrearVenta
 	@IDFacturaGenerada INT OUTPUT
 AS
 BEGIN
@@ -281,13 +281,17 @@ BEGIN
 	VALUES(NULL);
 
 	SET @IDFacturaGenerada = SCOPE_IDENTITY();	--Capturo el ID generado por el IDENTITY
+
+	INSERT dbVenta.
+
+
 END
 ----------------------------------------
 GO
-CREATE OR ALTER PROCEDURE dbFactura.InsertarDetalleDeFactura
+CREATE OR ALTER PROCEDURE dbFactura.InsertarDetalleDeVenta
 	@cantidad INT,
 	@FKProducto INT,
-	@FKFactura INT
+	@FKVenta INT
 AS
 BEGIN
 	DECLARE @error varchar(max) = '';
@@ -303,17 +307,21 @@ BEGIN
         SET @error = @error + 'El ID de producto ingresado no esta registrado. ';
 
 	--Validar que haya creado (no emitido) la factura				
-	IF (@FKFactura IS NULL OR @FKFactura = 0)
-        SET @error = @error + 'Factura vacía o nulo. ';
-    ELSE IF NOT EXISTS (SELECT IDFactura FROM dbFactura.Factura WHERE IDFactura = @FKFactura)
-        SET @error = @error + 'La factura todavia no existe. ';
-	ELSE IF EXISTS(SELECT 1 FROM dbFactura.Factura WHERE IDFactura = @FKFactura AND fechaHoraEmision IS NOT NULL)
-		SET  @error= @error + 'La factura ya fue emitida, no se pueden insertar más detalles. '
+	IF (@FKVenta IS NULL OR @FKVenta = 0)
+        SET @error = @error + 'ID venta vacía o nula. ';
+    ELSE IF NOT EXISTS (SELECT IDFactura FROM dbFactura.Factura WHERE IDFactura = @FKVenta)
+        SET @error = @error + 'La venta no existe. ';
+	ELSE IF EXISTS(
+		SELECT 1 FROM dbVenta.Venta v
+		JOIN dbFactura.Factura f ON f.IDFactura = v.FKFactura
+		WHERE v.IDVenta = @FKVenta AND f.fechaHoraEmision IS NOT NULL
+	)
+		SET  @error= @error + 'Ya se emitió una factura para esa venta, no se pueden insertar más detalles. '
 
 	IF(@error='')
 	BEGIN
-		INSERT dbFactura.DetalleDeFactura(cantidad,subtotal,precioUnitarioAlMomento,FKProducto,FKFactura)
-		SELECT @cantidad,@cantidad*p.precioUnitario,p.precioUnitario,@FKProducto,@FKFactura
+		INSERT dbVenta.DetalleDeVenta(cantidad,subtotal,precioUnitarioAlMomento,FKProducto, FKVenta)
+		SELECT @cantidad,@cantidad*p.precioUnitario,p.precioUnitario,@FKProducto,@FKVenta
 		FROM dbProducto.Producto p
 		WHERE p.IDProducto = @FKProducto;
 	END
@@ -323,7 +331,7 @@ END
 ------------------------------------------
 GO
 CREATE OR ALTER PROCEDURE dbFactura.EmitirFactura
-	@IDFactura INT,
+	@IDVenta INT,
 	@numeroFactura INT,
 	@tipoFactura CHAR(1),
 	@puntoDeVenta INT
@@ -352,16 +360,23 @@ BEGIN
 		SET @error = @error + 'Tipo de factura inválido(Tipos disponibles: A, B, C). ';
 
 	--Validar que la factura exista y no este emitida
-	IF (@IDFactura IS NULL OR @IDFactura = 0)
-        SET @error = @error + 'ID de factura vacio o nulo. ';
-	ELSE IF NOT EXISTS (SELECT IDFactura FROM dbFactura.Factura WHERE IDFactura = @IDFactura)
-		SET @error = @error + 'El ID de factura ingresado no existe. ';
-	ELSE IF EXISTS(SELECT 1 FROM dbFactura.Factura WHERE IDFactura = @IDFactura AND fechaHoraEmision IS NOT NULL)
+	IF (@IDVenta IS NULL OR @IDVenta = 0)
+        SET @error = @error + 'ID de venta vacio o nulo. ';
+	ELSE IF NOT EXISTS (SELECT @IDVenta FROM dbVenta.Venta WHERE IDVenta = @IDVenta)
+		SET @error = @error + 'El ID de venta ingresado no existe. ';
+	ELSE IF EXISTS(
+			SELECT 1 FROM dbFactura.Factura f
+			JOIN dbVenta.Venta v ON v.FKFactura = f.IDFactura
+			WHERE v.IDVenta = @IDVenta AND fechaHoraEmision IS NOT NULL
+		)
 		SET @error = @error + 'La factura ya fué emitida anteriormente. ';
 
 	--Validar que tenga al menos un detalle
-	IF NOT EXISTS (SELECT 1 FROM dbFactura.DetalleDeFactura WHERE FKFactura = @IDFactura)
-		SET @error = @error + 'La factura no tiene ningún detalle asociado. ';
+	IF NOT EXISTS (
+		SELECT 1 FROM dbVenta.DetalleDeVenta d
+		WHERE FKVenta = @IDVenta
+	)
+		SET @error = @error + 'La venta no tiene ningún detalle asociado. ';
 
 	IF @error=''
 	BEGIN
@@ -374,8 +389,9 @@ BEGIN
 		puntoDeVenta=@puntoDeVenta,
 		total=(
 			SELECT SUM(subtotal)
-			FROM dbFactura.DetalleDeFactura
-			WHERE FKFactura = dbFactura.Factura.IDFactura
+			FROM dbVenta.DetalleDeVenta d
+			JOIN dbVenta.Venta v ON d.FKVenta = v.IDVenta
+			WHERE FKFactura = @IDFactura
 		),
 		totalConIva=total+total*@IVA			--total IVA
 		WHERE IDFactura=@IDFactura
@@ -385,6 +401,8 @@ BEGIN
 END
 ------------------------------------------
 GO
+
+
 CREATE OR ALTER PROCEDURE dbVenta.InsertarVenta
 	@tipoCliente CHAR(6),	
 	@genero CHAR(6),
@@ -392,9 +410,12 @@ CREATE OR ALTER PROCEDURE dbVenta.InsertarVenta
 	@FKempleado INT,
 	@FKMetodoDePago INT,	
 	@FKSucursal INT,
-	@FKFactura INT
+	@FKFactura INT,
+	@IDVentaGenerada INT OUTPUT
 AS
 BEGIN
+
+	DECLARE @IDFacturaGenerada INT
 	DECLARE @error varchar(max) = '';
 
 	--Validar tipo de cliente
@@ -461,11 +482,23 @@ BEGIN
 
 	IF (@error = '')
     BEGIN
+
+		INSERT dbFactura.Factura(fechaHoraEmision)	--Hago este INSERT nada mas para que se genere el IDFactura, y asi pueda insertar detalles
+		VALUES(NULL);
+
+		SET @IDFacturaGenerada = SCOPE_IDENTITY();	--Capturo el ID generado por el IDENTITY
+
         INSERT INTO dbVenta.Venta(tipoCliente, genero, fechaHoraVenta,identificadorDePago, FKempleado, FKMetodoDePago, FKSucursal, FKFactura)
-		VALUES (@tipoCliente, @genero, GETDATE(), @identificadorDePago,@FKempleado, @FKMetodoDePago,@FKSucursal,@FKFactura)
+		VALUES (@tipoCliente, @genero, GETDATE(), @identificadorDePago,@FKempleado, @FKMetodoDePago,@FKSucursal,@IDFacturaGenerada)
+
+		SET @IDVentaGenerada = SCOPE_IDENTITY();
 	END
     ELSE
     BEGIN
         RAISERROR (@error, 16, 1);
     END
+
+
+
+
 END
