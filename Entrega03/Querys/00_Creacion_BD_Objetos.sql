@@ -158,6 +158,7 @@ CREATE TABLE dbFactura.NotaDeCredito(
 	numeroComprobante INT,		--8 digitos, con 0s adelante
 	motivo VARCHAR(150),
 	fechaHoraNota DATETIME,
+	monto DECIMAL(10,2),
 	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
 )
 go

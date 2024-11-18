@@ -392,7 +392,11 @@ CREATE OR ALTER PROCEDURE dbVenta.InsertarVenta
 	@FKempleado INT,
 	@FKMetodoDePago INT,	
 	@FKSucursal INT,
-	@FKFactura INT
+	@FKFactura INT,
+	@nombre VARCHAR(),			--Los datos del cliente por default son NULL, los quiero solamente si: FACTURA A(quiero CUIT, no CUIL)
+	@apellido VARCHAR(),		--o si me paso de montoMinimoDatos
+	@domicilio VARCHAR(),
+	@CodUnicoIdentificacion VARCHAR()
 AS
 BEGIN
 	DECLARE @error varchar(max) = '';
@@ -461,6 +465,12 @@ BEGIN
 
 	IF (@error = '')
     BEGIN
+
+		IF @tipoFactura='A'		--Agregar que busco los datos en la tabla cliente, si no está lo inserto
+			
+		ELSE IF ( (SELECT montoMinimoDatos FROM dbSistema.Parametrizacion) <= (SELECT totalConIva FROM dbFactura.Factura WHERE IDFactura=@IDFactura) )
+
+
         INSERT INTO dbVenta.Venta(tipoCliente, genero, fechaHoraVenta,identificadorDePago, FKempleado, FKMetodoDePago, FKSucursal, FKFactura)
 		VALUES (@tipoCliente, @genero, GETDATE(), @identificadorDePago,@FKempleado, @FKMetodoDePago,@FKSucursal,@FKFactura)
 	END

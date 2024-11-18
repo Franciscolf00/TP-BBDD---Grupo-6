@@ -5,6 +5,7 @@ CREATE OR ALTER PROCEDURE dbFactura.GenerarNotaDeCredito
 	@IDFactura INT,
 	@motivo VARCHAR(150),
 	@numeroComprobante INT,
+	@monto DECIMAL(10,2)
 AS
 BEGIN
 	DECLARE @error VARCHAR(MAX) = '';
@@ -21,6 +22,11 @@ BEGIN
 		SET @error = @error + 'Numero de comprobante inválido, debe encontrarse entre 1-99999999. ';
 	ELSE IF EXISTS(SELECT numeroComprobante FROM dbFactura.NotaDeCredito WHERE numeroComprobante=@numeroComprobante)
 		SET @error = @error + 'Numero de comprobante ya existente. ';
+	
+	IF (@monto <= 0 OR @monto IS NULL )
+		SET @error = @error + 'El monto debe ser mayor a 0. ';
+	ELSE IF(@monto > (SELECT total FROM dbFactura.Factura WHERE IDFactura=@IDFactura) )
+		SET @error = @error + 'El monto no puede ser mayor al total pagado. ';
 
 	IF EXISTS(SELECT 1 FROM dbFactura.Factura WHERE IDFactura=@IDFactura AND (estadoFactura = 'E' OR estadoFactura IS NULL))
 		SET @error = @error + 'Para realizar una nota de crédito, debe existir una factura en estado pagada.';
