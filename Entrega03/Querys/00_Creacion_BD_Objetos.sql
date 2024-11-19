@@ -52,6 +52,8 @@ CREATE SCHEMA dbReporte
 GO
 CREATE SCHEMA dbFactura
 GO
+CREATE SCHEMA dbCliente
+GO
 --create or alter function dbVenta.RutaImportacion()
 --returns VARCHAR(max)
 --AS
@@ -70,6 +72,7 @@ DROP TABLE IF EXISTS dbVenta.MetodoDePago;
 DROP TABLE IF EXISTS dbSucursal.Empleado;    
 DROP TABLE IF EXISTS dbSucursal.Sucursal; 
 DROP TABLE IF EXISTS dbFactura.Factura;
+DROP TABLE IF EXISTS dbCliente.Cliente
 
 CREATE TABLE dbSucursal.Sucursal(
 	IDSucursal INT IDENTITY(1,1) PRIMARY KEY,
@@ -158,10 +161,22 @@ CREATE TABLE dbFactura.NotaDeCredito(
 	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
 )
 go
+CREATE TABLE dbCliente.Cliente(
+	IDCliente INT IDENTITY(1,1) PRIMARY KEY,
+	cui CHAR(11),
+	nombre VARCHAR(30),
+	apellido VARCHAR(30),
+	direccion VARCHAR(70),
+	email VARCHAR(70),
+	fechaNac DATE,
+	tipoCliente CHAR(6) CHECK(tipoCliente in ('Member', 'Normal')),
+	genero CHAR(6) CHECK(genero in ('M', 'F')),
+	fechaBaja DATETIME
+)
+go
+
 CREATE TABLE dbVenta.Venta(
 	IDVenta INT IDENTITY(1,1) PRIMARY KEY,
-	tipoCliente CHAR(6) CHECK(tipoCliente in ('Member', 'Normal')),
-	genero CHAR(6) CHECK(genero in ('Male', 'Female')),
 	fechaHoraVenta DATETIME,
 	identificadorDePago VARCHAR(30) CHECK((LEN(identificadorDePago) = 22 AND identificadorDePago LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
 											OR (LEN(identificadorDePago) = 19 AND identificadorDePago LIKE '[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]')								
@@ -169,5 +184,18 @@ CREATE TABLE dbVenta.Venta(
 	FKEmpleado INT NOT NULL REFERENCES dbSucursal.Empleado(Legajo),
 	FKMetodoDePago INT NOT NULL REFERENCES dbVenta.MetodoDePago(IDMetodoDePago),
 	FKSucursal INT NOT NULL REFERENCES dbSucursal.Sucursal(IDSucursal),
-	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
+	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura),
+	FKCliente INT NOT NULL REFERENCES dbCliente.Cliente(IDCliente)
 )
+
+INSERT INTO dbCliente.Cliente (tipoCliente, genero)
+VALUES 
+('Member', 'M'),
+('Member', 'F'),
+('Normal', 'M'),
+('Normal', 'F')
+
+INSERT INTO dbCliente.Cliente (cui, nombre, apellido, direccion, email, fechaNac, tipoCliente, genero)
+VALUES ('20123456798', 'Gerardo', 'Martinez', 'Angelo Musetti 356', 'gMartinez@gmail.com', CAST('1999-05-20' AS DATETIME),'Member', 'M')
+
+select * from dbCliente.Cliente

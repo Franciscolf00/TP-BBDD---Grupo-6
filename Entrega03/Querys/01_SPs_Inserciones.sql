@@ -374,30 +374,16 @@ BEGIN
 END
 ------------------------------------------
 GO
-CREATE OR ALTER PROCEDURE dbVenta.InsertarVenta
-	@tipoCliente CHAR(6),	
-	@genero CHAR(6),
+CREATE OR ALTER PROCEDURE dbVenta.InsertarVenta	
 	@identificadorDePago VARCHAR(max),
 	@FKempleado INT,
 	@FKMetodoDePago INT,	
 	@FKSucursal INT,
-	@FKFactura INT
+	@FKFactura INT,
+	@FKCliente INT
 AS
 BEGIN
 	DECLARE @error varchar(max) = '';
-
-	--Validar tipo de cliente
-	IF (COALESCE(@tipoCliente, '') = '')
-		SET @error = @error + 'Falta el tipo de cliente. ';
-	ELSE IF(@tipoCliente not in ('Member', 'Normal'))
-		SET @error = @error + 'Tipo de cliente inválido(Tipos disponibles: Member, Normal). ';
-
-	--Validar genero
-	IF(@genero is not null)	-- si es NULL entonces no especifica, caso contrario entonces valido F o M
-	BEGIN
-		IF (@genero not in ('Female','Male'))
-			SET @error = @error + 'Genero inválido(Female o Male). ';
-	END
 
 	--Validar identificador de pago
 	IF (@identificadorDePago IS NOT NULL)	-- si es NULL es el caso de pago en efectivo, si no lo es entonces valido
@@ -447,14 +433,81 @@ BEGIN
 		IF EXISTS (SELECT 1 FROM dbVenta.Venta WHERE FKFactura = @FKFactura)
 			SET @error = @error + 'La factura ya tiene una venta asociada. ';
 	END
+	--Validar FK de Cliente
+	IF (@FKCliente IS NULL OR @FKCliente = 0)
+        SET @error = @error + 'ID de cliente vacio o nulo. ';
+	ELSE IF NOT EXISTS (SELECT 1 FROM dbCliente.Cliente WHERE IDCliente = @FKCliente)
+		SET @error = @error + 'El ID de factura ingresado no existe. ';
 
+	--INSERTAR
 	IF (@error = '')
     BEGIN
-        INSERT INTO dbVenta.Venta(tipoCliente, genero, fechaHoraVenta,identificadorDePago, FKempleado, FKMetodoDePago, FKSucursal, FKFactura)
-		VALUES (@tipoCliente, @genero, GETDATE(), @identificadorDePago,@FKempleado, @FKMetodoDePago,@FKSucursal,@FKFactura)
+        INSERT INTO dbVenta.Venta(FKCliente, fechaHoraVenta,identificadorDePago, FKempleado, FKMetodoDePago, FKSucursal, FKFactura)
+		VALUES (@FKCliente, GETDATE(), @identificadorDePago,@FKempleado, @FKMetodoDePago,@FKSucursal,@FKFactura)
 	END
     ELSE
     BEGIN
         RAISERROR (@error, 16, 1);
     END
 END
+
+------------------------------------------------------------------------------------
+GO
+--INSERTAR CLIENTE
+CREATE OR ALTER PROCEDURE dbCliente.InsertarCliente
+	@cui CHAR(11),
+	@nombre VARCHAR(30),
+	@apellido VARCHAR(30),
+	@direccion VARCHAR(70),
+	@email VARCHAR(70),
+	@fechaNac DATE,
+	@tipoCliente CHAR(6),
+	@genero CHAR(6)
+AS
+BEGIN
+	DECLARE @error varchar(max) = '';
+	--Validar que el cuil no sea null
+	IF @cui IS NULL
+		SET @error = @error + 'Cui vacio o null. '
+	--Validar que no exista el mismo cuil
+	IF EXISTS (SELECT 1 FROM dbCliente.Cliente WHERE cui = @cui)
+		SET @error = @error + 'Cui existente. '
+	--Validar que nombre no sea null
+	IF @nombre IS NULL
+		SET @error = @error + 'Nombre vacio o null. '
+	--Validar que apellido no sea null
+	IF @apellido IS NULL
+		SET @error = @error + 'Apellido vacio o null. '
+	--Validar que direccion no sea null
+	IF @direccion IS NULL
+		SET @error = @error + 'Direccion vacio o null. '
+	--Validar que fechaNac no sea null
+	IF @fechaNac IS NULL
+		SET @error = @error + 'Fecha de nacimiento vacio o null. '
+	--Validar que tipo de cliente no sea null
+	IF @tipoCLiente IS NULL
+		SET @error = @error + 'El tipo de cliente es vacio o null. '
+	--Chequear que tipo de cliente sea Member o Normal
+	IF @tipoCliente NOT IN('Member', 'Normal')
+		SET @error = @error + 'El tipo de cliente debe ser "Member" o "Normal'
+	--Validar que genero no se null
+	IF @genero IS NULL
+		SET @error = @error + 'Genero vacio o null. '
+	--Validar que genero sea M o F
+	IF @genero NOT IN ('M', 'F')
+		SET @error = @error + 'El tipo de genero debe ser "M" o "F". '
+
+	IF (@error = '')
+    BEGIN
+        INSERT INTO dbCliente.Cliente(cui, nombre, apellido, direccion, email, fechaNac, tipoCliente, genero)
+		VALUES (@cui, @nombre, @apellido, @direccion, @email,@fechaNac, @tipoCliente, @genero)
+	END
+    ELSE
+    BEGIN
+        RAISERROR (@error, 16, 1);
+    END
+END
+
+EXEC dbCliente.InsertarCliente 20421164348, 'Julian', 'Serna', 'Madero 285', 'julianserna@gmail.com', '1995-03-07', 'Member', 'M'
+
+select * from dbCliente.Cliente

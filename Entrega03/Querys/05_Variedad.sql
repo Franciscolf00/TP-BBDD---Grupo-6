@@ -61,8 +61,8 @@ BEGIN
 		STUFF(STUFF(CONVERT(VARCHAR(9), f.numeroFactura), 4, 0, '-'), 7, 0, '-') AS ID_Factura,
 		f.tipoFactura AS Tipo_de_Factura,
 		s.Ciudad AS Ciudad,
-		v.tipoCliente AS Tipo_de_Cliente,
-		v.genero AS Genero,
+		cl.tipoCliente AS Tipo_de_Cliente,
+		cl.genero AS Genero,
 		lp.nombre AS Linea_de_Producto,
 		p.nombre AS Producto,
 		p.precioUnitario AS Precio_Unitario,
@@ -97,6 +97,9 @@ BEGIN
 		ON e.Legajo = v.FKEmpleado
 	JOIN dbSucursal.Sucursal s
 		ON s.IDSucursal = v.FKSucursal
+	-- Relacionar Venta con Cliente
+	JOIN dbCliente.Cliente cl
+		ON v.FKCliente = cl.IDCliente
 	ORDER BY f.fechaHoraEmision
 END;
 GO

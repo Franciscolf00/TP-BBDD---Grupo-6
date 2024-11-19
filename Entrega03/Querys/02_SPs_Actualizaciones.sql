@@ -198,3 +198,54 @@ BEGIN
 		RAISERROR(@error, 16, 1);
 END
 GO
+
+------------------------------------------------------------------------------------
+-- Actualizar Cliente
+
+CREATE OR ALTER PROCEDURE dbCliente.ActualizarCliente
+	@IDCliente INT,
+	@nombre VARCHAR(30) = NULL,
+	@apellido VARCHAR(30) = NULL,
+	@direccion VARCHAR(70) = NULL,
+	@email VARCHAR(70) = NULL,
+	@tipoCliente CHAR(6) = NULL,
+	@genero CHAR(6) = NULL
+AS
+	
+BEGIN 
+	DECLARE @error VARCHAR(MAX)= ''
+	IF NOT EXISTS (SELECT 1 FROM dbCliente.Cliente WHERE IDCliente = @IDCliente)
+		SET @error = 'El cliente no existe. '
+	IF @IDCliente >= 1 AND @IDCliente <= 4
+		SET @error = 'No se puede modificar IDs entre 1 y 4. '
+	IF @genero NOT IN ('M', 'F')
+		SET @error = @error + 'El tipo de genero debe ser "M" o "F". '
+	IF @tipoCliente NOT IN('Member', 'Normal')
+		SET @error = @error + 'El tipo de cliente debe ser "Member" o "Normal'
+	IF @error = ''
+	BEGIN
+		UPDATE dbCliente.Cliente
+		SET nombre = COALESCE(@nombre, nombre),
+			apellido = COALESCE(@apellido, apellido),
+			direccion = COALESCE(@direccion, direccion),
+			email = COALESCE(@direccion, direccion),
+			tipoCliente = COALESCE(@tipoCliente, tipoCliente),
+			genero = COALESCE(@genero, genero)
+		WHERE IDCliente = @IDCliente
+		PRINT 'Cliente actualizado exitosamente.'
+	END
+	ELSE
+		RAISERROR(@error, 16, 1)
+END	
+
+
+EXEC dbCliente.ActualizarCliente @IDCliente = 1, @genero = 'F'
+GO
+
+EXEC dbCliente.ActualizarCliente @IDCliente = 5, @genero = 'F'
+GO
+
+EXEC dbCliente.ActualizarCliente @IDCliente = 5, @genero = 's'
+GO
+
+SELECT * FROM dbCliente.Cliente
