@@ -14,7 +14,7 @@ BEGIN
     IF (COALESCE(@nombre, '') = '')
         SET @error = @error + 'Falta nombre. ';
 	ELSE IF (LEN(@nombre)>11)
-		SET @error = @error + 'Nombre demasiado largo. Tamaño maximo de 11 caracteres. ';
+		SET @error = @error + 'Nombre demasiado largo. Tamaï¿½o maximo de 11 caracteres. ';
     ELSE IF EXISTS (SELECT nombre FROM dbVenta.MetodoDePago WHERE nombre = @nombre)
         SET @error = @error + 'El nombre del metodo de pago ingresado ya existe. ';
 
@@ -44,7 +44,7 @@ BEGIN
 	IF (COALESCE(@sucursal, '') = '')
         SET @error = @error + 'Falta la sucursal. ';
 	ELSE IF (LEN(@sucursal)>20)
-		SET @error = @error + 'Sucursal demasiado larga. Tamaño maximo de 20 caracteres. ';
+		SET @error = @error + 'Sucursal demasiado larga. Tamaï¿½o maximo de 20 caracteres. ';
     ELSE IF EXISTS (SELECT sucursal FROM dbSucursal.Sucursal WHERE sucursal = @sucursal)
         SET @error = @error + 'La sucursal ingresada ya existe. ';
 
@@ -52,7 +52,7 @@ BEGIN
 	IF (COALESCE(@ciudad, '') = '')
         SET @error = @error + 'Falta la ciudad. ';
 	ELSE IF (LEN(@ciudad)>9)
-		SET @error = @error + 'Ciudad demasiado larga. Tamaño maximo de 9 caracteres. ';
+		SET @error = @error + 'Ciudad demasiado larga. Tamaï¿½o maximo de 9 caracteres. ';
 	--Validar numTelefono
 	IF (COALESCE(@numTelefono, '') = '')
 		SET @error = @error + 'Falta el numero de telefono de la sucursal. ';
@@ -61,7 +61,7 @@ BEGIN
     IF (COALESCE(@direccion, '') = '')
         SET @error = @error + 'Falta direccion. ';
 	ELSE IF (LEN(@direccion)>100)
-		SET @error = @error + 'Dirección demasiado larga. Tamaño maximo de 100 caracteres. ';
+		SET @error = @error + 'Direcciï¿½n demasiado larga. Tamaï¿½o maximo de 100 caracteres. ';
 
     -- Insertar datos si no hay errores
     IF (@error = '')
@@ -93,13 +93,13 @@ BEGIN
 	
     --Validar Legajo
     IF (@Legajo IS NULL OR @Legajo = 0)
-        SET @error = 'Legajo vacío o nulo. ';
+        SET @error = 'Legajo vacï¿½o o nulo. ';
     IF EXISTS (SELECT @Legajo FROM dbSucursal.Empleado WHERE Legajo = @Legajo)
         SET @error = @error + 'El Legajo ingresado ya existe. '; 
 
 	--Validar dni
 	IF (@dni IS NULL OR @dni = 0)
-        SET @error = 'DNI vacío o nulo. ';
+        SET @error = 'DNI vacï¿½o o nulo. ';
     IF EXISTS (SELECT @dni FROM dbSucursal.Empleado WHERE dni = @dni)
         SET @error = @error + 'El DNI ingresado ya existe. '; 
 
@@ -107,37 +107,37 @@ BEGIN
     IF (COALESCE(@nombre, '') = '')
         SET @error = @error + 'Falta nombre. ';
 	ELSE IF (LEN(@nombre)>40)
-		SET @error = @error + 'Nombre demasiado largo. Tamaño maximo de 40 caracteres. ';
+		SET @error = @error + 'Nombre demasiado largo. Tamaï¿½o maximo de 40 caracteres. ';
 	
 	--Validar apellido
 	IF (COALESCE(@apellido, '') = '')
         SET @error = @error + 'Falta apellido. ';
 	ELSE IF (LEN(@apellido)>20)
-		SET @error = @error + 'Apellido demasiado largo. Tamaño maximo de 20 caracteres. ';
+		SET @error = @error + 'Apellido demasiado largo. Tamaï¿½o maximo de 20 caracteres. ';
 	
 	--Validar email Empresa
     IF (COALESCE(@emailEmpresa, '') = '' OR @emailEmpresa NOT LIKE '%@superA.com' 
 	OR LEN(@emailEmpresa) >= 100)
-        SET @error = @error + 'Mail(empresa) inválido. ';
+        SET @error = @error + 'Mail(empresa) invï¿½lido. ';
 
 	--Validar email Personal
     IF (COALESCE(@emailPersonal, '') = '' OR @emailPersonal NOT LIKE '%@%.com' 
 	OR LEN(@emailPersonal) >= 100)
-        SET @error = @error + 'Mail(personal) inválido. ';
+        SET @error = @error + 'Mail(personal) invï¿½lido. ';
 
-	--Validar dirección
+	--Validar direcciï¿½n
 	IF (COALESCE(@direccion, '') = '')
-		SET @error = @error + 'Falta la dirección. ';
+		SET @error = @error + 'Falta la direcciï¿½n. ';
 	ELSE IF (LEN(@direccion) > 100)
-		SET @error = @error + 'Dirección del empleado demasiado larga. Tamaño máximo de 100 caracteres. ';
+		SET @error = @error + 'Direcciï¿½n del empleado demasiado larga. Tamaï¿½o mï¿½ximo de 100 caracteres. ';
 
 	--Validar cargo
 	IF (COALESCE(@cargo, '') = '' OR @cargo NOT in('Cajero', 'Supervisor', 'Gerente de sucursal'))
-		SET @error = @error + 'Cargo inválido(Cargos disponibles: Cajero,Supervisor,Gerente de sucursal). ';
+		SET @error = @error + 'Cargo invï¿½lido(Cargos disponibles: Cajero,Supervisor,Gerente de sucursal). ';
 
 	--Validar turno
 	IF (COALESCE(@turno, '') = '' OR @turno NOT in('TM', 'TT' , 'Jornada Completa'))
-		SET @error = @error + 'Turno inválido(Turnos disponibles: TM,TT,Jornada Completa). ';
+		SET @error = @error + 'Turno invï¿½lido(Turnos disponibles: TM,TT,Jornada Completa). ';
 
 	--Validar FK de sucursal 
 	IF (@FKSucursal IS NULL OR @FKSucursal = 0)
@@ -167,7 +167,7 @@ BEGIN
 	IF (COALESCE(@nombreLineaDeProducto, '') = '')
 		SET @error = @error + 'Falta la linea de producto. ';
 	ELSE IF (LEN(@nombreLineaDeProducto) > 30)
-		SET @error = @error + 'Linea de producto demasiado larga. Tamaño máximo de 30 caracteres. ';
+		SET @error = @error + 'Linea de producto demasiado larga. Tamaï¿½o mï¿½ximo de 30 caracteres. ';
 	ELSE IF EXISTS (SELECT nombre FROM dbProducto.LineaDeProducto WHERE nombre = @nombreLineaDeProducto)
 		SET @error = @error + 'La linea de producto ingresada ya existe. ';
 
@@ -193,7 +193,7 @@ BEGIN
 	IF (COALESCE(@nombreCategoria,'')='')
 		SET @error = @error + 'Falta categoria. ';
 	ELSE IF (LEN(@nombreCategoria) > 50)
-		SET @error = @error + 'Categoria demasiado larga. Tamaño máximo de 50 caracteres. ';
+		SET @error = @error + 'Categoria demasiado larga. Tamaï¿½o mï¿½ximo de 50 caracteres. ';
 	ELSE IF EXISTS (SELECT nombre FROM dbProducto.Categoria WHERE nombre = @nombreCategoria)
 		SET @error = @error + 'La categoria ingresada ya existe. ';
 
@@ -229,7 +229,7 @@ BEGIN
 	IF (COALESCE(@nombre, '') = '')
 		SET @error = @error + 'Falta el nombre del producto. ';
 	ELSE IF (LEN(@nombre) > 30)
-		SET @error = @error + 'Nombre del producto demasiado larga. Tamaño máximo de 50 caracteres. ';
+		SET @error = @error + 'Nombre del producto demasiado larga. Tamaï¿½o mï¿½ximo de 50 caracteres. ';
 	ELSE IF EXISTS (SELECT nombre FROM dbProducto.Producto WHERE nombre = @nombre)
 		SET @error = @error + 'El nombre del producto ingresado ya existe. ';
 
@@ -245,7 +245,7 @@ BEGIN
 	IF (COALESCE(@unidadReferencia, '') = '')
 		SET @error = @error + 'Falta la unidad de referencia. ';
 	ELSE IF (LEN(@unidadReferencia) > 10)
-		SET @error = @error + 'Unidad de referencia demasiado larga. Tamaño máximo de 10 caracteres. ';
+		SET @error = @error + 'Unidad de referencia demasiado larga. Tamaï¿½o mï¿½ximo de 10 caracteres. ';
 
 	--Validar FK de categoria
 	IF (@FKCategoria IS NULL OR @FKCategoria = 0)
@@ -265,7 +265,7 @@ BEGIN
 END
 ----------------------------------------
 /*
-	logica de facturación:
+	logica de facturaciï¿½n:
 		Ok, luego de cranearlo...
 		1-creo la factura, solo con ID (la pk, no el numero). El resto lo dejo vacio
 		2-inserto detalles
@@ -298,17 +298,17 @@ BEGIN
 
 	--Validar producto							
 	IF (@FKProducto IS NULL OR @FKProducto = 0)
-        SET @error = @error + 'Producto vacío o nulo. ';
+        SET @error = @error + 'Producto vacï¿½o o nulo. ';
     IF NOT EXISTS (SELECT IDProducto FROM dbProducto.Producto WHERE IDProducto = @FKProducto)
         SET @error = @error + 'El ID de producto ingresado no esta registrado. ';
 
 	--Validar que haya creado (no emitido) la factura				
 	IF (@FKFactura IS NULL OR @FKFactura = 0)
-        SET @error = @error + 'Factura vacía o nulo. ';
+        SET @error = @error + 'Factura vacï¿½a o nulo. ';
     ELSE IF NOT EXISTS (SELECT IDFactura FROM dbFactura.Factura WHERE IDFactura = @FKFactura)
         SET @error = @error + 'La factura todavia no existe. ';
 	ELSE IF EXISTS(SELECT 1 FROM dbFactura.Factura WHERE IDFactura = @FKFactura AND fechaHoraEmision IS NOT NULL)
-		SET  @error= @error + 'La factura ya fue emitida, no se pueden insertar más detalles. '
+		SET  @error= @error + 'La factura ya fue emitida, no se pueden insertar mï¿½s detalles. '
 
 	IF(@error='')
 	BEGIN
@@ -337,7 +337,7 @@ BEGIN
 	IF (@numeroFactura=0 OR @numeroFactura IS NULL)
 		SET @error = @error + 'Falta el numero de factura. ';
 	ELSE IF(@numeroFactura < 100000000 OR @numeroFactura > 999999999)
-		SET @error = @error + 'Numero de factura inválido, deben ser 9 digitos exactos del 0-9. ';
+		SET @error = @error + 'Numero de factura invï¿½lido, deben ser 9 digitos exactos del 0-9. ';
 	ELSE IF EXISTS(SELECT numeroFactura FROM dbFactura.Factura WHERE numeroFactura=@numeroFactura )
 		SET @error = @error + 'Numero de factura ya existente. ';
 
@@ -345,11 +345,11 @@ BEGIN
 	IF (@puntoDeVenta=0 OR @puntoDeVenta IS NULL)
 		SET @error = @error + 'Falta el punto de venta. ';
 	ELSE IF(@puntoDeVenta < 1 OR @puntoDeVenta > 99999)
-		SET @error = @error + 'Punto de venta inválido, debe encontrarse entre 1-99999. ';
+		SET @error = @error + 'Punto de venta invï¿½lido, debe encontrarse entre 1-99999. ';
 
 	--Validar tipo de factura												
 	IF (@tipoFactura IS NULL OR @tipoFactura not in('A', 'B', 'C'))
-		SET @error = @error + 'Tipo de factura inválido(Tipos disponibles: A, B, C). ';
+		SET @error = @error + 'Tipo de factura invï¿½lido(Tipos disponibles: A, B, C). ';
 
 	--Validar que la factura exista y no este emitida
 	IF (@IDFactura IS NULL OR @IDFactura = 0)
@@ -357,11 +357,11 @@ BEGIN
 	ELSE IF NOT EXISTS (SELECT IDFactura FROM dbFactura.Factura WHERE IDFactura = @IDFactura)
 		SET @error = @error + 'El ID de factura ingresado no existe. ';
 	ELSE IF EXISTS(SELECT 1 FROM dbFactura.Factura WHERE IDFactura = @IDFactura AND fechaHoraEmision IS NOT NULL)
-		SET @error = @error + 'La factura ya fué emitida anteriormente. ';
+		SET @error = @error + 'La factura ya fuï¿½ emitida anteriormente. ';
 
 	--Validar que tenga al menos un detalle
 	IF NOT EXISTS (SELECT 1 FROM dbFactura.DetalleDeFactura WHERE FKFactura = @IDFactura)
-		SET @error = @error + 'La factura no tiene ningún detalle asociado. ';
+		SET @error = @error + 'La factura no tiene ningï¿½n detalle asociado. ';
 
 	IF @error=''
 	BEGIN
@@ -385,49 +385,31 @@ BEGIN
 END
 ------------------------------------------
 GO
-CREATE OR ALTER PROCEDURE dbVenta.InsertarVenta
-	@tipoCliente CHAR(6),	
-	@genero CHAR(6),
+CREATE OR ALTER PROCEDURE dbVenta.InsertarVenta	
 	@identificadorDePago VARCHAR(max),
 	@FKempleado INT,
 	@FKMetodoDePago INT,	
 	@FKSucursal INT,
 	@FKFactura INT,
-	@nombre VARCHAR(),			--Los datos del cliente por default son NULL, los quiero solamente si: FACTURA A(quiero CUIT, no CUIL)
-	@apellido VARCHAR(),		--o si me paso de montoMinimoDatos
-	@domicilio VARCHAR(),
-	@CodUnicoIdentificacion VARCHAR()
+	@FKCliente INT
 AS
 BEGIN
 	DECLARE @error varchar(max) = '';
-
-	--Validar tipo de cliente
-	IF (COALESCE(@tipoCliente, '') = '')
-		SET @error = @error + 'Falta el tipo de cliente. ';
-	ELSE IF(@tipoCliente not in ('Member', 'Normal'))
-		SET @error = @error + 'Tipo de cliente inválido(Tipos disponibles: Member, Normal). ';
-
-	--Validar genero
-	IF(@genero is not null)	-- si es NULL entonces no especifica, caso contrario entonces valido F o M
-	BEGIN
-		IF (@genero not in ('Female','Male'))
-			SET @error = @error + 'Genero inválido(Female o Male). ';
-	END
 
 	--Validar identificador de pago
 	IF (@identificadorDePago IS NOT NULL)	-- si es NULL es el caso de pago en efectivo, si no lo es entonces valido
 	BEGIN
 		IF (LEN(@identificadorDePago) = 22 AND @identificadorDePago LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
-			SET @error = @error + 'El identificador de pago de 22 caracteres debe contener solo números(0-9). ';
+			SET @error = @error + 'El identificador de pago de 22 caracteres debe contener solo nï¿½meros(0-9). ';
 		ELSE IF (LEN(@identificadorDePago) = 19 AND @identificadorDePago NOT LIKE '[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]')
-			SET @error = @error + 'El identificador de pago de 19 caracteres debe tener el siguiente formato: ''XXXX-XXXX-XXXX-XXXX'', siendo X un número del 0-9. ';
+			SET @error = @error + 'El identificador de pago de 19 caracteres debe tener el siguiente formato: ''XXXX-XXXX-XXXX-XXXX'', siendo X un nï¿½mero del 0-9. ';
 		ELSE IF (LEN(@identificadorDePago) <> 22 AND LEN(@identificadorDePago) <> 19)
 			SET @error = @error + 'El identificador de pago debe tener 19 o 22 caracteres. ';
 	END
 
 	--Validar legajo
 	IF (@FKempleado IS NULL OR @FKempleado = 0)
-        SET @error = @error + 'Legajo vacío o nulo. ';
+        SET @error = @error + 'Legajo vacï¿½o o nulo. ';
     IF NOT EXISTS (SELECT Legajo FROM dbSucursal.Empleado WHERE legajo = @FKempleado)
         SET @error = @error + 'El legajo ingresado no esta registrado. ';
 
@@ -452,30 +434,91 @@ BEGIN
 	-- Validar que la factura ya haya sido emitida
 	IF EXISTS (SELECT 1 FROM dbFactura.Factura WHERE IDFactura = @FKFactura AND estadoFactura IS NULL)
 	BEGIN
-		SET @error = @error + 'La factura aún no ha sido emitida, no se puede asociar una venta. ';
+		SET @error = @error + 'La factura aï¿½n no ha sido emitida, no se puede asociar una venta. ';
 	END
 
-	-- Solo si no hay error de emisión, verificar la venta asociada
+	-- Solo si no hay error de emisiï¿½n, verificar la venta asociada
 	IF @error = ''
 	BEGIN
 		-- Validar que la factura no tenga una venta asociada
 		IF EXISTS (SELECT 1 FROM dbVenta.Venta WHERE FKFactura = @FKFactura)
 			SET @error = @error + 'La factura ya tiene una venta asociada. ';
 	END
+	--Validar FK de Cliente
+	IF (@FKCliente IS NULL OR @FKCliente = 0)
+        SET @error = @error + 'ID de cliente vacio o nulo. ';
+	ELSE IF NOT EXISTS (SELECT 1 FROM dbCliente.Cliente WHERE IDCliente = @FKCliente)
+		SET @error = @error + 'El ID de factura ingresado no existe. ';
 
+	--INSERTAR
 	IF (@error = '')
     BEGIN
-
-		IF @tipoFactura='A'		--Agregar que busco los datos en la tabla cliente, si no está lo inserto
-			
-		ELSE IF ( (SELECT montoMinimoDatos FROM dbSistema.Parametrizacion) <= (SELECT totalConIva FROM dbFactura.Factura WHERE IDFactura=@IDFactura) )
-
-
-        INSERT INTO dbVenta.Venta(tipoCliente, genero, fechaHoraVenta,identificadorDePago, FKempleado, FKMetodoDePago, FKSucursal, FKFactura)
-		VALUES (@tipoCliente, @genero, GETDATE(), @identificadorDePago,@FKempleado, @FKMetodoDePago,@FKSucursal,@FKFactura)
+        INSERT INTO dbVenta.Venta(FKCliente, fechaHoraVenta,identificadorDePago, FKempleado, FKMetodoDePago, FKSucursal, FKFactura)
+		VALUES (@FKCliente, GETDATE(), @identificadorDePago,@FKempleado, @FKMetodoDePago,@FKSucursal,@FKFactura)
 	END
     ELSE
     BEGIN
         RAISERROR (@error, 16, 1);
     END
 END
+
+------------------------------------------------------------------------------------
+GO
+--INSERTAR CLIENTE
+CREATE OR ALTER PROCEDURE dbCliente.InsertarCliente
+	@cui CHAR(11),
+	@nombre VARCHAR(30),
+	@apellido VARCHAR(30),
+	@direccion VARCHAR(70),
+	@email VARCHAR(70),
+	@fechaNac DATE,
+	@tipoCliente CHAR(6),
+	@genero CHAR(6)
+AS
+BEGIN
+	DECLARE @error varchar(max) = '';
+	--Validar que el cuil no sea null
+	IF @cui IS NULL
+		SET @error = @error + 'Cui vacio o null. '
+	--Validar que no exista el mismo cuil
+	IF EXISTS (SELECT 1 FROM dbCliente.Cliente WHERE cui = @cui)
+		SET @error = @error + 'Cui existente. '
+	--Validar que nombre no sea null
+	IF @nombre IS NULL
+		SET @error = @error + 'Nombre vacio o null. '
+	--Validar que apellido no sea null
+	IF @apellido IS NULL
+		SET @error = @error + 'Apellido vacio o null. '
+	--Validar que direccion no sea null
+	IF @direccion IS NULL
+		SET @error = @error + 'Direccion vacio o null. '
+	--Validar que fechaNac no sea null
+	IF @fechaNac IS NULL
+		SET @error = @error + 'Fecha de nacimiento vacio o null. '
+	--Validar que tipo de cliente no sea null
+	IF @tipoCLiente IS NULL
+		SET @error = @error + 'El tipo de cliente es vacio o null. '
+	--Chequear que tipo de cliente sea Member o Normal
+	IF @tipoCliente NOT IN('Member', 'Normal')
+		SET @error = @error + 'El tipo de cliente debe ser "Member" o "Normal'
+	--Validar que genero no se null
+	IF @genero IS NULL
+		SET @error = @error + 'Genero vacio o null. '
+	--Validar que genero sea M o F
+	IF @genero NOT IN ('M', 'F')
+		SET @error = @error + 'El tipo de genero debe ser "M" o "F". '
+
+	IF (@error = '')
+    BEGIN
+        INSERT INTO dbCliente.Cliente(cui, nombre, apellido, direccion, email, fechaNac, tipoCliente, genero)
+		VALUES (@cui, @nombre, @apellido, @direccion, @email,@fechaNac, @tipoCliente, @genero)
+	END
+    ELSE
+    BEGIN
+        RAISERROR (@error, 16, 1);
+    END
+END
+
+EXEC dbCliente.InsertarCliente 20421164348, 'Julian', 'Serna', 'Madero 285', 'julianserna@gmail.com', '1995-03-07', 'Member', 'M'
+
+select * from dbCliente.Cliente
