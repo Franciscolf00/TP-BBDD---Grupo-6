@@ -94,11 +94,17 @@
           <AssociatedConnUserName />
           <FullPath>11_LotesDePrueba_NC.sql</FullPath>
         </FileNode>
-        <FileNode Name="12_RolesYUsuarios.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-FSRIB0R\SQLEXPRESS:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>DESKTOP-FSRIB0R\SQLEXPRESS</AssociatedConnSrvName>
+        <FileNode Name="12_EncriptadoDeDatos.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-A3LKK57\SQLEXPRESS01:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-A3LKK57\SQLEXPRESS01</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>12_RolesYUsuarios.sql</FullPath>
+          <FullPath>12_EncriptadoDeDatos.sql</FullPath>
+        </FileNode>
+        <FileNode Name="13_RolesYUsuarios.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-A3LKK57\SQLEXPRESS01:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-A3LKK57\SQLEXPRESS01</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>13_RolesYUsuarios.sql</FullPath>
         </FileNode>
       </Items>
     </LogicalFolder>

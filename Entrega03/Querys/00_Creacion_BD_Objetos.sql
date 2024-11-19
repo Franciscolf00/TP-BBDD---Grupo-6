@@ -94,7 +94,7 @@ CREATE TABLE dbSucursal.Empleado(
 	nombre VARCHAR(40),
 	apellido VARCHAR(20),
 	emailEmpresa VARCHAR(100) CHECK(emailEmpresa like '%@superA.com'),
-	emailPersonal VARCHAR(100) CHECK(emailPersonal like '%@%.com'),
+	emailPersonal VARCHAR(100),
 	direccion VARCHAR(100),
 	cargo CHAR(22) CHECK(cargo in ('Cajero', 'Supervisor', 'Gerente de sucursal')),
 	turno VARCHAR(16) CHECK(turno in('TM', 'TT' , 'Jornada Completa')),
