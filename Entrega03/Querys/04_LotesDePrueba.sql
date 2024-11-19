@@ -201,11 +201,14 @@ BEGIN
 	EXEC dbFactura.EmitirFactura
 		@IDFactura=7645,			--Factura no existente
 		@numeroFactura=0,			--Invalido
-		@tipoFactura='Z';			--Tipo Factura inválido
+		@tipoFactura='Z',			--Tipo Factura inválido
+		@puntoDeVenta=-4;			--Invalido
+
 	EXEC dbFactura.EmitirFactura
 		@IDFactura=@IDFactura,			
 		@numeroFactura=546665237,		--SI QUIERO EMITIR OTRA CAMBIO ESTE NUMERO
-		@tipoFactura='A';
+		@tipoFactura='A',
+		@puntoDeVenta=1;
 
 	--Le asignó la factura a la venta
 	EXEC dbVenta.InsertarVenta
@@ -247,7 +250,8 @@ BEGIN
 	EXEC dbFactura.EmitirFactura		--Falta al menos un detalle
 		@IDFactura=@IDFactura,			
 		@numeroFactura=867662468,	
-		@tipoFactura='B';
+		@tipoFactura='B',
+		@puntoDeVenta=2;
 	EXEC dbVenta.InsertarVenta			--Falta que se emita la factura
 		@tipoCliente = 'Member',
 		@genero = 'Female',

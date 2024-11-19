@@ -52,6 +52,8 @@ CREATE SCHEMA dbReporte
 GO
 CREATE SCHEMA dbFactura
 GO
+CREATE SCHEMA dbSistema
+GO
 --create or alter function dbVenta.RutaImportacion()
 --returns VARCHAR(max)
 --AS
@@ -70,6 +72,7 @@ DROP TABLE IF EXISTS dbVenta.MetodoDePago;
 DROP TABLE IF EXISTS dbSucursal.Empleado;    
 DROP TABLE IF EXISTS dbSucursal.Sucursal; 
 DROP TABLE IF EXISTS dbFactura.Factura;
+DROP TABLE IF EXISTS dbSistema.Parametrizacion;
 
 CREATE TABLE dbSucursal.Sucursal(
 	IDSucursal INT IDENTITY(1,1) PRIMARY KEY,
@@ -137,7 +140,8 @@ CREATE TABLE dbFactura.Factura(
 	fechaHoraEmision DATETIME,
 	estadoFactura CHAR(1) CHECK(estadoFactura in ('E','P')),	--Emitida,Pagada
 	total DECIMAL(10,2),
-	totalConIva DECIMAL(10,2)
+	totalConIva DECIMAL(10,2),
+	puntoDeVenta INT		--5 digitos
 )
 go
 CREATE TABLE dbFactura.DetalleDeFactura(
@@ -151,10 +155,10 @@ CREATE TABLE dbFactura.DetalleDeFactura(
 go
 CREATE TABLE dbFactura.NotaDeCredito(
 	IDNotaDeCredito INT IDENTITY (1,1) PRIMARY KEY,
-	--numeroComprobante INT,	--8 digitos, con 0s adelante
-	--puntoDeVenta	INT,		--5 digitos
+	numeroComprobante INT,		--8 digitos, con 0s adelante
 	motivo VARCHAR(150),
 	fechaHoraNota DATETIME,
+	monto DECIMAL(10,2),
 	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
 )
 go
@@ -171,3 +175,48 @@ CREATE TABLE dbVenta.Venta(
 	FKSucursal INT NOT NULL REFERENCES dbSucursal.Sucursal(IDSucursal),
 	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
 )
+go
+CREATE FUNCTION dbSistema.ValidarCUIT (@CUIT CHAR(13))
+RETURNS BIT
+AS
+BEGIN
+    DECLARE @resultado BIT = 0;
+    DECLARE @cuitSinGuiones CHAR(11);
+    DECLARE @suma INT = 0;
+    DECLARE @digitoVerificador INT;
+    DECLARE @multiplicadores TABLE (Posicion INT, Valor INT);
+    
+    -- Validar largo y formato
+    IF LEN(@CUIT) = 13 AND @CUIT LIKE '30-[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]-[0-9]'
+    BEGIN
+        --Saco guiones
+        SET @cuitSinGuiones = REPLACE(@CUIT, '-', '');
+
+        --Obtengo el digito verificador
+        SET @digitoVerificador = CAST(SUBSTRING(@cuitSinGuiones, 11, 1) AS INT);
+
+        --Multiplicadores para el calculo
+        INSERT INTO @multiplicadores
+        VALUES 
+            (1, 5), (2, 4), (3, 3), (4, 2), (5, 7), (6, 6), (7, 5), (8, 4), (9, 3), (10, 2);
+
+        --Hago la suma ponderada
+        SELECT @suma = @suma + 
+            (CAST(SUBSTRING(@cuitSinGuiones, m.Posicion, 1) AS INT) * m.Valor)
+        FROM @multiplicadores m;
+
+        --Valido que el digito verificador sea correcto
+        IF (@digitoVerificador = (11 - (@suma % 11)) % 11)
+            SET @resultado = 1;
+    END
+
+    RETURN @resultado;
+END;
+go
+CREATE TABLE dbSistema.Parametrizacion(
+	CUITAurora CHAR(13) CHECK( (LEN(CUITAurora) = 13) AND CUITAurora like '30-[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]-[0-9]'
+								AND dbSistema.ValidarCUIT(CUITAurora) = 1),		--CUIT de AURORA SA, empieza con sufijo 30 y cumple con el calculo de CUIT
+	PorcentajeIVA DECIMAL(5,2),		--% de IVA a aplicar al total
+	montoMinimoDatos INT			--Monto minimo para pedir los datos del cliente
+)
+go

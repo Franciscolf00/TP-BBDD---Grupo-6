@@ -68,10 +68,11 @@ BEGIN
 		p.precioUnitario AS Precio_Unitario,
 		df.cantidad AS Cantidad,
 		f.total AS Total,
-		(f.total * 1.21) AS Con_IVA,
+		f.totalConIva AS Con_IVA,			--cambiar con la parametrizacion
 		CAST(f.fechaHoraEmision AS DATE) AS Fecha,
 		CAST(f.fechaHoraEmision AS TIME) AS Hora,
 		m.nombre AS Medio_de_Pago,
+		REPLICATE('0', 5 - DATALENGTH(f.puntoDeVenta)) + f.puntoDeVenta AS Punto_de_Venta,
 		e.Legajo AS Empleado,
 		s.sucursal AS Sucursal
 	FROM dbVenta.Venta v
