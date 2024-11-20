@@ -197,15 +197,7 @@ CREATE TABLE dbVenta.DetalleDeVenta(
 	FKVenta INT NOT NULL REFERENCES dbVenta.Venta(IDVenta)
 )
 go
-CREATE TABLE dbFactura.NotaDeCredito(
-	IDNotaDeCredito INT IDENTITY (1,1) PRIMARY KEY,
-	numeroComprobante INT,		--8 digitos, con 0s adelante
-	motivo VARCHAR(150),
-	fechaHoraNota DATETIME,
-	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
-)
 
-go
 CREATE OR ALTER FUNCTION dbSistema.ValidarCUIT (@CUIT CHAR(13))
 RETURNS BIT
 AS
@@ -262,6 +254,9 @@ INSERT INTO dbCliente.Cliente (cui, nombre, apellido, direccion, email, fechaNac
 VALUES ('20123456798', 'Gerardo', 'Martinez', 'Angelo Musetti 356', 'gMartinez@gmail.com', CAST('1999-05-20' AS DATETIME),'Member', 'M')
 
 select * from dbCliente.Cliente
+GO
+
+
 CREATE OR ALTER PROCEDURE dbSistema.ConfiguracionInicial
 	@CUITAurora CHAR(13),
 	@PorcentajeIVA DECIMAL(5,2),

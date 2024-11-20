@@ -295,6 +295,7 @@ CREATE OR ALTER PROCEDURE dbVenta.InsertarVenta
 	@FKMetodoDePago INT,	
 	@FKSucursal INT,
 	@FKCliente INT,
+
 	@IDVentaGenerada INT OUTPUT
 AS
 BEGIN
@@ -366,8 +367,8 @@ BEGIN
 		SET @IDFacturaGenerada = SCOPE_IDENTITY();	--Capturo el ID generado por el IDENTITY
 
 		--Inserto la venta, con todos los datos y sus FK validadas + FK Factura que acabo de generar. Ahora puedo insertarle detalles a esa venta 
-        INSERT INTO dbVenta.Venta(tipoCliente, genero, fechaHoraVenta,identificadorDePago, FKempleado, FKMetodoDePago, FKSucursal, FKFactura)
-		VALUES (@tipoCliente, @genero, GETDATE(), @identificadorDePago,@FKempleado, @FKMetodoDePago,@FKSucursal,@IDFacturaGenerada)
+        INSERT INTO dbVenta.Venta(fechaHoraVenta,identificadorDePago, FKempleado, FKMetodoDePago, FKSucursal, FKFactura, FKCliente)
+		VALUES (GETDATE(), @identificadorDePago,@FKempleado, @FKMetodoDePago,@FKSucursal,@IDFacturaGenerada, @FKCliente)
 
 		SET @IDVentaGenerada = SCOPE_IDENTITY();	--Capturo el ID generado por el IDENTITY
 	END

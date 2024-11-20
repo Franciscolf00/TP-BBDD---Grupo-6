@@ -218,8 +218,3 @@ BEGIN
 	ELSE
 		RAISERROR(@error, 16, 1);
 END
-
-EXEC dbCliente.ModificarEstadoCliente @IDCliente = 6 , @estado = 0
-GO
-
-SELECT * FROM dbCliente.Cliente

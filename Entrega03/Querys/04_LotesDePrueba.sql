@@ -330,6 +330,14 @@ EXEC dbVenta.ModificarEstadoMetodoDePago
 	@estado=1;
 GO
 
+--CLIENTE
+EXEC dbCliente.ModificarEstadoCliente @IDCliente = 6 , @estado = 0
+
+
+
+
+
+
 
 --SELECT * FROM dbSucursal.Sucursal
 --GO
