@@ -54,6 +54,8 @@ CREATE SCHEMA dbFactura
 GO
 CREATE SCHEMA dbSistema
 GO
+CREATE SCHEMA dbSeguridad
+GO
 --create or alter function dbVenta.RutaImportacion()
 --returns VARCHAR(max)
 --AS
