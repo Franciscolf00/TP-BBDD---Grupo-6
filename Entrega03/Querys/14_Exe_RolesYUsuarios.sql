@@ -54,7 +54,7 @@ EXEC dbSeguridad.AsignarRolAUsuario 'Administrador', 'GerenteDeSucursal'
 GO
 
 -- Asignamos permisos de ejecución a roles
-EXEC dbSeguridad.AsignarPermisosEjecucionARol 'dbVenta.insertarVenta', 'Cajero'
+EXEC dbSeguridad.AsignarPermisosEjecucionARol 'dbVenta', 'Cajero'
 EXEC dbSeguridad.AsignarPermisosEjecucionARol 'dbFactura.GenerarNotaDeCredito', 'Administrador'
 
 -- Visualizar permisos asignados de manera explícita
@@ -84,3 +84,8 @@ SELECT perms.state_desc AS State,
 FROM sys.database_permissions perms
 JOIN sys.database_principals dp ON perms.grantee_principal_id = dp.principal_id
 JOIN sys.objects obj ON perms.major_id = obj.object_id;
+
+-- Un cajero tiene el rol asignado para poder agregar ventas:
+
+EXECUTE AS LOGIN 'Cajero';
+EXEC dbVenta.insertarVenta 
