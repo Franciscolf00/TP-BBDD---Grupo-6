@@ -185,3 +185,36 @@ BEGIN
     ELSE
 		RAISERROR(@error, 16, 1);
 END
+GO
+------------------------------------------------------------------------------------
+--Modificar Cliente
+
+
+CREATE OR ALTER PROCEDURE dbCliente.ModificarEstadoCliente
+	@IDCliente INT,
+	@estado BIT
+AS
+BEGIN
+	DECLARE @error VARCHAR(MAX)= ''
+	IF NOT EXISTS (SELECT 1 FROM dbCliente.Cliente WHERE IDCliente = @IDCliente)
+		SET @error = 'El cliente no existe. '
+	IF @IDCliente >= 1 AND @IDCliente <= 4
+		SET @error = 'No se puede modificar IDs entre 1 y 4. '
+	IF @error = ''
+	BEGIN
+		IF(@estado = 1)
+		BEGIN
+			UPDATE dbCliente.Cliente
+			SET fechaBaja = NULL
+			WHERE IDCliente = @IDCliente
+			PRINT 'El cliente ha sido dada de alta correctamente'
+		END
+		ELSE
+			UPDATE dbCliente.Cliente
+			SET fechaBaja = GETDATE()
+			WHERE IDCliente = @IDCliente
+			PRINT 'El cliente ha sido dada de baja correctamente'
+	END
+	ELSE
+		RAISERROR(@error, 16, 1);
+END

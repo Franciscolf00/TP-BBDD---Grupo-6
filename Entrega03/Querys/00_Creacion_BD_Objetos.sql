@@ -56,6 +56,8 @@ CREATE SCHEMA dbSistema
 GO
 CREATE SCHEMA dbSeguridad
 GO
+CREATE SCHEMA dbCliente
+GO
 --create or alter function dbVenta.RutaImportacion()
 --returns VARCHAR(max)
 --AS
@@ -64,17 +66,19 @@ GO
 --END
 go
 
-DROP TABLE IF EXISTS dbFactura.DetalleDeFactura;
+
+DROP TABLE IF EXISTS dbFactura.DetalleDeVenta;
+DROP TABLE IF EXISTS dbVenta.Venta;
+DROP TABLE IF EXISTS dbFactura.Factura;
 DROP TABLE IF EXISTS dbProducto.Producto; 
 DROP TABLE IF EXISTS dbProducto.Categoria;   
 DROP TABLE IF EXISTS dbProducto.LineaDeProducto; 
 DROP TABLE IF EXISTS dbFactura.NotaDeCredito;
-DROP TABLE IF EXISTS dbVenta.Venta;
 DROP TABLE IF EXISTS dbVenta.MetodoDePago;   
 DROP TABLE IF EXISTS dbSucursal.Empleado;    
 DROP TABLE IF EXISTS dbSucursal.Sucursal; 
-DROP TABLE IF EXISTS dbFactura.Factura;
 DROP TABLE IF EXISTS dbSistema.Parametrizacion;
+DROP TABLE IF EXISTS dbCliente.Cliente
 
 CREATE TABLE dbSucursal.Sucursal(
 	IDSucursal INT IDENTITY(1,1) PRIMARY KEY,
@@ -134,6 +138,7 @@ CREATE TABLE dbVenta.MetodoDePago(
 	estado BIT,
 	fechaBaja DATETIME
 )
+
 go
 CREATE TABLE dbFactura.Factura(
 	IDFactura INT IDENTITY (1,1) PRIMARY KEY,
@@ -146,15 +151,8 @@ CREATE TABLE dbFactura.Factura(
 	puntoDeVenta INT		--5 digitos
 )
 go
-CREATE TABLE dbFactura.DetalleDeFactura(
-	IDDetalle INT IDENTITY (1,1) PRIMARY KEY,
-	cantidad INT,
-	subtotal DECIMAL(10,2),
-	precioUnitarioAlMomento DECIMAL(10,2),
-	FKProducto INT NOT NULL REFERENCES dbProducto.Producto(IDProducto),
-	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
-)
-go
+
+
 CREATE TABLE dbFactura.NotaDeCredito(
 	IDNotaDeCredito INT IDENTITY (1,1) PRIMARY KEY,
 	numeroComprobante INT,		--8 digitos, con 0s adelante
@@ -164,10 +162,22 @@ CREATE TABLE dbFactura.NotaDeCredito(
 	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
 )
 go
+CREATE TABLE dbCliente.Cliente(
+	IDCliente INT IDENTITY(1,1) PRIMARY KEY,
+	cui CHAR(11),
+	nombre VARCHAR(30),
+	apellido VARCHAR(30),
+	direccion VARCHAR(70),
+	email VARCHAR(70),
+	fechaNac DATE,
+	tipoCliente CHAR(6) CHECK(tipoCliente in ('Member', 'Normal')),
+	genero CHAR(6) CHECK(genero in ('M', 'F')),
+	fechaBaja DATETIME
+)
+go
+
 CREATE TABLE dbVenta.Venta(
 	IDVenta INT IDENTITY(1,1) PRIMARY KEY,
-	tipoCliente CHAR(6) CHECK(tipoCliente in ('Member', 'Normal')),
-	genero CHAR(6) CHECK(genero in ('Male', 'Female')),
 	fechaHoraVenta DATETIME,
 	identificadorDePago VARCHAR(30) CHECK((LEN(identificadorDePago) = 22 AND identificadorDePago LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
 											OR (LEN(identificadorDePago) = 19 AND identificadorDePago LIKE '[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]')								
@@ -175,10 +185,22 @@ CREATE TABLE dbVenta.Venta(
 	FKEmpleado INT NOT NULL REFERENCES dbSucursal.Empleado(Legajo),
 	FKMetodoDePago INT NOT NULL REFERENCES dbVenta.MetodoDePago(IDMetodoDePago),
 	FKSucursal INT NOT NULL REFERENCES dbSucursal.Sucursal(IDSucursal),
-	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
+	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura),
+	FKCliente INT NOT NULL REFERENCES dbCliente.Cliente(IDCliente)
 )
 go
-CREATE FUNCTION dbSistema.ValidarCUIT (@CUIT CHAR(13))
+
+CREATE TABLE dbVenta.DetalleDeVenta(
+	IDDetalle INT IDENTITY (1,1) PRIMARY KEY,
+	cantidad INT,
+	subtotal DECIMAL(10,2),
+	precioUnitarioAlMomento DECIMAL(10,2),
+	FKProducto INT NOT NULL REFERENCES dbProducto.Producto(IDProducto),
+	FKVenta INT NOT NULL REFERENCES dbVenta.Venta(IDVenta)
+)
+go
+
+CREATE OR ALTER FUNCTION dbSistema.ValidarCUIT (@CUIT CHAR(13))
 RETURNS BIT
 AS
 BEGIN
@@ -222,3 +244,47 @@ CREATE TABLE dbSistema.Parametrizacion(
 	montoMinimoDatos INT			--Monto minimo para pedir los datos del cliente
 )
 go
+
+INSERT INTO dbCliente.Cliente (tipoCliente, genero)
+VALUES 
+('Member', 'M'),
+('Member', 'F'),
+('Normal', 'M'),
+('Normal', 'F')
+
+INSERT INTO dbCliente.Cliente (cui, nombre, apellido, direccion, email, fechaNac, tipoCliente, genero)
+VALUES ('20123456798', 'Gerardo', 'Martinez', 'Angelo Musetti 356', 'gMartinez@gmail.com', CAST('1999-05-20' AS DATETIME),'Member', 'M')
+
+select * from dbCliente.Cliente
+GO
+
+
+CREATE OR ALTER PROCEDURE dbSistema.ConfiguracionInicial
+	@CUITAurora CHAR(13),
+	@PorcentajeIVA DECIMAL(5,2),
+	@montoMinimoDatos DECIMAL(10,2)
+AS
+BEGIN
+	DECLARE @error VARCHAR(max)='';
+	IF( dbSistema.ValidarCUIT(@CUITAurora) = 0)
+		SET @error=@error + 'CUIT de la empresa invalido. ';
+
+	IF (@PorcentajeIVA < 0 OR @PorcentajeIVA IS NULL )
+		SET @error = @error + 'El IVA debe ser mayor o igual a 0. ';	--se vale soñar
+
+	IF (@montoMinimoDatos <= 0 OR @montoMinimoDatos IS NULL )
+		SET @error = @error + 'El monto minimo para exigir datos para factura tipo B y C debe ser mayor a 0. ';
+
+	IF (@error = '')
+    BEGIN
+        INSERT INTO dbSistema.Parametrizacion (CUITAurora,PorcentajeIVA,montoMinimoDatos)
+		VALUES (@CUITAurora,@PorcentajeIVA,@montoMinimoDatos);
+    END
+    ELSE
+        RAISERROR (@error, 16, 1);
+END
+GO
+EXEC dbSistema.ConfiguracionInicial 
+	@CUITAurora='30-68584975-1',
+	@PorcentajeIVA=0.21,
+	@montoMinimoDatos=40000;
