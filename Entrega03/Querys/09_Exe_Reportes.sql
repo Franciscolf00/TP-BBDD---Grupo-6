@@ -3,7 +3,7 @@ GO
 SET LANGUAGE Spanish;
 
 GO
-exec dbReporte.mostrarTotalDias 1,2019
+exec dbReporte.mostrarTotalDias 3,2019
 GO
 exec dbReporte.mostrarTotalTrimestre 1,2019
 GO
@@ -15,7 +15,7 @@ EXEC dbReporte.mostrarTop5ProductosPorSemana 1, 2019;
 GO
 EXEC dbReporte.mostrarTopMenos5ProductosPorMes 1, 2019;
 GO
-EXEC dbReporte.mostrarAcumuladoSucursal '2019-03-01', 1;
+EXEC dbReporte.mostrarAcumuladoSucursal '2019-03-01', 3;
 GO
---EXEC dbVenta.MostrarVentas;
+EXEC dbReporte.MostrarVentas;
 GO
