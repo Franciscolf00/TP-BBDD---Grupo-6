@@ -1,0 +1,1537 @@
+{
+  "id": "0",
+  "name": "Com2900G06-db",
+  "createdAt": "2024-11-26T17:20:15.081Z",
+  "updatedAt": "2024-11-26T17:20:15.081Z",
+  "databaseType": "sql_server",
+  "tables": [
+    {
+      "id": "1",
+      "name": "Categoria",
+      "schema": "dbProducto",
+      "x": 1300,
+      "y": 100,
+      "fields": [
+        {
+          "id": "2",
+          "name": "IDCategoria",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": true,
+          "unique": true,
+          "nullable": "false",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "3",
+          "name": "nombre",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "50",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "4",
+          "name": "FKLineaDeProducto",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "false",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "5",
+          "name": "estado",
+          "type": {
+            "id": "bit",
+            "name": "bit"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "6",
+          "name": "fechaBaja",
+          "type": {
+            "id": "datetime",
+            "name": "datetime"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "createdAt": 1732640869078
+        }
+      ],
+      "indexes": [
+        {
+          "id": "7",
+          "name": "PK__Categori__70E82E283F65E7F6",
+          "unique": true,
+          "fieldIds": [
+            "2"
+          ],
+          "createdAt": 1732640869078
+        }
+      ],
+      "color": "#9ef07a",
+      "isView": false,
+      "isMaterializedView": false,
+      "createdAt": 1732640869078,
+      "diagramId": "iy9f7nlbf1bg"
+    },
+    {
+      "id": "8",
+      "name": "Cliente",
+      "schema": "dbCliente",
+      "x": 97.8581592026402,
+      "y": 449.96217815376906,
+      "fields": [
+        {
+          "id": "9",
+          "name": "IDCliente",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": true,
+          "unique": true,
+          "nullable": "false",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "10",
+          "name": "cui",
+          "type": {
+            "id": "char",
+            "name": "char"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "11",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "11",
+          "name": "nombre",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "30",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "12",
+          "name": "apellido",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "30",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "13",
+          "name": "direccion",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "70",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "14",
+          "name": "email",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "70",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "15",
+          "name": "fechaNac",
+          "type": {
+            "id": "date",
+            "name": "date"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "16",
+          "name": "tipoCliente",
+          "type": {
+            "id": "char",
+            "name": "char"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "6",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "17",
+          "name": "genero",
+          "type": {
+            "id": "char",
+            "name": "char"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "1",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "18",
+          "name": "fechaBaja",
+          "type": {
+            "id": "datetime",
+            "name": "datetime"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "createdAt": 1732640869078
+        }
+      ],
+      "indexes": [
+        {
+          "id": "19",
+          "name": "PK__Cliente__9B8553FC51B74DF8",
+          "unique": true,
+          "fieldIds": [
+            "9"
+          ],
+          "createdAt": 1732640869078
+        }
+      ],
+      "color": "#7175fa",
+      "isView": false,
+      "isMaterializedView": false,
+      "createdAt": 1732640869078,
+      "diagramId": "iy9f7nlbf1bg"
+    },
+    {
+      "id": "20",
+      "name": "DetalleDeVenta",
+      "schema": "dbVenta",
+      "x": 501.5669910139329,
+      "y": 57.691242623808364,
+      "fields": [
+        {
+          "id": "21",
+          "name": "IDDetalle",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": true,
+          "unique": true,
+          "nullable": "false",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "22",
+          "name": "cantidad",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "23",
+          "name": "subtotal",
+          "type": {
+            "id": "decimal",
+            "name": "decimal"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "precision": 10,
+          "scale": 2,
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "24",
+          "name": "precioUnitarioAlMomento",
+          "type": {
+            "id": "decimal",
+            "name": "decimal"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "precision": 10,
+          "scale": 2,
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "25",
+          "name": "FKProducto",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "false",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "26",
+          "name": "FKVenta",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "false",
+          "createdAt": 1732640869079
+        }
+      ],
+      "indexes": [
+        {
+          "id": "27",
+          "name": "PK__DetalleD__32EB9E47E565C8FB",
+          "unique": true,
+          "fieldIds": [
+            "21"
+          ],
+          "createdAt": 1732640869079
+        }
+      ],
+      "color": "#ffe374",
+      "isView": false,
+      "isMaterializedView": false,
+      "createdAt": 1732640869079,
+      "diagramId": "iy9f7nlbf1bg"
+    },
+    {
+      "id": "28",
+      "name": "Empleado",
+      "schema": "dbSucursal",
+      "x": -336.6156431038864,
+      "y": 500.1058905996259,
+      "fields": [
+        {
+          "id": "29",
+          "name": "Legajo",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": true,
+          "unique": true,
+          "nullable": "false",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "30",
+          "name": "dni",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": false,
+          "unique": true,
+          "nullable": "true",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "31",
+          "name": "nombre",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "40",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "32",
+          "name": "apellido",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "20",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "33",
+          "name": "emailEmpresa",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "100",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "34",
+          "name": "emailPersonal",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "100",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "35",
+          "name": "direccion",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "100",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "36",
+          "name": "cargo",
+          "type": {
+            "id": "char",
+            "name": "char"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "22",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "37",
+          "name": "turno",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "16",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "38",
+          "name": "FKSucursal",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "false",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "39",
+          "name": "estado",
+          "type": {
+            "id": "bit",
+            "name": "bit"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "40",
+          "name": "fechaBaja",
+          "type": {
+            "id": "datetime",
+            "name": "datetime"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "createdAt": 1732640869079
+        }
+      ],
+      "indexes": [
+        {
+          "id": "41",
+          "name": "PK__Empleado__0E01039BFA03A381",
+          "unique": true,
+          "fieldIds": [
+            "29"
+          ],
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "42",
+          "name": "UQ__Empleado__D87608A7900F1FEE",
+          "unique": true,
+          "fieldIds": [
+            "30"
+          ],
+          "createdAt": 1732640869079
+        }
+      ],
+      "color": "#ff9f74",
+      "isView": false,
+      "isMaterializedView": false,
+      "createdAt": 1732640869079,
+      "diagramId": "iy9f7nlbf1bg"
+    },
+    {
+      "id": "43",
+      "name": "Factura",
+      "schema": "dbFactura",
+      "x": -650.9080501826264,
+      "y": 56.385416778864226,
+      "fields": [
+        {
+          "id": "44",
+          "name": "IDFactura",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": true,
+          "unique": true,
+          "nullable": "false",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "45",
+          "name": "numeroFactura",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "46",
+          "name": "tipoFactura",
+          "type": {
+            "id": "char",
+            "name": "char"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "1",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "47",
+          "name": "fechaHoraEmision",
+          "type": {
+            "id": "datetime",
+            "name": "datetime"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "48",
+          "name": "estadoFactura",
+          "type": {
+            "id": "char",
+            "name": "char"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "1",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "49",
+          "name": "total",
+          "type": {
+            "id": "decimal",
+            "name": "decimal"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "precision": 10,
+          "scale": 2,
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "50",
+          "name": "totalConIva",
+          "type": {
+            "id": "decimal",
+            "name": "decimal"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "precision": 10,
+          "scale": 2,
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "51",
+          "name": "CUITAur",
+          "type": {
+            "id": "char",
+            "name": "char"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "13",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "52",
+          "name": "puntoDeVenta",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "createdAt": 1732640869078
+        }
+      ],
+      "indexes": [
+        {
+          "id": "53",
+          "name": "PK__Factura__492FE939DC91EFF4",
+          "unique": true,
+          "fieldIds": [
+            "44"
+          ],
+          "createdAt": 1732640869078
+        }
+      ],
+      "color": "#ff6b8a",
+      "isView": false,
+      "isMaterializedView": false,
+      "createdAt": 1732640869078,
+      "diagramId": "iy9f7nlbf1bg"
+    },
+    {
+      "id": "54",
+      "name": "LineaDeProducto",
+      "schema": "dbProducto",
+      "x": 1700,
+      "y": 100,
+      "fields": [
+        {
+          "id": "55",
+          "name": "IDLineaDeProducto",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": true,
+          "unique": true,
+          "nullable": "false",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "56",
+          "name": "nombre",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "30",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "57",
+          "name": "estado",
+          "type": {
+            "id": "bit",
+            "name": "bit"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "58",
+          "name": "fechaBaja",
+          "type": {
+            "id": "datetime",
+            "name": "datetime"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "createdAt": 1732640869078
+        }
+      ],
+      "indexes": [
+        {
+          "id": "59",
+          "name": "PK__LineaDeP__F9C90E02CB87BB56",
+          "unique": true,
+          "fieldIds": [
+            "55"
+          ],
+          "createdAt": 1732640869078
+        }
+      ],
+      "color": "#b067e9",
+      "isView": false,
+      "isMaterializedView": false,
+      "createdAt": 1732640869078,
+      "diagramId": "iy9f7nlbf1bg"
+    },
+    {
+      "id": "60",
+      "name": "MetodoDePago",
+      "schema": "dbVenta",
+      "x": -477.21369702028863,
+      "y": -290.70394451602755,
+      "fields": [
+        {
+          "id": "61",
+          "name": "IDMetodoDePago",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": true,
+          "unique": true,
+          "nullable": "false",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "62",
+          "name": "nombre",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "11",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "63",
+          "name": "estado",
+          "type": {
+            "id": "bit",
+            "name": "bit"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "64",
+          "name": "fechaBaja",
+          "type": {
+            "id": "datetime",
+            "name": "datetime"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "createdAt": 1732640869079
+        }
+      ],
+      "indexes": [
+        {
+          "id": "65",
+          "name": "PK__MetodoDe__A439BF6D12F00B40",
+          "unique": true,
+          "fieldIds": [
+            "61"
+          ],
+          "createdAt": 1732640869079
+        }
+      ],
+      "color": "#9ef07a",
+      "isView": false,
+      "isMaterializedView": false,
+      "createdAt": 1732640869079,
+      "diagramId": "iy9f7nlbf1bg"
+    },
+    {
+      "id": "66",
+      "name": "NotaDeCredito",
+      "schema": "dbFactura",
+      "x": 99.99999999999991,
+      "y": -349.99999999999994,
+      "fields": [
+        {
+          "id": "67",
+          "name": "IDNotaDeCredito",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": true,
+          "unique": true,
+          "nullable": "false",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "68",
+          "name": "numeroComprobante",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "69",
+          "name": "motivo",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "150",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "70",
+          "name": "fechaHoraNota",
+          "type": {
+            "id": "datetime",
+            "name": "datetime"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "71",
+          "name": "monto",
+          "type": {
+            "id": "decimal",
+            "name": "decimal"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "precision": 10,
+          "scale": 2,
+          "createdAt": 1732640869078
+        },
+        {
+          "id": "72",
+          "name": "FKFactura",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "false",
+          "createdAt": 1732640869078
+        }
+      ],
+      "indexes": [
+        {
+          "id": "73",
+          "name": "PK__NotaDeCr__32C22D467B36C28A",
+          "unique": true,
+          "fieldIds": [
+            "67"
+          ],
+          "createdAt": 1732640869078
+        }
+      ],
+      "color": "#c05dcf",
+      "isView": false,
+      "isMaterializedView": false,
+      "createdAt": 1732640869078,
+      "diagramId": "iy9f7nlbf1bg"
+    },
+    {
+      "id": "74",
+      "name": "Parametrizacion",
+      "schema": "dbSistema",
+      "x": 603.2101834911766,
+      "y": -253.696704390711,
+      "fields": [
+        {
+          "id": "75",
+          "name": "CUITAurora",
+          "type": {
+            "id": "char",
+            "name": "char"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "13",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "76",
+          "name": "PorcentajeIVA",
+          "type": {
+            "id": "decimal",
+            "name": "decimal"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "precision": 5,
+          "scale": 2,
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "77",
+          "name": "montoMinimoDatos",
+          "type": {
+            "id": "decimal",
+            "name": "decimal"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "precision": 10,
+          "scale": 2,
+          "createdAt": 1732640869079
+        }
+      ],
+      "indexes": [],
+      "color": "#42e0c0",
+      "isView": false,
+      "isMaterializedView": false,
+      "createdAt": 1732640869079,
+      "diagramId": "iy9f7nlbf1bg"
+    },
+    {
+      "id": "78",
+      "name": "Producto",
+      "schema": "dbProducto",
+      "x": 900,
+      "y": 100,
+      "fields": [
+        {
+          "id": "79",
+          "name": "IDProducto",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": true,
+          "unique": true,
+          "nullable": "false",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "80",
+          "name": "nombre",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "100",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "81",
+          "name": "precioUnitario",
+          "type": {
+            "id": "decimal",
+            "name": "decimal"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "precision": 10,
+          "scale": 2,
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "82",
+          "name": "precioReferencia",
+          "type": {
+            "id": "decimal",
+            "name": "decimal"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "precision": 10,
+          "scale": 2,
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "83",
+          "name": "unidadReferencia",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "20",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "84",
+          "name": "fechaCreacion",
+          "type": {
+            "id": "smalldatetime",
+            "name": "smalldatetime"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "85",
+          "name": "FKCategoria",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "false",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "86",
+          "name": "estado",
+          "type": {
+            "id": "bit",
+            "name": "bit"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "87",
+          "name": "fechaBaja",
+          "type": {
+            "id": "datetime",
+            "name": "datetime"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "createdAt": 1732640869079
+        }
+      ],
+      "indexes": [
+        {
+          "id": "88",
+          "name": "PK__Producto__ABDAF2B4356C8E8C",
+          "unique": true,
+          "fieldIds": [
+            "79"
+          ],
+          "createdAt": 1732640869079
+        }
+      ],
+      "color": "#b067e9",
+      "isView": false,
+      "isMaterializedView": false,
+      "createdAt": 1732640869079,
+      "diagramId": "iy9f7nlbf1bg"
+    },
+    {
+      "id": "89",
+      "name": "Sucursal",
+      "schema": "dbSucursal",
+      "x": 747.2971553097044,
+      "y": 788.4322371633021,
+      "fields": [
+        {
+          "id": "90",
+          "name": "IDSucursal",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": true,
+          "unique": true,
+          "nullable": "false",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "91",
+          "name": "direccion",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "100",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "92",
+          "name": "numTelefono",
+          "type": {
+            "id": "char",
+            "name": "char"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "9",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "93",
+          "name": "ciudad",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "50",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "94",
+          "name": "sucursal",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "50",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "95",
+          "name": "estado",
+          "type": {
+            "id": "bit",
+            "name": "bit"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "96",
+          "name": "fechaBaja",
+          "type": {
+            "id": "datetime",
+            "name": "datetime"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "createdAt": 1732640869079
+        }
+      ],
+      "indexes": [
+        {
+          "id": "97",
+          "name": "PK__Sucursal__696BA61036FC7D61",
+          "unique": true,
+          "fieldIds": [
+            "90"
+          ],
+          "createdAt": 1732640869079
+        }
+      ],
+      "color": "#42e0c0",
+      "isView": false,
+      "isMaterializedView": false,
+      "createdAt": 1732640869079,
+      "diagramId": "iy9f7nlbf1bg"
+    },
+    {
+      "id": "98",
+      "name": "Venta",
+      "schema": "dbVenta",
+      "x": 100,
+      "y": 100,
+      "fields": [
+        {
+          "id": "99",
+          "name": "IDVenta",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": true,
+          "unique": true,
+          "nullable": "false",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "100",
+          "name": "fechaHoraVenta",
+          "type": {
+            "id": "datetime",
+            "name": "datetime"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "101",
+          "name": "identificadorDePago",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "true",
+          "character_maximum_length": "30",
+          "collation": "Modern_Spanish_CI_AS",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "102",
+          "name": "FKEmpleado",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "false",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "103",
+          "name": "FKMetodoDePago",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "false",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "104",
+          "name": "FKSucursal",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "false",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "105",
+          "name": "FKFactura",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "false",
+          "createdAt": 1732640869079
+        },
+        {
+          "id": "106",
+          "name": "FKCliente",
+          "type": {
+            "id": "int",
+            "name": "int"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": "false",
+          "createdAt": 1732640869079
+        }
+      ],
+      "indexes": [
+        {
+          "id": "107",
+          "name": "PK__Venta__27134B82E07FD345",
+          "unique": true,
+          "fieldIds": [
+            "99"
+          ],
+          "createdAt": 1732640869079
+        }
+      ],
+      "color": "#ff9f74",
+      "isView": false,
+      "isMaterializedView": false,
+      "createdAt": 1732640869079,
+      "diagramId": "iy9f7nlbf1bg"
+    }
+  ],
+  "relationships": [
+    {
+      "id": "108",
+      "name": "FK__Categoria__FKLin__41B8C09B",
+      "sourceSchema": "dbProducto",
+      "targetSchema": "dbProducto",
+      "sourceTableId": "1",
+      "targetTableId": "54",
+      "sourceFieldId": "4",
+      "targetFieldId": "55",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1732640869079,
+      "diagramId": "iy9f7nlbf1bg"
+    },
+    {
+      "id": "109",
+      "name": "FK__DetalleDe__FKPro__5B78929E",
+      "sourceSchema": "dbVenta",
+      "targetSchema": "dbProducto",
+      "sourceTableId": "20",
+      "targetTableId": "78",
+      "sourceFieldId": "25",
+      "targetFieldId": "79",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1732640869079,
+      "diagramId": "iy9f7nlbf1bg"
+    },
+    {
+      "id": "110",
+      "name": "FK__DetalleDe__FKVen__5C6CB6D7",
+      "sourceSchema": "dbVenta",
+      "targetSchema": "dbVenta",
+      "sourceTableId": "20",
+      "targetTableId": "98",
+      "sourceFieldId": "26",
+      "targetFieldId": "99",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1732640869079,
+      "diagramId": "iy9f7nlbf1bg"
+    },
+    {
+      "id": "111",
+      "name": "FK__Empleado__FKSucu__3CF40B7E",
+      "sourceSchema": "dbSucursal",
+      "targetSchema": "dbSucursal",
+      "sourceTableId": "28",
+      "targetTableId": "89",
+      "sourceFieldId": "38",
+      "targetFieldId": "90",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1732640869079,
+      "diagramId": "iy9f7nlbf1bg"
+    },
+    {
+      "id": "112",
+      "name": "FK__NotaDeCre__FKFac__4D2A7347",
+      "sourceSchema": "dbFactura",
+      "targetSchema": "dbFactura",
+      "sourceTableId": "66",
+      "targetTableId": "43",
+      "sourceFieldId": "72",
+      "targetFieldId": "44",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1732640869079,
+      "diagramId": "iy9f7nlbf1bg"
+    },
+    {
+      "id": "113",
+      "name": "FK__Producto__FKCate__44952D46",
+      "sourceSchema": "dbProducto",
+      "targetSchema": "dbProducto",
+      "sourceTableId": "78",
+      "targetTableId": "1",
+      "sourceFieldId": "85",
+      "targetFieldId": "2",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1732640869079,
+      "diagramId": "iy9f7nlbf1bg"
+    },
+    {
+      "id": "114",
+      "name": "FK__Venta__FKCliente__589C25F3",
+      "sourceSchema": "dbVenta",
+      "targetSchema": "dbCliente",
+      "sourceTableId": "98",
+      "targetTableId": "8",
+      "sourceFieldId": "106",
+      "targetFieldId": "9",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1732640869079,
+      "diagramId": "iy9f7nlbf1bg"
+    },
+    {
+      "id": "115",
+      "name": "FK__Venta__FKEmplead__54CB950F",
+      "sourceSchema": "dbVenta",
+      "targetSchema": "dbSucursal",
+      "sourceTableId": "98",
+      "targetTableId": "28",
+      "sourceFieldId": "102",
+      "targetFieldId": "29",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1732640869079,
+      "diagramId": "iy9f7nlbf1bg"
+    },
+    {
+      "id": "116",
+      "name": "FK__Venta__FKFactura__57A801BA",
+      "sourceSchema": "dbVenta",
+      "targetSchema": "dbFactura",
+      "sourceTableId": "98",
+      "targetTableId": "43",
+      "sourceFieldId": "105",
+      "targetFieldId": "44",
+      "sourceCardinality": "one",
+      "targetCardinality": "one",
+      "createdAt": 1732640869079,
+      "diagramId": "iy9f7nlbf1bg"
+    },
+    {
+      "id": "117",
+      "name": "FK__Venta__FKMetodoD__55BFB948",
+      "sourceSchema": "dbVenta",
+      "targetSchema": "dbVenta",
+      "sourceTableId": "98",
+      "targetTableId": "60",
+      "sourceFieldId": "103",
+      "targetFieldId": "61",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1732640869079,
+      "diagramId": "iy9f7nlbf1bg"
+    },
+    {
+      "id": "118",
+      "name": "FK__Venta__FKSucursa__56B3DD81",
+      "sourceSchema": "dbVenta",
+      "targetSchema": "dbSucursal",
+      "sourceTableId": "98",
+      "targetTableId": "89",
+      "sourceFieldId": "104",
+      "targetFieldId": "90",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1732640869079,
+      "diagramId": "iy9f7nlbf1bg"
+    }
+  ],
+  "dependencies": []
+}

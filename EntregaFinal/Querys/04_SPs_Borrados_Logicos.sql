@@ -188,7 +188,7 @@ END
 GO
 ------------------------------------------------------------------------------------
 --Modificar Cliente
-CREATE OR ALTER PROCEDURE dbCliente.ModificarEstadoCliente
+CREATE OR ALTER PROCEDURE dbCliente.ModificarTipoCliente
 	@IDCliente INT,
 	@estado BIT
 AS
@@ -203,15 +203,17 @@ BEGIN
 		IF(@estado = 1)
 		BEGIN
 			UPDATE dbCliente.Cliente
-			SET fechaBaja = NULL
+			SET tipoCliente='Member'
 			WHERE IDCliente = @IDCliente
-			PRINT 'El cliente ha sido dada de alta correctamente'
+			PRINT 'El cliente ha sido dado de alta como Member.'
 		END
 		ELSE
+		BEGIN
 			UPDATE dbCliente.Cliente
-			SET fechaBaja = GETDATE()
+			SET tipoCliente='Normal'
 			WHERE IDCliente = @IDCliente
-			PRINT 'El cliente ha sido dada de baja correctamente'
+			PRINT 'El cliente ha sido dado de baja como Member, pasó a ser Normal.'
+		END
 	END
 	ELSE
 		RAISERROR(@error, 16, 1);

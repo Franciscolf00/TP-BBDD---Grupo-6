@@ -577,7 +577,6 @@ BEGIN
 		CUITAur=@CUIT
 		WHERE IDFactura=(SELECT FKFactura FROM dbVenta.Venta WHERE IDVenta=@IDVenta)
 	END
-			
 	ELSE
 		RAISERROR (@error, 16, 1);
 END

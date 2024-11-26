@@ -1,4 +1,4 @@
--- Entrega 5/11/2024
+-- Entrega 26/11/2024
 -- Grupo 06
 -- Materia: Base de Datos Aplicadas-2900
 -- Alumnos:
@@ -52,24 +52,31 @@ CREATE SCHEMA dbReporte
 GO
 CREATE SCHEMA dbFactura
 GO
-create or alter function dbVenta.RutaImportacion()
-returns VARCHAR(max)
-AS
-BEGIN
-	RETURN 'C:\Users\Tomas_Arce\Documents\GitHub\TP-BBDD---Grupo-6\TP_integrador_Archivos'; --Aca copiaríaas tu ruta base hasta los archivos.
-END
+CREATE SCHEMA dbSistema
+GO
+CREATE SCHEMA dbCliente
+GO
+--create or alter function dbVenta.RutaImportacion()
+--returns VARCHAR(max)
+--AS
+--BEGIN
+--	RETURN 'C:\Users\Tomas_Arce\Documents\GitHub\TP-BBDD---Grupo-6\TP_integrador_Archivos'; --Aca copiaríaas tu ruta base hasta los archivos.
+--END
 go
 
+
+DROP TABLE IF EXISTS dbVenta.DetalleDeVenta;
 DROP TABLE IF EXISTS dbVenta.Venta;
-DROP TABLE IF EXISTS dbSucursal.Empleado;    
-DROP TABLE IF EXISTS dbSucursal.Sucursal; 
+DROP TABLE IF EXISTS dbFactura.NotaDeCredito;
+DROP TABLE IF EXISTS dbFactura.Factura;
 DROP TABLE IF EXISTS dbProducto.Producto; 
 DROP TABLE IF EXISTS dbProducto.Categoria;   
 DROP TABLE IF EXISTS dbProducto.LineaDeProducto; 
 DROP TABLE IF EXISTS dbVenta.MetodoDePago;   
-DROP TABLE IF EXISTS dbFactura.Factura;
-DROP TABLE IF EXISTS dbFactura.DetalleDeFactura;
-DROP TABLE IF EXISTS dbFactura.NotaDeCredito;
+DROP TABLE IF EXISTS dbSucursal.Empleado;    
+DROP TABLE IF EXISTS dbSucursal.Sucursal; 
+DROP TABLE IF EXISTS dbSistema.Parametrizacion;
+DROP TABLE IF EXISTS dbCliente.Cliente;
 
 CREATE TABLE dbSucursal.Sucursal(
 	IDSucursal INT IDENTITY(1,1) PRIMARY KEY,
@@ -87,7 +94,7 @@ CREATE TABLE dbSucursal.Empleado(
 	nombre VARCHAR(40),
 	apellido VARCHAR(20),
 	emailEmpresa VARCHAR(100) CHECK(emailEmpresa like '%@superA.com'),
-	emailPersonal VARCHAR(100) CHECK(emailPersonal like '%@%.com'),
+	emailPersonal VARCHAR(100),
 	direccion VARCHAR(100),
 	cargo CHAR(22) CHECK(cargo in ('Cajero', 'Supervisor', 'Gerente de sucursal')),
 	turno VARCHAR(16) CHECK(turno in('TM', 'TT' , 'Jornada Completa')),
@@ -135,30 +142,36 @@ CREATE TABLE dbFactura.Factura(
 	numeroFactura INT,	--Lo tengo que guardar como int para verificar duplicados a la hora de insertar
 	tipoFactura CHAR(1) CHECK(tipoFactura in ('A', 'B', 'C')),
 	fechaHoraEmision DATETIME,
-	estadoFactura CHAR(1) CHECK(estadoFactura in ('E','P')),	--Emitida,Pagada
-	total real
-)
-go
-CREATE TABLE dbFactura.DetalleDeFactura(
-	IDDetalle INT IDENTITY (1,1) PRIMARY KEY,
-	cantidad INT,
-	subtotal real,
-	precioUnitarioAlMomento real,
-	FKProducto INT NOT NULL REFERENCES dbProducto.Producto(IDProducto),
-	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
+	estadoFactura CHAR(1) CHECK(estadoFactura in ('E','P','C')),	--Emitida,Pagada,Cancelada
+	total DECIMAL(10,2),
+	totalConIva DECIMAL(10,2),
+	CUITAur CHAR(13),
+	puntoDeVenta INT		--5 digitos
 )
 go
 CREATE TABLE dbFactura.NotaDeCredito(
 	IDNotaDeCredito INT IDENTITY (1,1) PRIMARY KEY,
+	numeroComprobante INT,		--8 digitos, con 0s adelante
 	motivo VARCHAR(150),
 	fechaHoraNota DATETIME,
+	monto DECIMAL(10,2),
 	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
+)
+go
+CREATE TABLE dbCliente.Cliente(
+	IDCliente INT IDENTITY(1,1) PRIMARY KEY,
+	cui CHAR(13),
+	nombre VARCHAR(30),
+	apellido VARCHAR(30),
+	direccion VARCHAR(70),
+	email VARCHAR(70),
+	fechaNac DATE,
+	tipoCliente CHAR(6) CHECK(tipoCliente in ('Member', 'Normal')),
+	genero CHAR(1) CHECK(genero in ('M', 'F'))
 )
 go
 CREATE TABLE dbVenta.Venta(
 	IDVenta INT IDENTITY(1,1) PRIMARY KEY,
-	tipoCliente CHAR(6) CHECK(tipoCliente in ('Member', 'Normal')),
-	genero CHAR(6) CHECK(genero in ('Male', 'Female')),
 	fechaHoraVenta DATETIME,
 	identificadorDePago VARCHAR(30) CHECK((LEN(identificadorDePago) = 22 AND identificadorDePago LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
 											OR (LEN(identificadorDePago) = 19 AND identificadorDePago LIKE '[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]')								
@@ -166,5 +179,66 @@ CREATE TABLE dbVenta.Venta(
 	FKEmpleado INT NOT NULL REFERENCES dbSucursal.Empleado(Legajo),
 	FKMetodoDePago INT NOT NULL REFERENCES dbVenta.MetodoDePago(IDMetodoDePago),
 	FKSucursal INT NOT NULL REFERENCES dbSucursal.Sucursal(IDSucursal),
-	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura)
+	FKFactura INT NOT NULL REFERENCES dbFactura.Factura(IDFactura),
+	FKCliente INT NOT NULL REFERENCES dbCliente.Cliente(IDCliente)
 )
+go
+CREATE TABLE dbVenta.DetalleDeVenta(
+	IDDetalle INT IDENTITY (1,1) PRIMARY KEY,
+	cantidad INT,
+	subtotal DECIMAL(10,2),
+	precioUnitarioAlMomento DECIMAL(10,2),
+	FKProducto INT NOT NULL REFERENCES dbProducto.Producto(IDProducto),
+	FKVenta INT NOT NULL REFERENCES dbVenta.Venta(IDVenta)
+)
+go
+CREATE OR ALTER FUNCTION dbSistema.ValidarCUIT (@CUIT CHAR(13))
+RETURNS BIT
+AS
+BEGIN
+    DECLARE @resultado BIT = 0;
+    DECLARE @cuitSinGuiones CHAR(11);
+    DECLARE @suma INT = 0;
+    DECLARE @digitoVerificador INT;
+    DECLARE @multiplicadores TABLE (Posicion INT, Valor INT);
+    
+    -- Validar largo y formato
+    IF LEN(@CUIT) = 13 AND @CUIT LIKE '30-[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]-[0-9]'
+    BEGIN
+        --Saco guiones
+        SET @cuitSinGuiones = REPLACE(@CUIT, '-', '');
+
+        --Obtengo el digito verificador
+        SET @digitoVerificador = CAST(SUBSTRING(@cuitSinGuiones, 11, 1) AS INT);
+
+        --Multiplicadores para el calculo
+        INSERT INTO @multiplicadores
+        VALUES 
+            (1, 5), (2, 4), (3, 3), (4, 2), (5, 7), (6, 6), (7, 5), (8, 4), (9, 3), (10, 2);
+
+        --Hago la suma ponderada
+        SELECT @suma = @suma + 
+            (CAST(SUBSTRING(@cuitSinGuiones, m.Posicion, 1) AS INT) * m.Valor)
+        FROM @multiplicadores m;
+
+        --Valido que el digito verificador sea correcto
+        IF (@digitoVerificador = (11 - (@suma % 11)) % 11)
+            SET @resultado = 1;
+    END
+
+    RETURN @resultado;
+END;
+go
+CREATE TABLE dbSistema.Parametrizacion(
+	CUITAurora CHAR(13) CHECK( (LEN(CUITAurora) = 13) AND CUITAurora like '30-[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]-[0-9]'
+								AND dbSistema.ValidarCUIT(CUITAurora) = 1),		--CUIT de AURORA SA, empieza con sufijo 30 y cumple con el calculo de CUIT
+	PorcentajeIVA DECIMAL(5,2),		--% de IVA a aplicar al total
+	montoMinimoDatos DECIMAL(10,2)			--Monto minimo para pedir los datos del cliente
+)
+go
+
+
+
+
+
+

@@ -36,30 +36,31 @@ CREATE OR ALTER PROCEDURE dbProducto.CargaInicialLineaYCategoria
 AS
 BEGIN
 	----Inserto Linea de producto "Importado" para luego poder buscarla al insertar productos importados
-	--EXEC dbProducto.InsertarLineaDeProducto 
-	--	@nombreLineaDeProducto='Importado';
+	EXEC dbProducto.InsertarLineaDeProducto 
+		@nombreLineaDeProducto='Importado';
 
-	----Inserto Linea de producto "Tecnología" y ,asociada a la misma, categoría "Electrónicos" para luego poder buscarla al insertar 
-	----productos que sean accesorios electrónicos
-	--EXEC dbProducto.InsertarLineaDeProducto 
-	--	@nombreLineaDeProducto='Tecnología';
-	--DECLARE @IDTecnologicos INT;
-	--SELECT @IDTecnologicos=IDLineaDeProducto FROM dbProducto.LineaDeProducto WHERE nombre='Tecnología';
-	--EXEC dbProducto.InsertarCategoria
-	--	@nombreCategoria='Eletrónicos',
-	--	@FKLineaDeProducto=@IDTecnologicos;
+	--Inserto Linea de producto "Tecnología" y ,asociada a la misma, categoría "Electrónicos" para luego poder buscarla al insertar 
+	--productos que sean accesorios electrónicos
+	EXEC dbProducto.InsertarLineaDeProducto 
+		@nombreLineaDeProducto='Tecnología';
+	DECLARE @IDTecnologicos INT;
+	SELECT @IDTecnologicos=IDLineaDeProducto FROM dbProducto.LineaDeProducto WHERE nombre='Tecnología';
+	EXEC dbProducto.InsertarCategoria
+		@nombreCategoria='Electrónicos',
+		@FKLineaDeProducto=@IDTecnologicos;
 
 	--DEBUG(no valido duplicados porque inserto directo)
-	INSERT INTO dbProducto.LineaDeProducto(nombre,estado)
-	VALUES('Importado',1)
+	--INSERT INTO dbProducto.LineaDeProducto(nombre,estado)
+	--VALUES('Importado',1)
 	
-	INSERT INTO dbProducto.LineaDeProducto(nombre,estado)
-	VALUES('Tecnología',1)
+	--INSERT INTO dbProducto.LineaDeProducto(nombre,estado)
+	--VALUES('Tecnología',1)
 
-	INSERT INTO dbProducto.Categoria(nombre,FKLineaDeProducto,estado)
-	SELECT 'Electrónicos',IDLineaDeProducto,1
-	FROM dbProducto.LineaDeProducto
-	WHERE nombre='Tecnología'
+	--INSERT INTO dbProducto.Categoria(nombre,FKLineaDeProducto,estado)
+	--SELECT 'Electrónicos',IDLineaDeProducto,1
+	--FROM dbProducto.LineaDeProducto
+	--WHERE nombre='Tecnología'
 END
 GO
 EXEC dbProducto.CargaInicialLineaYCategoria
+GO
