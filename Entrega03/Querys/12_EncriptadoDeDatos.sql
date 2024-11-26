@@ -99,8 +99,7 @@ JOIN
     CTE c ON e.Legajo = c.Legajo;
 GO
 
--- Mostramos toda la tabla
-
+-- Mostramos toda la tabla encriptada
 SELECT legajo, dni, nombre, apellido, emailPersonal, direccion , emailEmpresa
 FROM dbSucursal.Empleado;
 go

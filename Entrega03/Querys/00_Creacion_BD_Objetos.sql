@@ -92,7 +92,7 @@ CREATE TABLE dbSucursal.Sucursal(
 go
 CREATE TABLE dbSucursal.Empleado(
 	Legajo INT PRIMARY KEY,
-	dni INT UNIQUE,
+	dni INT,
 	nombre VARCHAR(40),
 	apellido VARCHAR(20),
 	emailEmpresa VARCHAR(100) CHECK(emailEmpresa like '%@superA.com'),
