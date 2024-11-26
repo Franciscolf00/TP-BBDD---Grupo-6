@@ -237,8 +237,8 @@ BEGIN
 	ELSE
 		RAISERROR(@error, 16, 1)
 END	
-
-
+GO
+/*
 EXEC dbCliente.ActualizarCliente @IDCliente = 1, @genero = 'F'
 GO
 
@@ -249,3 +249,4 @@ EXEC dbCliente.ActualizarCliente @IDCliente = 5, @genero = 's'
 GO
 
 SELECT * FROM dbCliente.Cliente
+*/

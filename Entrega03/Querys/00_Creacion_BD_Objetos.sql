@@ -243,21 +243,7 @@ CREATE TABLE dbSistema.Parametrizacion(
 	PorcentajeIVA DECIMAL(5,2),		--% de IVA a aplicar al total
 	montoMinimoDatos INT			--Monto minimo para pedir los datos del cliente
 )
-go
-
-INSERT INTO dbCliente.Cliente (tipoCliente, genero)
-VALUES 
-('Member', 'M'),
-('Member', 'F'),
-('Normal', 'M'),
-('Normal', 'F')
-
-INSERT INTO dbCliente.Cliente (cui, nombre, apellido, direccion, email, fechaNac, tipoCliente, genero)
-VALUES ('20123456798', 'Gerardo', 'Martinez', 'Angelo Musetti 356', 'gMartinez@gmail.com', CAST('1999-05-20' AS DATETIME),'Member', 'M')
-
-select * from dbCliente.Cliente
 GO
-
 
 CREATE OR ALTER PROCEDURE dbSistema.ConfiguracionInicial
 	@CUITAurora CHAR(13),
