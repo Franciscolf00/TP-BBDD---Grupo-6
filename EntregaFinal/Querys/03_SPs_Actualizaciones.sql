@@ -208,7 +208,7 @@ BEGIN
 	IF NOT EXISTS (SELECT 1 FROM dbFactura.Factura WHERE IDFactura=@IDFactura)
 		SET @error=@error+'La factura con el ID ingresado no existe.'
 	ELSE IF EXISTS(SELECT 1 FROM dbFactura.Factura WHERE IDFactura=@IDFactura AND fechaHoraEmision IS NOT NULL)
-		SET @error=@error+'La factura con el ID ingresado ya fué emitida.'
+		SET @error=@error+'La factura con el ID ingresado ya fuï¿½ emitida.'
 
 	IF @error=''
 	BEGIN

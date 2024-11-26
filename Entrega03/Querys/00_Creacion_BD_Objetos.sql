@@ -52,12 +52,18 @@ CREATE SCHEMA dbReporte
 GO
 CREATE SCHEMA dbFactura
 GO
-create or alter function dbVenta.RutaImportacion()
-returns VARCHAR(max)
-AS
-BEGIN
-	RETURN 'C:\Users\Tomas_Arce\Documents\GitHub\TP-BBDD---Grupo-6\TP_integrador_Archivos'; --Aca copiaríaas tu ruta base hasta los archivos.
-END
+CREATE SCHEMA dbSistema
+GO
+CREATE SCHEMA dbSeguridad
+GO
+CREATE SCHEMA dbCliente
+GO
+--create or alter function dbVenta.RutaImportacion()
+--returns VARCHAR(max)
+--AS
+--BEGIN
+--	RETURN 'C:\Users\Tomas_Arce\Documents\GitHub\TP-BBDD---Grupo-6\TP_integrador_Archivos'; --Aca copiaríaas tu ruta base hasta los archivos.
+--END
 go
 
 DROP TABLE IF EXISTS dbVenta.Venta;
@@ -83,7 +89,7 @@ CREATE TABLE dbSucursal.Sucursal(
 go
 CREATE TABLE dbSucursal.Empleado(
 	Legajo INT PRIMARY KEY,
-	dni INT UNIQUE,
+	dni INT,
 	nombre VARCHAR(40),
 	apellido VARCHAR(20),
 	emailEmpresa VARCHAR(100) CHECK(emailEmpresa like '%@superA.com'),
