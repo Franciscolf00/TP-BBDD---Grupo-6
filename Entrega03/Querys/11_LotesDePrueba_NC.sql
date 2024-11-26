@@ -1,55 +1,57 @@
 USE Com2900G06
-
--- Caso 1: No hay motivo
-EXEC dbFactura.GenerarNotaDeCredito 1, '';
 GO
-
---Caso 2: No existe factura
-EXEC dbFactura.GenerarNotaDeCredito 3856333, 'Nota de crédito por feriado';
-GO
-
---Caso 3: Caso de éxito
-EXEC dbFactura.GenerarNotaDeCredito 11, 'Nota de crédito por fondos insuficientes';
-GO
-
 CREATE OR ALTER PROCEDURE dbFactura.PruebaFacturasVentasYNotasDeCredito
 AS
 BEGIN
-	DECLARE @IDFactura INT;
-	--Creo la factura
-	EXEC dbFactura.CrearFactura @IDFacturaGenerada=@IDFactura OUTPUT;
+	DECLARE @IDVenta INT;
 
-	--Inserto detalles
-	EXEC dbFactura.InsertarDetalleDeFactura
-		@cantidad=5,
-		@FKProducto=1,
-		@FKFactura=@IDFactura;
-	EXEC dbFactura.InsertarDetalleDeFactura
-		@cantidad=2,
-		@FKProducto=2,
-		@FKFactura=@IDFactura;
-
-	--Emito la factura
-	EXEC dbFactura.EmitirFactura
-		@IDFactura=@IDFactura,			
-		@numeroFactura=546665241,	
-		@tipoFactura='A';
-
-	--Le asigno la factura a la venta
-	EXEC dbVenta.InsertarVenta
-		@tipoCliente = 'Normal',
-		@genero = 'Male',
-		@identificadorDePago = '1234-5678-9012-3456', 
+	EXEC dbVenta.InsertarVenta				
 		@FKempleado = 54321,              
 		@FKMetodoDePago = 1,                       
 		@FKSucursal = 1,
-		@FKFactura = @IDFactura;
+		@IDVentaGenerada=@IDVenta OUTPUT;	
 
-	--Recibo pago factura
-	EXEC dbFactura.RecibirPagoFactura @IDFactura
+	EXEC dbVenta.InsertarDetalleDeVenta	
+		@cantidad=5,
+		@FKProducto=1,
+		@FKVenta=@IDVenta;
+	EXEC dbVenta.InsertarDetalleDeVenta	
+		@cantidad=2,
+		@FKProducto=2,
+		@FKVenta=@IDVenta;
 
-	--Genero NC factura
-	EXEC dbFactura.GenerarNotaDeCredito @IDFactura, 'Devolución de compra por insatisfacción.'
+	EXEC dbFactura.EmitirFactura
+		@IDVenta=@IDVenta,			
+		@numeroFactura=996665244,			
+		@identificadorDePago = '1234-5678-9012-3456', 
+		@tipoFactura='B',
+		@puntoDeVenta=1;
+
+
+	EXEC dbFactura.GenerarNotaDeCredito 10, '',756,-30;	--No hay motivo, no existe factura, numero comprobante invalido y monto invalido
+	EXEC dbFactura.GenerarNotaDeCredito					--monto excedido al total y no esta pagada
+		1, 
+		'Nota de crédito por feriado',
+		99965999,
+		500;
+
+	EXEC dbFactura.RecibirPagoFactura 1;
+
+	EXEC dbFactura.GenerarNotaDeCredito					--Se genera exitosamente la NC($93 restantes)
+		1,
+		'Devolución de compra por insatisfacción.',
+		99965500,
+		100.60;
+	EXEC dbFactura.GenerarNotaDeCredito					--Se genera exitosamente la NC($3 restantes)
+		1,
+		'Devolución de compra por mucha insatisfacción.',
+		99965501,
+		90;
+	EXEC dbFactura.GenerarNotaDeCredito					--monto excedido al total
+		1,
+		'Devolución de compra por exceso de insatisfacción.',
+		99965502,
+		5;
 
 END
 GO
@@ -61,3 +63,4 @@ SELECT * FROM dbFactura.Factura
 GO
 SELECT * FROM dbFactura.NotaDeCredito
 GO
+delete from dbFactura.NotaDeCredito
