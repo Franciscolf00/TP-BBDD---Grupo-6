@@ -61,7 +61,7 @@ CREATE OR ALTER PROCEDURE dbSeguridad.AsignarPermisosEjecucionARol
 AS
 BEGIN
 	DECLARE @sql NVARCHAR(MAX)
-	SET @sql = 'GRANT EXECUTE ON ' + @objeto + '
+	SET @sql = 'GRANT EXECUTE ON ' + @objeto + ' 
 		TO ' + @rol
 	EXEC sp_executesql @sql;
 END
@@ -73,31 +73,7 @@ CREATE OR ALTER PROCEDURE dbSeguridad.QuitarPermisosEjecucionARol
 AS
 BEGIN
 	DECLARE @sql NVARCHAR(MAX)
-	SET @sql = 'REVOKE EXECUTE ON ' + @objeto + '
-		TO ' + @rol
-	EXEC sp_executesql @sql;
-END
-GO
-
-CREATE OR ALTER PROCEDURE dbSeguridad.AsignarPermisosSchemaARol
-	@objeto VARCHAR(MAX),
-	@rol VARCHAR(MAX)
-AS
-BEGIN
-	DECLARE @sql NVARCHAR(MAX)
-	SET @sql = 'GRANT CONTROL ON ' + @objeto + '
-		TO ' + @rol
-	EXEC sp_executesql @sql;
-END
-GO
-
-CREATE OR ALTER PROCEDURE dbSeguridad.QuitarPermisosSchemaARol
-	@objeto VARCHAR(MAX),
-	@rol VARCHAR(MAX)
-AS
-BEGIN
-	DECLARE @sql NVARCHAR(MAX)
-	SET @sql = 'REVOKE CONTROL ON ' + @objeto + '
+	SET @sql = 'REVOKE EXECUTE ON ' + @objeto + ' 
 		TO ' + @rol
 	EXEC sp_executesql @sql;
 END
